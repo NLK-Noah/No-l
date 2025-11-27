@@ -9,28 +9,10 @@ body {
   overflow: hidden;
 }
 
-/* --- GUIRLANDE HAUT FIABLE --- */
-.guirlande-bar {
-  position: fixed;
-  top: -10px;
-  left: -10px;
-  width: 100%;
-  height: 110px; /* hauteur ajustable */
-  
-  background-image: url("gui.png");
-  background-repeat: repeat-x;
-
-  /* ❗️ clé pour rapprocher la guirlande */
-  background-size: 110px 100%;  
-  /* tu peux tester 250px, 200px ou 350px selon le rendu voulu */
-
-  background-position: top center;
-  z-index: 999;
-}
 
 /* --- ESPACE AUTOMATIQUE POUR NE PAS QUE LE TEXTE MONTE DESSUS --- */
 .header-space {
-  height: 140px; /* ajuste selon la hauteur réelle de ton PNG */
+  height: 80px; /* ajuste selon la hauteur réelle de ton PNG */
 }
 
 /* --- BLOC DE LOGIN --- */
@@ -111,6 +93,16 @@ button:active {
 /* --- RESPONSIVE --- */
 @media (max-width: 480px) {
     img#logo {
-        width: 450px;
+        width: 400px;
+    }
+    
+    button{
+      width: 100%;
+      margin-right: 40px;
+    }
+    
+    #username{
+      width: 100%;
+      margin-right: 40px;
     }
 }
