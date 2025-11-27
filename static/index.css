@@ -3,7 +3,7 @@ body {
   padding: 0;
   text-align: center;
   background-color: #830303;
-  font-family: sans-serif;
+  font-family: 'Chango', sans-serif;
   position: relative;
   overflow-x: hidden;
 }
@@ -86,6 +86,7 @@ button {
   border: 5px solid #000;
   border-radius: 100px;
 
+  font-family: 'Chango', sans-serif;
   font-size: 1.3rem;
   color: #DAA520;
   font-weight: 700;

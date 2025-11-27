@@ -1,0 +1,51 @@
+/* Corps de la page */
+body {
+margin: 0;
+padding: 0;
+text-align: center;
+background-color: #830303; /* fond rouge */
+font-family: 'Chango', sans-serif;
+/* suppression de flex centré pour éviter que la grid soit compressée */
+}
+
+/* Conteneur principal centré */
+.main-container {
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
+}
+
+/* Conteneur des boutons */
+.button-container {
+display: grid;
+grid-template-columns: 150px 150px; /* 2 colonnes fixes */
+gap: 30px;
+justify-content: center; /* centre la grid horizontalement */
+}
+
+/* Chaque bouton */
+.button-item {
+text-align: center;
+}
+
+/* Texte au-dessus du bouton */
+.button-item p {
+margin-bottom: 10px;
+font-size: 23px;
+color: #DAA520; /* texte blanc pour contraster sur fond rouge */
+}
+
+/* Image du bouton */
+.button-item img {
+width: 150px;
+height: 150px;
+cursor: pointer;
+border-radius: 10px;
+transition: transform 0.2s;
+}
+
+/* Hover sur l'image */
+.button-item img:hover {
+transform: scale(1.1);
+}
