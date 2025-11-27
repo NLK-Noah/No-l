@@ -1,33 +1,33 @@
 <!DOCTYPE html>
 <html>
 <head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <title>Le Festin d'Hiver</title>
-  <!-- Import des  fichiers -->
+
+  <!-- CSS -->
   <link rel="stylesheet" href="static/index.css">
 </head>
+
 <body>
-    <div class="container">
-<img id="logo" src="static/Grinch.png" alt="Le Festin d'Hiver">
-<p>C'est quoi ton prénom ?</p>
-<input type="text" id="username" placeholder="Ton prénom ici" />
-<br />
-<button onclick="enterSite()">Rentre dans la fête !!!</button>
-</div>
 
+  <!-- Guirlande répétée -->
+  <div class="guirlande-bar"></div>
 
-<script>
-function enterSite() {
-const name = document.getElementById('username').value.trim();
-if (!name) {
-alert('Merci d\'entrer un prénom !');
-return;
-}
-localStorage.setItem('username', name);
-window.location.href = 'menu.html';
-}
-</script>
+  <!-- Espace sous la guirlande -->
+  <div class="header-space"></div>
 
+  <!-- Logo -->
+  <img id="logo" src="static/Grinch.png" class="logo" />
 
+  <!-- Formulaire -->
+  <div class="login-container">
+    <p>C'est quoi ton prénom ?</p>
+    <input type="text" id="username" placeholder="Ton prénom ici" />
+    <button onclick="enterSite()">Rentre dans la fête !!!</button>
+  </div>
+
+  <!-- JS -->
+  <script src="static/home.js"></script>
 </body>
 </html>

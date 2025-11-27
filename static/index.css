@@ -1,80 +1,114 @@
 body {
-margin: 0;
-font-family: 'Arial', sans-serif;
-background: #7a0b0b;
-color: white;
-text-align: center;
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  background-color: #830303;
+  font-family: sans-serif;
+  position: relative;
+  overflow-x: hidden;
 }
-.container {
-padding: 1.5rem;
+
+/* --- GUIRLANDE HAUT FIABLE --- */
+.guirlande-bar {
+  position: fixed;
+  top: -10px;
+  left: -10px;
+  width: 100%;
+  height: 110px; /* hauteur ajustable */
+  
+  background-image: url("gui.png");
+  background-repeat: repeat-x;
+
+  /* ❗️ clé pour rapprocher la guirlande */
+  background-size: 110px 100%;  
+  /* tu peux tester 250px, 200px ou 350px selon le rendu voulu */
+
+  background-position: top center;
+  z-index: 999;
 }
-img .logo {
-  width: 80%;
-  max-width: 900px;
+
+/* --- ESPACE AUTOMATIQUE POUR NE PAS QUE LE TEXTE MONTE DESSUS --- */
+.header-space {
+  height: 140px; /* ajuste selon la hauteur réelle de ton PNG */
 }
-input {
-padding: 1rem;
-font-size: 1rem;
-width: 90%;
-max-width: 320px;
-border-radius: 10px;
-border: none;
+
+/* --- BLOC DE LOGIN --- */
+.login-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 auto;
+  margin-top: 1rem;
+  padding: 2rem 1.5rem;
+
+  width: 90%;
+  max-width: 420px;
+
+  text-align: center;
+  gap: 1.5rem;
 }
+
+/* Texte */
+.login-container p {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #DAA520;
+  margin-bottom: 0.5rem;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.25);
+}
+
+/* Input */
+#username {
+  width: 100%;
+  padding: 1rem 1.2rem;
+  margin-left: 40px;
+
+  font-size: 1.2rem;
+  color: #000;
+  border-radius: 100px;
+  border: 5px solid #000;
+
+  background: #D9D9D9 20%;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+}
+
+/* Bouton */
 button {
-margin-top: 1.2rem;
-padding: 0.9rem 1.5rem;
-border: none;
-border-radius: 15px;
-background: #ffcc66;
-font-size: 1rem;
-font-weight: bold;
-cursor: pointer;
-width: 90%;
-max-width: 320px;
+  width: 100%;
+  padding: 1rem 1.3rem;
+  margin-left: 40px;
+
+  background: linear-gradient(135deg, #900, #F900);
+  color: #fff;
+
+  border: 5px solid #000;
+  border-radius: 100px;
+
+  font-size: 1.3rem;
+  color: #DAA520;
+  font-weight: 700;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-/* --------- Mobile optimisé --------- */
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+/* --- RESPONSIVE --- */
 @media (max-width: 480px) {
-img .logo{
-width: 90%;
-max-width: 900px;
-}
-}
-
-/* --------- Tablettes larges (769px à 1024px) --------- */
-@media (min-width: 769px) and (max-width: 1024px) {
-.container {
-padding: 3rem;
-}
-input {
-width: 90%;
-font-size: 1.2rem;
-}
-button {
-width: 60%;
-font-size: 1.2rem;
-}
-img .logo {
-width: 90%;
-max-width: 900px;
-}
-}
-
-
-/* --------- Desktop (1025px et +) --------- */
-@media (min-width: 1025px) {
-.container {
-padding: 4rem;
-}
-input {
-width: 40%;
-font-size: 1.3rem;
-}
-button {
-width: 40%;
-font-size: 1.3rem;
-}
-img .logo {
-width: 85%;
-max-width: 240px;
-}
+    img#logo {
+        width: 450px;
+    }
 }
