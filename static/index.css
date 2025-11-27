@@ -6,6 +6,7 @@ body {
   font-family: 'Chango', sans-serif;
   position: relative;
   overflow-x: hidden;
+  overflow: hidden;
 }
 
 /* --- GUIRLANDE HAUT FIABLE --- */

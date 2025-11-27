@@ -1,0 +1,51 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #830303;
+  font-family: 'Chango', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+img#back{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+}
+
+img#logo{
+  margin-top: 20px;
+  margin: 0 auto;
+  display: flex;
+  width: 200px;
+}
+
+.plat {
+  width: 300px;
+  height: auto;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.plat h2 {
+    font-size: 1.8rem;
+    color: #DAA520;
+    margin-top: 10px;
+}
+
+.plat p {
+    font-size: 1.2rem;
+    color: #000;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding: 0 10px;
+}
+
+@media (max-width: 480px){
+    img#back{
+        margin-top: 20px;
+        width: 100px;
+    }
+}
+    
