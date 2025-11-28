@@ -9,27 +9,10 @@
 
 <!-- CSS -->
 <link rel="stylesheet" href="static/rapporte.css">
-
-<style>
-    /* Style pour le bouton de notification */
-    #notifyButton {
-        padding: 10px 15px;
-        background-color: #e5b800;
-        color: #830303;
-        border: none;
-        border-radius: 5px;
-        font-family: 'Chango', sans-serif;
-        cursor: pointer;
-        margin-bottom: 10px; /* Espace au-dessus de l'input */
-    }
-
-    #notifyButton.hidden {
-        display: none;
-    }
-</style>
-
 </head>
 <body>
+
+
 
 <a href="menu.html">
     <img id="back" src="static/back.png" class="back" />
@@ -38,8 +21,6 @@
 <div class="header-space"></div>
 
 <div id="chat-container">
-    <!-- Nouveau bouton de notification ajouté ici -->
-    <button id="notifyButton">Activer les notifications de messages</button>
 
     <ul id="messages"></ul>
 
@@ -74,73 +55,29 @@ const q = query(messagesRef, orderBy("timestamp", "asc"));
 const messagesList = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
-const notifyButton = document.getElementById("notifyButton"); // Récupération du bouton
 
-const currentUser = localStorage.getItem("username") || "Inconnu";
-
-
-// 🔹 LOGIQUE DE NOTIFICATION 🔹
-
-function handleNotificationPermission(permission) {
-    if (permission === "granted") {
-        console.log("Notification permission granted.");
-        notifyButton.classList.add('hidden'); // Cache le bouton si accepté
-    } else if (permission === "denied") {
-        console.log("Notification permission denied.");
-        notifyButton.classList.remove('hidden'); // Laisse le bouton visible si refusé/bloqué
-    }
-}
-
-// Vérifie l'état actuel au chargement de la page
-if ("Notification" in window) {
-    handleNotificationPermission(Notification.permission);
-    
-    notifyButton.addEventListener("click", () => {
-        Notification.requestPermission().then(handleNotificationPermission);
-    });
-} else {
-    notifyButton.classList.add('hidden'); // Cache le bouton si le navigateur ne supporte pas
-}
-
-// Fonction pour afficher une notification d'un nouveau message
-function showNewMessageNotification(msgSender, msgContent) {
-    // N'envoie pas de notification si c'est l'utilisateur local qui a envoyé le message
-    if (msgSender === currentUser) return; 
-
-    if (Notification.permission === "granted") {
-        new Notification(`Nouveau message de ${msgSender} !`, {
-            body: msgContent,
-            icon: "static/naima.png"
-        });
-    }
-}
-
-
-// 🔹 AFFICHAGE EN TEMPS RÉEL 🔹
+// 🔹 AFFICHAGE EN TEMPS RÉEL
 onSnapshot(q, (snapshot) => {
-    snapshot.docChanges().forEach((change) => {
-        if (change.type === "added") {
-            const msg = change.doc.data();
-            const li = document.createElement("li");
-            li.innerHTML = `<strong>${msg.sender}</strong> : ${msg.content}`;
-            messagesList.appendChild(li);
-
-            // Affiche la notification pour le nouveau message reçu
-            showNewMessageNotification(msg.sender, msg.content);
-        }
+    messagesList.innerHTML = "";
+    snapshot.forEach((doc) => {
+        const msg = doc.data();
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${msg.sender}</strong> : ${msg.content}`;
+        messagesList.appendChild(li);
     });
-    // auto scroll après ajout
+
+    // auto scroll
     messagesList.scrollTop = messagesList.scrollHeight;
 });
 
-
-// 🔹 ENVOYER UN MESSAGE 🔹
+// 🔹 ENVOYER UN MESSAGE
 sendBtn.addEventListener("click", async () => {
+    const sender = localStorage.getItem("username") || "Inconnu";
     const content = input.value.trim();
 
     if (content) {
         await addDoc(messagesRef, {
-            sender: currentUser, // Utilise le nom d'utilisateur local
+            sender: sender,
             content: content,
             timestamp: serverTimestamp()
         });
