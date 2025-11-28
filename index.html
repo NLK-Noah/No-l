@@ -26,10 +26,63 @@
   <div class="login-container">
     <p>C'est quoi ton Prénom ?</p>
     <input type="text" id="username" placeholder="Ton prénom ici" />
-    <button onclick="enterSite()">Rentre dans la fête !!!</button>
+    <button id="username-btn">Rentre dans la fête !!!</button>
   </div>
 
   <!-- JS -->
-  <script src="static/home.js"></script>
+<!-- Script en module -->
+    <script type="module">
+        // Import Firebase
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getFirestore, collection, query, where, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+            authDomain: "santa-secret-3c1f4.firebaseapp.com",
+            projectId: "santa-secret-3c1f4",
+            storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+            messagingSenderId: "238129661360",
+            appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+        };
+
+        // Initialisation Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
+        async function enterSite() {
+            const nameInput = document.getElementById('username');
+            const name = nameInput.value.trim();
+
+            if (!name) {
+                alert("Merci d'entrer un prénom !");
+                return;
+            }
+
+            // Vérifie si le prénom existe dans la collection participants
+            try {
+                const participantsQuery = query(
+                    collection(db, "participants"),
+                    where("name", "==", name)
+                );
+
+                const snapshot = await getDocs(participantsQuery);
+
+                if (snapshot.empty) {
+                    alert("Désolé, tu n'es pas inscrit pour jouer !");
+                    return;
+                }
+
+                // Sinon, tout est bon
+                localStorage.setItem('username', name);
+                window.location.href = 'menu.html';
+            } catch (error) {
+                console.error("Erreur lors de la vérification des participants :", error);
+                alert("Une erreur est survenue. Merci de réessayer.");
+            }
+        }
+
+        document.getElementById("username-btn").addEventListener("click", enterSite);
+    </script>
 </body>
 </html>

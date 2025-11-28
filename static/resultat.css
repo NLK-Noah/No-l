@@ -1,0 +1,75 @@
+body {
+  margin: 0;
+  padding: 0;
+  text-align: center;
+  background-color: #830303;
+  font-family: 'Chango', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+  overflow: hidden;
+}
+
+.coming-soon-regular {
+  font-family: "Coming Soon", cursive;
+  font-weight: 400;
+  font-style: normal;
+}
+
+
+.header-space{
+  height: 40px;
+}
+
+img#logo{
+  margin-top: 20px;
+  margin: 0 auto;
+  display: flex;
+  width: 100px;
+}
+
+
+
+img#back{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+}
+
+.result h2{
+  font-family: 'Chango', sans-serif;
+  color: #DAA520;
+  font-size: 30px;
+}
+
+.result p{
+  font-family: 'Chango', sans-serif;
+  color: #DAA520;
+  font-size: 24px;
+}
+.result p#resultName{
+  font-family: "Coming Soon", cursive;
+  color: #000;
+  font-size: 64px;
+}
+
+img#tr{
+  position: absolute;
+  width: 300px;
+  display: flex;
+  left: 50px;
+}
+
+@media (max-width: 480px){
+
+    button{
+      width: 70%;
+      margin-right: 40px;
+      margin-left: 60px;
+    }
+
+    img#back{
+        margin-top: 20px;
+        width: 100px;
+    }
+}
