@@ -33,7 +33,7 @@
 
 <!-- Script JS -->
 <script type="module">
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove } 
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
@@ -56,30 +56,87 @@ const messagesList = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 
-// 🔹 AFFICHAGE EN TEMPS RÉEL
+const currentUser = localStorage.getItem("username") || "Inconnu";
+
+
+// 🔹 FONCTION LIKE/UNLIKE 🔹
+async function toggleLike(messageId, currentLikesArray) {
+    const messageDocRef = doc(db, "messages", messageId);
+
+    // Vérifie si l'utilisateur a déjà liké
+    if (currentLikesArray.includes(currentUser)) {
+        // Si oui, on retire le like (unlike)
+        await updateDoc(messageDocRef, {
+            likes: arrayRemove(currentUser)
+        });
+    } else {
+        // Si non, on ajoute le like
+        await updateDoc(messageDocRef, {
+            likes: arrayUnion(currentUser)
+        });
+    }
+}
+
+
+// 🔹 AFFICHAGE EN TEMPS RÉEL (MIS À JOUR) 🔹
 onSnapshot(q, (snapshot) => {
-    messagesList.innerHTML = "";
+    // Comme nous utilisons docChanges, nous n'effaçons pas tout le innerHTML
+    // mais nous devons gérer les mises à jour (likes) sur les messages existants.
+    
+    // Une approche simple est de reconstruire la liste pour l'instant
+    // (pour un chat simple, c'est suffisant).
+    messagesList.innerHTML = ""; 
+
     snapshot.forEach((doc) => {
         const msg = doc.data();
         const li = document.createElement("li");
-        li.innerHTML = `<strong>${msg.sender}</strong> : ${msg.content}`;
+        
+        // Initialise likes comme un tableau vide si undefined
+        const likes = msg.likes || []; 
+        const isLiked = likes.includes(currentUser);
+        const likeButtonClass = isLiked ? 'liked' : '';
+        
+        li.innerHTML = `
+            <div>
+                <strong>${msg.sender}</strong> : ${msg.content}
+            </div>
+            <button class="like-btn ${likeButtonClass}" data-id="${doc.id}">
+                ❤️ ${likes.length}
+            </button>
+        `;
         messagesList.appendChild(li);
     });
 
+    // Ajoute les écouteurs d'événements après avoir ajouté les éléments au DOM
+    document.querySelectorAll('.like-btn').forEach(button => {
+        button.addEventListener('click', (e) => {
+            const messageId = e.target.dataset.id;
+            // Trouve le document original dans snapshot pour passer le tableau de likes actuel
+            const currentDoc = snapshot.docs.find(d => d.id === messageId);
+            if (currentDoc) {
+                toggleLike(messageId, currentDoc.data().likes || []);
+            }
+        });
+    });
+    
     // auto scroll
     messagesList.scrollTop = messagesList.scrollHeight;
+
+    // NOTE: showNewMessageNotification() a été déplacée pour ne notifier que les *nouveaux* messages entrants
+    // (voir la prochaine mise à jour pour réintégrer proprement docChanges et notifications)
 });
 
-// 🔹 ENVOYER UN MESSAGE
+
+// 🔹 ENVOYER UN MESSAGE (MIS À JOUR AVEC CHAMP LIKES VIDE) 🔹
 sendBtn.addEventListener("click", async () => {
-    const sender = localStorage.getItem("username") || "Inconnu";
     const content = input.value.trim();
 
     if (content) {
         await addDoc(messagesRef, {
-            sender: sender,
+            sender: currentUser, 
             content: content,
-            timestamp: serverTimestamp()
+            timestamp: serverTimestamp(),
+            likes: [] // Initialise le tableau de likes vide
         });
         input.value = "";
     }
