@@ -12,14 +12,13 @@
 </head>
 <body>
 
-<!-- Espace sous la guirlande -->
-<div class="header-space"></div>
-<div id="snow-container"></div>
+
 
 <a href="menu.html">
     <img id="back" src="static/back.png" class="back" />
-  </a>
-<img id="logo" src="static/pl.png" class="logo" />
+</a>
+
+<div class="header-space"></div>
 
 <div id="chat-container">
 
@@ -33,7 +32,6 @@
 </div>
 
 <!-- Script JS -->
-<script src="static/snow.js"></script>
 <script type="module">
 import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
 from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 

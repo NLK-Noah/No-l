@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" href="static/naima.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+<title>Le Festin d'Hiver</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="static/aup.css">
+</head>
+<body>
+
+
+
+<a href="lpn.html">
+    <img id="back" src="static/back.png" class="back" />
+</a>
+
+<div id="chat-container">
+
+    <ul id="messages"></ul>
+
+    <div id="input-area">
+        <input type="text" id="messageInput" placeholder="Écris un message...">
+        <button id="sendBtn">➤</button>
+    </div>
+</div>
+<!-- Script JS -->
+<script type="module">
+import { getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    addDoc,
+    serverTimestamp,
+    onSnapshot,
+    orderBy  }
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+const firebaseConfig = {
+    apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+    authDomain: "santa-secret-3c1f4.firebaseapp.com",
+    projectId: "santa-secret-3c1f4",
+    storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+    messagingSenderId: "238129661360",
+    appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// L'utilisateur actuel de cette page EST le Père Noël.
+const currentUser = localStorage.getItem("username"); 
+let assignedPlayer = null; // C'est l'autre personne (qui ne doit pas voir "Père Noël" comme expéditeur)
+
+// DOM elements
+const messagesList = document.getElementById('messages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+// 1. Fonction pour récupérer l'autre personne
+async function fetchAssignedPlayer() {
+    const resultsRef = collection(db, "results");
+    // On cherche l'entrée où 'player' (Père Noël) est notre utilisateur actuel
+    const q = query(resultsRef, where("player", "==", currentUser));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        // L'assignedPlayer est la personne 'picked' par le Père Noël
+        assignedPlayer = querySnapshot.docs[0].data().picked;
+        console.log("Talking to:", assignedPlayer);
+        setupChat();
+    } else {
+        console.log("No one picked you yet.");
+    }
+}
+
+// 2. Fonction pour déterminer un ID de chat unique et cohérent
+function getChatId(user1, user2) {
+    return [user1, user2].sort().join('_');
+}
+
+// 3. Fonction principale pour configurer l'écoute et l'envoi de messages
+function setupChat() {
+    if (!currentUser || !assignedPlayer) return;
+
+    const chatId = getChatId(currentUser, assignedPlayer);
+    const messagesRef = collection(db, `chats/${chatId}/messages`);
+    const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+    onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                displayMessage(change.doc.data());
+            }
+        });
+    });
+
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+
+// 4. Fonction pour envoyer un nouveau message
+async function sendMessage() {
+    const content = messageInput.value.trim();
+
+    if (content && currentUser && assignedPlayer) {
+        const chatId = getChatId(currentUser, assignedPlayer);
+        const messagesRef = collection(db, `chats/${chatId}/messages`);
+
+        await addDoc(messagesRef, {
+            sender: currentUser, // Le nom réel de l'utilisateur (Père Noël)
+            receiver: assignedPlayer,
+            content: content,
+            timestamp: serverTimestamp()
+        });
+
+        messageInput.value = '';
+    }
+}
+
+// 5. Fonction pour afficher un message dans l'interface utilisateur (CORRIGÉE)
+function displayMessage(message) {
+    const li = document.createElement('li');
+
+    if (message.sender === currentUser) {
+        // Si c'est NOUS (Père Noël) qui envoyons, on masque le nom de l'expéditeur.
+        li.textContent = `${message.content}`;
+        li.classList.add('my-message'); // Classe CSS pour style bulle droite
+    } else {
+        // Si c'est l'autre personne qui envoie, on affiche son nom (l'autre personne n'est pas le Père Noël)
+        li.textContent = `${message.sender}: ${message.content}`;
+        li.classList.add('other-message'); // Classe CSS pour style bulle gauche
+    }
+
+    messagesList.appendChild(li);
+    messagesList.scrollTop = messagesList.scrollHeight;
+}
+
+// Initialise le processus
+fetchAssignedPlayer();
+</script>
+</body>
+</html>

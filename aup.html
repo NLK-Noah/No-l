@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" href="static/naima.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+<title>Le Festin d'Hiver</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="static/aup.css">
+</head>
+<body>
+
+
+
+<a href="lpn.html">
+    <img id="back" src="static/back.png" class="back" />
+</a>
+
+<div id="chat-container">
+
+    <ul id="messages"></ul>
+
+    <div id="input-area">
+        <input type="text" id="messageInput" placeholder="Écris un message...">
+        <button id="sendBtn">➤</button>
+    </div>
+</div>
+<!-- Script JS -->
+<script type="module">
+import { getFirestore, 
+    collection, 
+    query, 
+    where, 
+    getDocs,
+    addDoc, 
+    serverTimestamp, 
+    onSnapshot, 
+    orderBy  } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"; 
+
+// ... (votre configuration firebaseConfig reste la même) ...
+const firebaseConfig = {
+    apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+    authDomain: "santa-secret-3c1f4.firebaseapp.com",
+    projectId: "santa-secret-3c1f4",
+    storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+    messagingSenderId: "238129661360",
+    appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const currentUser = localStorage.getItem("username"); // C'est l'utilisateur local ('picked')
+let assignedPlayer = null; // C'est la personne qui envoie (le futur "Père Noël")
+
+// DOM elements
+const messagesList = document.getElementById('messages');
+const messageInput = document.getElementById('messageInput');
+const sendBtn = document.getElementById('sendBtn');
+
+// 1. Function to retrieve the assigned player
+async function fetchAssignedPlayer() {
+    const resultsRef = collection(db, "results");
+    const q = query(resultsRef, where("picked", "==", currentUser));
+    const querySnapshot = await getDocs(q);
+
+    if (!querySnapshot.empty) {
+        // Assuming there is only one result per 'picked' user
+        assignedPlayer = querySnapshot.docs[0].data().player;
+        console.log("Assigned player:", assignedPlayer);
+        setupChat(); // Initializes the chat once both users are available
+    } else {
+        console.log("No assigned player found.");
+    }
+}
+
+// 2. Function to determine a unique and consistent chat ID
+function getChatId(user1, user2) {
+    // Creates a consistent chat ID by alphabetically sorting the usernames
+    return [user1, user2].sort().join('_');
+}
+
+// 3. Main function to set up message listening and sending
+function setupChat() {
+    if (!currentUser || !assignedPlayer) return;
+
+    const chatId = getChatId(currentUser, assignedPlayer);
+    const messagesRef = collection(db, `chats/${chatId}/messages`);
+    const q = query(messagesRef, orderBy("timestamp", "asc")); 
+
+    // Listens to messages in real-time (initializes and loads old messages)
+    onSnapshot(q, (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+            if (change.type === "added") {
+                // Adds the new message to the user interface
+                displayMessage(change.doc.data());
+            }
+        });
+    });
+
+    // Message sending management
+    sendBtn.addEventListener('click', sendMessage);
+    messageInput.addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') {
+            sendMessage();
+        }
+    });
+}
+
+// 4. Function to send a new message
+async function sendMessage() {
+    const content = messageInput.value.trim();
+
+    if (content && currentUser && assignedPlayer) {
+        const chatId = getChatId(currentUser, assignedPlayer);
+        const messagesRef = collection(db, `chats/${chatId}/messages`);
+
+        await addDoc(messagesRef, {
+            sender: currentUser, // Who is sending
+            receiver: assignedPlayer, // Who is receiving (for security rules/filtering)
+            content: content,
+            timestamp: serverTimestamp() // Accurate timestamp
+        });
+
+        messageInput.value = ''; // Clears the input field
+    }
+}
+
+// 5. Function to display a message in the user interface (MODIFIÉE)
+function displayMessage(message) {
+    const li = document.createElement('li');
+
+    // Si le message vient de l'utilisateur actuel
+    if (message.sender === currentUser) {
+        li.textContent = `${message.sender}: ${message.content}`;
+        li.classList.add('my-message');
+    } 
+    // Si le message vient de l'autre personne (celle qui doit être nommée "Père Noël")
+    else {
+        li.textContent = `Le Père Noël: ${message.content}`; // <-- Modification ici
+        li.classList.add('other-message');
+    }
+    
+    messagesList.appendChild(li);
+    // Scroll to the bottom to see the last message
+    messagesList.scrollTop = messagesList.scrollHeight;
+}
+
+// Initializes the process
+fetchAssignedPlayer();
+
+</script>
+</body>
+</html>
+
