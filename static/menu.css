@@ -6,6 +6,7 @@ text-align: center;
 background-color: #830303; /* fond rouge */
 font-family: 'Chango', sans-serif;
 /* suppression de flex centré pour éviter que la grid soit compressée */
+overflow: hidden;
 }
 
 /* Conteneur principal centré */
@@ -48,4 +49,10 @@ transition: transform 0.2s;
 /* Hover sur l'image */
 .button-item img:hover {
 transform: scale(1.1);
+}
+
+.footer {
+  color: #DAA520;
+  font-size: 14px;
+
 }

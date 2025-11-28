@@ -1,0 +1,87 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #830303;
+  font-family: 'Chango', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+.header-space{
+  height: 40px;
+}
+
+img#logo{
+  margin-top: 20px;
+  margin: 0 auto;
+  display: flex;
+  width: 100px;
+}
+
+
+
+img#back{
+  position: absolute;
+  width: 150px;
+}
+
+
+.rules h2 {
+    font-size: 1.8rem;
+    color: #DAA520;
+    margin-top: 10px;
+    text-align: center;
+}
+
+.rules p {
+    font-size: 1rem;
+    color: #000;
+    margin-top: 5px;
+    margin-bottom: 15px;
+    padding: 0 10px;
+    text-align: center;
+}
+
+
+/* Bouton */
+button {
+  width: 100%;
+  padding: 1rem 1.3rem;
+  margin-left: 40px;
+
+  background: linear-gradient(135deg, #900, #F900);
+  color: #fff;
+
+  border: 5px solid #000;
+  border-radius: 100px;
+
+  font-family: 'Chango', sans-serif;
+  font-size: 1.3rem;
+  color: #DAA520;
+  font-weight: 700;
+
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+  cursor: pointer;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+}
+
+button:active {
+  transform: translateY(1px);
+  box-shadow: 0 3px 8px rgba(0,0,0,0.25);
+}
+
+
+@media (max-width: 480px){
+
+    button{
+      width: 70%;
+      margin-right: 40px;
+      margin-left: 60px;
+    }
+}
