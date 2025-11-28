@@ -1,0 +1,105 @@
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #830303;
+  font-family: 'Chango', sans-serif;
+  position: relative;
+  overflow-x: hidden;
+}
+
+img#back{
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 150px;
+}
+
+img#logo{
+  margin-top: 20px;
+  margin: 0 auto;
+  display: flex;
+  width: 50px;
+}
+
+/* Conteneur général */
+#chat-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  background: #830303;
+  font-family: 'Chango', sans-serif;
+}
+
+/* Zone de messages */
+#messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+}
+
+/* Chaque message */
+.message {
+  max-width: 70%;
+  padding: 10px 14px;
+  margin-bottom: 12px;
+  border-radius: 15px;
+  font-size: 15px;
+  line-height: 1.4;
+  display: inline-block;
+}
+
+/* Message envoyé par l'utilisateur */
+.me {
+  background: #d1ffd1;
+  margin-left: auto;
+  text-align: right;
+}
+
+/* Message des autres */
+.other {
+  background: white;
+  border: 1px solid #ddd;
+  text-align: left;
+}
+
+/* Nom au-dessus */
+.sender-name {
+  font-size: 12px;
+  margin-bottom: 3px;
+  opacity: 0.7;
+}
+
+/* Zone de saisie */
+#input-area {
+  display: flex;
+  padding: 10px;
+  background: white;
+  border-top: 1px solid #ddd;
+}
+
+/* Input */
+#messageInput {
+  flex: 1;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 20px;
+  border: 1px solid #ccc;
+  outline: none;
+}
+
+/* Bouton envoyer */
+#sendBtn {
+  width: 45px;
+  height: 45px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 50%;
+  background: #025405;
+  color: white;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+#sendBtn:hover {
+  background: #43a047;
+}

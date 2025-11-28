@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<link rel="icon" type="image/png" href="static/naima.png">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="UTF-8">
+<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+<title>Le Festin d'Hiver</title>
+
+<!-- CSS -->
+<link rel="stylesheet" href="static/rapporte.css">
+</head>
+<body>
+
+<!-- Espace sous la guirlande -->
+<div class="header-space"></div>
+
+<a href="menu.html">
+    <img id="back" src="static/back.png" class="back" />
+  </a>
+<img id="logo" src="static/pl.png" class="logo" />
+
+<div id="chat-container">
+
+    <ul id="messages"></ul>
+
+    <div id="input-area">
+        <input type="text" id="messageInput" placeholder="Écris un message...">
+        <button id="sendBtn">➤</button>
+    </div>
+
+</div>
+
+<!-- Script JS -->
+<script type="module">
+import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp } 
+from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+    authDomain: "santa-secret-3c1f4.firebaseapp.com",
+    projectId: "santa-secret-3c1f4",
+    storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+    messagingSenderId: "238129661360",
+    appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const messagesRef = collection(db, "messages");
+const q = query(messagesRef, orderBy("timestamp", "asc"));
+
+const messagesList = document.getElementById("messages");
+const input = document.getElementById("messageInput");
+const sendBtn = document.getElementById("sendBtn");
+
+// 🔹 AFFICHAGE EN TEMPS RÉEL
+onSnapshot(q, (snapshot) => {
+    messagesList.innerHTML = "";
+    snapshot.forEach((doc) => {
+        const msg = doc.data();
+        const li = document.createElement("li");
+        li.innerHTML = `<strong>${msg.sender}</strong> : ${msg.content}`;
+        messagesList.appendChild(li);
+    });
+
+    // auto scroll
+    messagesList.scrollTop = messagesList.scrollHeight;
+});
+
+// 🔹 ENVOYER UN MESSAGE
+sendBtn.addEventListener("click", async () => {
+    const sender = localStorage.getItem("username") || "Inconnu";
+    const content = input.value.trim();
+
+    if (content) {
+        await addDoc(messagesRef, {
+            sender: sender,
+            content: content,
+            timestamp: serverTimestamp()
+        });
+        input.value = "";
+    }
+});
+
+// Touch ENTER
+input.addEventListener("keyup", (e) => {
+    if (e.key === "Enter") sendBtn.click();
+});
+</script>
+
+</body>
+</html>
