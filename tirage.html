@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <link rel="icon" type="image/png" href="static/naima.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tirage Secret Santa</title>
+</head>
+<body>
+  <p>Chargement du tirage…</p>
+
+  <script type="module">
+    import { db } from "./static/firebase-init.js";
+import { collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+async function startTirage() {
+  const username = localStorage.getItem("username");
+
+  // Récupérer tous les participants
+  const participantsSnapshot = await getDocs(collection(db, "participants"));
+  let participants = participantsSnapshot.docs.map(doc => doc.data().name);
+
+  // Récupérer tous les tirages existants
+  const resultsSnapshot = await getDocs(collection(db, "results"));
+  const alreadyPicked = resultsSnapshot.docs.map(doc => doc.data().picked);
+
+  // Filtrer : enlever le joueur actuel + les déjà tirés
+  participants = participants.filter(p => p !== username && !alreadyPicked.includes(p));
+
+  if (participants.length === 0) {
+    alert("Plus aucun participant disponible pour le tirage !");
+    return;
+  }
+
+  // Tirage aléatoire
+  const randomIndex = Math.floor(Math.random() * participants.length);
+  const picked = participants[randomIndex];
+
+  // Enregistrer le résultat
+  await addDoc(collection(db, "results"), {
+    player: username,
+    picked: picked
+  });
+
+  window.location.href = "resultat.html";
+}
+
+startTirage();
+  </script>
+</body>
+</html>

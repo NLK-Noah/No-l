@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <link rel="icon" type="image/png" href="static/naima.png">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Résultat Secret Santa</title>
+  <link rel="stylesheet" href="static/santa.css">
+</head>
+<body>
+
+  <a href="menu.html">
+    <img id="back" src="static/back.png" class="back" />
+  </a>
+
+  <img id="logo" src="static/et.png" class="logo" />
+
+  <div class="result">
+    <h2>Ton tirage</h2>
+    <p>Tu dois offrir un cadeau à :</p>
+    <p id="resultName" class="highlight"></p>
+  </div>
+
+  <script type="module">
+    import { db } from "./static/firebase-init.js";
+    import { collection, query, where, getDocs } 
+      from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+    async function showResult() {
+      const username = localStorage.getItem("username");
+      if (!username) {
+        window.location.href = "index.html";
+        return;
+      }
+
+      // Chercher le tirage correspondant
+      const q = query(collection(db, "results"), where("player", "==", username));
+      const snapshot = await getDocs(q);
+
+      if (snapshot.size === 0) {
+        // Si pas encore tiré → retourner aux règles
+        window.location.href = "santasecret.html";
+        return;
+      }
+
+      const result = snapshot.docs[0].data().picked;
+
+      document.getElementById("resultName").textContent = result;
+    }
+
+    showResult();
+  </script>
+
+</body>
+</html>

@@ -3,7 +3,7 @@ function enterSite() {
     if (!name) {
         alert('Merci d\'entrer un prénom !');
         return;
-}
-localStorage.setItem('username', name);
-window.location.href = 'menu.html';
+    }
+    localStorage.setItem('username', name);
+    window.location.href = 'menu.html'; // pas encore Santa Secret
 }
