@@ -29,7 +29,11 @@
 </div>
 <!-- Script JS -->
 <script type="module">
-import { getFirestore,
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+
+import { 
+    getFirestore,
     collection,
     query,
     where,
@@ -37,9 +41,8 @@ import { getFirestore,
     addDoc,
     serverTimestamp,
     onSnapshot,
-    orderBy  }
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+    orderBy  
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 const firebaseConfig = {
     apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
     authDomain: "santa-secret-3c1f4.firebaseapp.com",

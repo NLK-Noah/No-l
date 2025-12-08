@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <link rel="icon" type="image/png" href="static/naima.png">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+  <title>Le Festin d'Hiver</title>
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="static/bac.css">
+  
+</head>
+
+<body>
+  <!-- Espace sous la guirlande -->
+  <div class="header-space"></div>
+
+  <div id="snow-container"></div>
+     
+
+  <!-- Formulaire -->
+  <div class="login-container">
+    <h1 id="lettre">C</h1>
+    <p>DONNES MOI UN PAYS AVEC CETTE LETTRE</p>
+    <p>Inscrit ta réponse</p>
+    <input type="text" id="réponse" placeholder="Ta réponse ici" />
+    <button id="réponse-btn">Valider</button>
+    <a href="métier.html">
+    <button id="pass">Je passe</button>
+    </a>
+  </div>
+
+  <!-- JS -->
+<!-- Script en module -->
+    <script type="module" src="static/bac.js "></script>
+    <script src="static/snow.js"></script>
+    <script type="module">
+        // Importation des fonctions Firebase nécessaires, y compris addDoc
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+
+
+import { 
+    getFirestore,
+    collection,
+    query,
+    where,
+    getDocs,
+    addDoc,
+    serverTimestamp,
+    onSnapshot,
+    orderBy  
+} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+// Configuration Firebase (Utilisez VOTRE configuration exacte)
+const firebaseConfig = {
+    apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+    authDomain: "santa-secret-3c1f4.firebaseapp.com",
+    projectId: "santa-secret-3c1f4",
+    storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+    messagingSenderId: "238129661360",
+    appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+};
+
+// Initialisation Firebase
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+
+
+// --- 2. Fonction pour SOUMETTRE la réponse de l'utilisateur ---
+async function submitAnswer(paysName) {
+            const username = localStorage.getItem('username');
+
+            if (!username) {
+                alert("Nom d'utilisateur non trouvé.");
+                window.location.href = 'menu.html';
+                return;
+            }
+
+            try {
+                // MODIFICATION ICI: Le champ s'appelle maintenant 'pays'
+                await addDoc(collection(db, "responses"), {
+                    user: username,
+                    pays: paysName, // Sera "None" si la personne passe
+                    timestamp: new Date()
+                });
+
+                // Empêche le retour arrière et redirige vers l'étape suivante
+                window.history.replaceState(null, null, 'métier.html'); 
+                window.location.href = 'métier.html';
+
+            } catch (error) {
+                console.error("Erreur lors de l'enregistrement de la réponse :", error);
+                alert("Une erreur est survenue lors de l'enregistrement.");
+            }
+        }
+
+        // --- 3. Gestionnaires d'événements (Event Listeners) ---
+
+        // Gère le bouton "Valider"
+        document.getElementById("réponse-btn").addEventListener("click", () => {
+            const inputElement = document.getElementById('réponse');
+            const answer = inputElement.value.trim();
+
+            if (answer === "") {
+                alert("Veuillez entrer un pays ou appuyer sur 'Je passe'.");
+                return;
+            }
+            // Notez que nous passons la réponse ici, ce n'est plus un "animalName"
+            submitAnswer(answer); 
+        });
+
+        // Gère le bouton "Je passe"
+        document.getElementById("pass").addEventListener("click", (event) => {
+            event.preventDefault(); // Empêche l'<a> d'aller directement à métier.html
+            submitAnswer("None"); // Enregistre "None" pour le pays
+        });
+    </script>
+</body>
+</html>

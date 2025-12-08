@@ -5,32 +5,29 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
-  <audio src="static/El Paso Del Canguro.mp3" autoplay loop></audio>
   <title>Le Festin d'Hiver</title>
 
   <!-- CSS -->
-  <link rel="stylesheet" href="static/index.css">
+  <link rel="stylesheet" href="static/bac.css">
 </head>
 
 <body>
 
-  <!-- Guirlande répétée -->
-  <div class="guirlande-bar"></div>
-
+    <a href="menu.html">
+        <img id="back" src="static/back.png" class="back" />
+      </a>
   <!-- Espace sous la guirlande -->
   <div class="header-space"></div>
 
   <div id="snow-container"></div>
      
 
-  <!-- Logo -->
-  <img id="logo" src="static/Grinch.png" class="logo" />
-
   <!-- Formulaire -->
   <div class="login-container">
-    <p>Inscrit ton prénom</p>
+    <h1>BAC</h1>
+    <p>Inscrit toi  à la partie</p>
     <input type="text" id="username" placeholder="Ton prénom ici" />
-    <button id="username-btn">Rentre dans la fête !!!</button>
+    <button id="username-btn">Valider</button>
   </div>
 
   <!-- JS -->
@@ -80,7 +77,7 @@
 
                 // Sinon, tout est bon
                 localStorage.setItem('username', name);
-                window.location.href = 'menu.html';
+                window.location.href = 'animal.html';
             } catch (error) {
                 console.error("Erreur lors de la vérification des participants :", error);
                 alert("Une erreur est survenue. Merci de réessayer.");
