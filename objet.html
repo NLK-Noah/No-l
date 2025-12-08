@@ -69,7 +69,7 @@ const db = getFirestore(app);
 
 
 // --- 2. Fonction pour SOUMETTRE la réponse de l'utilisateur ---
-async function submitAnswer(métierName) {
+async function submitAnswer(objetName) {
             const username = localStorage.getItem('username');
 
             if (!username) {
@@ -82,7 +82,7 @@ async function submitAnswer(métierName) {
                 // MODIFICATION ICI: Le champ s'appelle maintenant 'pays'
                 await addDoc(collection(db, "responses"), {
                     user: username,
-                    pays: métierName, // Sera "None" si la personne passe
+                    pays: objetName, // Sera "None" si la personne passe
                     timestamp: new Date()
                 });
 
