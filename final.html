@@ -15,12 +15,70 @@
     <h1>Félécitation voici tes réponses:</h1>
     <li>Animal:</li>
     <p id="animalRep"></p>
+    <li>Pays:</li>
+    <p id="paysRep"></p>
     <li>Objet:</li>
     <p id="objetRep"></p>
     <li>Métier:</li>
     <p id="metierRep"></p>
     <li>Aliment:</li>
     <p id="alimentRep"></p>
-    <button onclick="location.href='menu.html'">Retour au menu</button>
+    <button onclick="location.href='jeux.html'">Retour au menu</button>
+    <script type="module">
+  // --- IMPORT FIREBASE ---
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, collection, query, where, getDocs } 
+    from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  // --- CONFIG FIREBASE (à remplacer par la tienne) ---
+  const firebaseConfig = {
+    apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+    authDomain: "santa-secret-3c1f4.firebaseapp.com",
+    projectId: "santa-secret-3c1f4",
+    storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+    messagingSenderId: "238129661360",
+    appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+  };
+
+  // Init Firebase
+  const app = initializeApp(firebaseConfig);
+  const db = getFirestore(app);
+
+  // 🔥 Récupération du nom dans le localStorage
+  const playerName = localStorage.getItem("username");
+
+
+  if (!playerName) {
+    alert("Aucun joueur trouvé dans le localStorage.");
+  } else {
+    // 🔥 Récupérer le document Firestore correspondant
+    async function getUserReponses() {
+      const q = query(
+        collection(db, "responses"),
+        where("user", "==", playerName)
+      );
+
+      const querySnapshot = await getDocs(q);
+
+      if (querySnapshot.empty) {
+        alert("Aucune réponse trouvée pour " + playerName);
+        return;
+      }
+
+      // Normalement un seul document
+      const doc = querySnapshot.docs[0].data();
+      console.log("Réponses récupérées:", doc);
+
+      // 🔥 Affichage dans la page
+      document.getElementById("animalRep").textContent = doc.animal || "Aucune réponse";
+      document.getElementById("objetRep").textContent = doc.objet || "Aucune réponse";
+      document.getElementById("metierRep").textContent = doc.metier || "Aucune réponse";
+      document.getElementById("alimentRep").textContent = doc.aliment || "Aucune réponse";
+      document.getElementById("paysRep").textContent = doc.pays|| "Aucune réponse";
+    }
+
+    getUserReponses();
+  }
+</script>
 </body>
 </html>

@@ -79,11 +79,9 @@ async function submitAnswer(paysName) {
             }
 
             try {
-                // MODIFICATION ICI: Le champ s'appelle maintenant 'pays'
-                await addDoc(collection(db, "responses"), {
-                    user: username,
-                    pays: paysName, // Sera "None" si la personne passe
-                    timestamp: new Date()
+
+                await updateDoc(doc(db, "responses", userId), {
+                    pays: paysName;
                 });
 
                 // Empêche le retour arrière et redirige vers l'étape suivante
