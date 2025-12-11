@@ -47,9 +47,11 @@ import {
     where,
     getDocs,
     addDoc,
+    updateDoc,
     serverTimestamp,
     onSnapshot,
-    orderBy  
+    orderBy,
+    doc
 } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 // Configuration Firebase (Utilisez VOTRE configuration exacte)
@@ -68,31 +70,48 @@ const db = getFirestore(app);
 
 
 
-// --- 2. Fonction pour SOUMETTRE la réponse de l'utilisateur ---
 async function submitAnswer(paysName) {
-            const username = localStorage.getItem('username');
+    const username = localStorage.getItem('username');
 
-            if (!username) {
-                alert("Nom d'utilisateur non trouvé.");
-                window.location.href = 'menu.html';
-                return;
-            }
+    if (!username) {
+        alert("Nom d'utilisateur non trouvé.");
+        window.location.href = 'menu.html';
+        return;
+    }
 
-            try {
+    try {
+        // 1. Chercher le document du joueur
+        const q = query(
+            collection(db, "responses"),
+            where("user", "==", username)
+        );
+        console.log("coucou")
+        console.log(q);
+        const querySnapshot = await getDocs(q);
 
-                await updateDoc(doc(db, "responses", userId), {
-                    pays: paysName;
-                });
-
-                // Empêche le retour arrière et redirige vers l'étape suivante
-                window.history.replaceState(null, null, 'métier.html'); 
-                window.location.href = 'métier.html';
-
-            } catch (error) {
-                console.error("Erreur lors de l'enregistrement de la réponse :", error);
-                alert("Une erreur est survenue lors de l'enregistrement.");
-            }
+        if (querySnapshot.empty) {
+            console.error("Aucun document trouvé pour ce joueur.");
+            alert("Aucun document 'responses' trouvé pour cet utilisateur.");
+            return;
         }
+
+        // 2. Mettre à jour le document trouvé
+        querySnapshot.forEach(async (document) => {
+            await updateDoc(document.ref, {
+                pays: paysName
+            });
+        });
+
+        // 3. Redirection
+        window.history.replaceState(null, null, 'métier.html');
+        window.location.href = 'métier.html';
+
+    } catch (error) {
+        console.error("Erreur lors de l'enregistrement de la réponse :", error);
+        alert("Une erreur est survenue lors de l'enregistrement.");
+    }
+}
+
 
         // --- 3. Gestionnaires d'événements (Event Listeners) ---
 
