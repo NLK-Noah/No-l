@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <link rel="icon" type="image/png" href="static/naima.png">
+  <link rel="icon" type="image/png" href="static/png/naima.png">
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -9,15 +9,15 @@
 <link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Résultat Secret Santa</title>
-  <link rel="stylesheet" href="static/resultat.css">
+  <link rel="stylesheet" href="static/css/resultat.css">
 </head>
 <body>
   <div id="snow-container"></div>
   <a href="menu.html">
-    <img id="back" src="static/back.png" class="back" />
+    <img id="back" src="static/png/back.png" class="back" />
   </a>
 
-  <img id="logo" src="static/et.png" class="logo" />
+  <img id="logo" src="static/png/et.png" class="logo" />
 
   <div class="result">
     <h2>Ton tirage</h2>
@@ -27,10 +27,10 @@
 
   <a href="https://www.amazon.com.be/b?node=212919107031&pf_rd_p=26857562-04e2-4bc1-b6e2-c1208342ac9d&pf_rd_r=5V042GZ4E57EA2W6VJPJ&ref_=eu_xmas25_mvn">Idée de cadeaux à moins de 15€</a>
 
-  <img id="tr" src="static/tr.png" class="tr" />
+  <img id="tr" src="static/png/tr.png" class="tr" />
 
   <script type="module">
-    import { db } from "./static/firebase-init.js";
+    import { db } from "./static/java/firebase-init.js";
     import { collection, query, where, getDocs } 
       from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
@@ -58,7 +58,7 @@
 
     showResult();
   </script>
-  <script src="static/snow.js"></script>
+  <script src="static/java/snow.js"></script>
 
 </body>
 </html>

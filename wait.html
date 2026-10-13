@@ -144,13 +144,13 @@
             }
         }
     </style>
-    <!-- Assurez-vous que static/snow.js existe et fonctionne -->
-    <script src="static/snow.js" defer></script>
+    <!-- Assurez-vous que static/java/snow.js existe et fonctionne -->
+    <script src="static/java/snow.js" defer></script>
 </head>
 <body>
     <div id="snow-container"></div>
     <a href="menu.html">
-        <img id="back" src="static/back.png" class="back" />
+        <img id="back" src="static/png/back.png" class="back" />
     </a>
     <div class="container">
         <div id="countdown-wrapper">
@@ -211,7 +211,7 @@
             if (Notification.permission === "granted") {
                 new Notification("🎉 C'est le grand jour !", {
                     body: "Les tirages au sort et les discussions avec le Père Noël sont ouverts !",
-                    icon: "static/naima.png" // Assurez-vous que l'icône existe
+                    icon: "static/png/naima.png" // Assurez-vous que l'icône existe
                 });
             }
         }

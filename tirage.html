@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <link rel="icon" type="image/png" href="static/naima.png">
+  <link rel="icon" type="image/png" href="static/png/naima.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Tirage Secret Santa</title>
@@ -10,7 +10,7 @@
   <p>Chargement du tirage…</p>
 
   <script type="module">
-    import { db } from "./static/firebase-init.js";
+    import { db } from "./static/java/firebase-init.js";
 import { collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 async function startTirage() {
