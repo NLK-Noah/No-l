@@ -15,11 +15,24 @@
           min-height: 100vh;
           margin: 0;
           padding: 0;
+          flex-direction: column;
+      }
+      .grinch-title {
+          width: 300px;
+          height: auto;
+          margin-bottom: 20px;
+          filter: drop-shadow(0 0 20px var(--bright-red));
+          z-index: 100;
+          animation: float 3s ease-in-out infinite;
+      }
+      @keyframes float {
+          0%, 100% { transform: translateY(0); }
+          50% { transform: translateY(-20px); }
       }
       .countdown-container {
           text-align: center;
           padding: 30px;
-          background: rgba(0, 0, 0, 0.5);
+          background: rgba(0, 0, 0, 0.6);
           backdrop-filter: blur(15px);
           border: 6px solid var(--gold);
           border-radius: 40px;
@@ -27,18 +40,9 @@
           max-width: 600px;
           color: white;
           font-family: 'Chango', cursive;
-          box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+          box-shadow: 0 20px 50px rgba(0,0,0,0.8);
           position: relative;
           z-index: 100;
-      }
-      .countdown-logo {
-          width: 220px;
-          height: auto;
-          margin-bottom: 20px;
-          filter: drop-shadow(0 0 15px var(--bright-red));
-          display: block;
-          margin-left: auto;
-          margin-right: auto;
       }
       .timer {
           display: flex;
@@ -54,7 +58,7 @@
           min-width: 80px;
       }
       .timer-val {
-          font-size: 3.5rem;
+          font-size: 3rem;
           font-weight: bold;
           color: white;
           text-shadow: 0 0 10px var(--bright-red);
@@ -64,8 +68,28 @@
           color: var(--gold);
           text-transform: uppercase;
       }
-      .entry-btn-wrapper {
+      .login-section {
           margin-top: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 15px;
+      }
+      .login-input {
+          padding: 12px 20px;
+          border-radius: 25px;
+          border: 3px solid var(--gold);
+          background: white;
+          color: #333;
+          font-size: 1.1rem;
+          text-align: center;
+          outline: none;
+          width: 80%;
+          max-width: 300px;
+          font-family: 'Poppins', sans-serif;
+      }
+      .entry-btn-wrapper {
+          margin-top: 10px;
       }
   </style>
 </head>
@@ -73,16 +97,21 @@
     <div class="header-space"></div>
     <div id="snow-container"></div>
 
+    <img src="static/png/Grinch.png" class="grinch-title" alt="Grinch">
+
     <div class="countdown-container">
-        <img src="static/png/Grinch.png" class="countdown-logo" alt="Grinch">
         <div class="timer">
             <div class="timer-item"><span id="days" class="timer-val">00</span><span class="timer-label">Jours</span></div>
             <div class="timer-item"><span id="hours" class="timer-val">00</span><span class="timer-label">Heures</span></div>
             <div class="timer-item"><span id="mins" class="timer-val">00</span><span class="timer-label">Mins</span></div>
             <div class="timer-item"><span id="secs" class="timer-val">00</span><span class="timer-label">Secs</span></div>
         </div>
-        <div class="entry-btn-wrapper">
-            <a href="menu.html" class="btn-noel">Entrer dans la magie ✨</a>
+
+        <div class="login-section">
+            <input type="text" id="usernameInput" class="login-input" placeholder="Ton nom secret...">
+            <div class="entry-btn-wrapper">
+                <a href="#" id="enterBtn" class="btn-noel">Entrer dans la magie ✨</a>
+            </div>
         </div>
     </div>
 
@@ -91,17 +120,13 @@
             const targetDate = new Date('December 24, 2026 00:00:00').getTime();
             const now = new Date().getTime();
             const diff = targetDate - now;
-
             if (diff <= 0) {
-                document.querySelector('.countdown-logo').outerHTML = '<h2 style="color: #ffd700; font-size: 2rem;">🎄 JOYEUX NOËL ! 🎄</h2>';
                 return;
             }
-
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
             const s = Math.floor((diff % (1000 * 60)) / 1000);
-
             document.getElementById('days').innerText = d.toString().padStart(2, '0');
             document.getElementById('hours').innerText = h.toString().padStart(2, '0');
             document.getElementById('mins').innerText = m.toString().padStart(2, '0');
@@ -110,6 +135,20 @@
 
         setInterval(updateCountdown, 1000);
         updateCountdown();
+
+        // Login Logic
+        const enterBtn = document.getElementById('enterBtn');
+        const usernameInput = document.getElementById('usernameInput');
+
+        enterBtn.onclick = () => {
+            const name = usernameInput.value.trim();
+            if (name) {
+                localStorage.setItem("username", name);
+                window.location.href = "menu.html";
+            } else {
+                alert("S'il te plaît, entre ton nom secret ! 🎅");
+            }
+        };
     </script>
     <script src="static/java/theme.js"></script>
     <script src="static/java/effects.js"></script>
