@@ -6,10 +6,18 @@
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
   <title>Le Festin d'Hiver</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+      }
+    }
+  </script>
 
   <!-- CSS -->
   <link rel="stylesheet" href="static/css/menu.css">
-    
+
     <link rel="stylesheet" href="static/css/noel-3d.css">
 
 <link rel="apple-touch-icon" href="static/png/naima.png">
@@ -17,7 +25,7 @@
 <link rel="manifest" href="manifest.json">
 </head>
 
-<body>
+<body style="background: url('static/png/back.jpeg') center center / cover no-repeat fixed !important;">
 
   <!-- Guirlande répétée -->
   <div class="guirlande-bar"></div>
@@ -55,29 +63,28 @@
   </div>
 </div>
 </div>
-  
+
   <div style="text-align:center; margin-bottom: 40px; position: relative; z-index: 100;">
     <p style="font-size: 2rem; color: #ffd700; margin-bottom: 20px;">✨ Nouvelles Activités ✨</p>
     <a href="avent.html" class="btn-noel">📅 Calendrier de l'Avent</a>
     <a href="jeux.html" class="btn-noel">🎮 Jeux de Noël</a>
     <a href="livre_or.html" class="btn-noel">📖 Livre d'Or</a>
     <a href="profile.html" class="btn-noel">👤 Mon Profil</a>
-
-    
   </div>
 
 <div class="footer">
     <p>Contactez Noah en cas de soucis</p>
     <p>© 2025 Le Festin d'Hiver. Tous droits réservés.</p>
-  </div>
+</div>
 
   <!-- JS -->
   <script src="static/java/home.js"></script>
   <script src="static/java/snow.js"></script>
     <script src="static/java/audio.js"></script>
-<script src="static/java/theme.js"></script>
+    <script src="static/java/theme.js"></script>
     <script src="static/java/effects.js"></script>
     <script src="static/java/noel-ui.js"></script>
+    <script type="module" src="static/java/christmas-tree-3d.js"></script>
 <script>
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {

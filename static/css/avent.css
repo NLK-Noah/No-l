@@ -10,9 +10,22 @@ body {
     overflow-x: hidden;
 }
 
+.back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 50px;
+    z-index: 1000;
+}
+
+.back img {
+    width: 100%;
+    display: block;
+}
+
 header {
     text-align: center;
-    padding: 40px 20px;
+    padding: 80px 20px 40px 20px;
 }
 
 h1 {
@@ -129,6 +142,9 @@ h1 {
 }
 
 @media (max-width: 600px) {
+    .back {
+        width: 40px;
+    }
     .calendar-grid {
         grid-template-columns: repeat(4, 1fr);
     }

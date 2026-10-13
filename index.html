@@ -6,6 +6,14 @@
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Chango&display=swap" rel="stylesheet">
   <title>Le Festin d'Hiver</title>
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.150.1/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.150.1/examples/jsm/"
+      }
+    }
+  </script>
   <link rel="stylesheet" href="static/css/noel-3d.css">
   <style>
       body {
@@ -107,7 +115,7 @@
 <link rel="stylesheet" href="static/css/transitions.css">
 <link rel="manifest" href="manifest.json">
 </head>
-<body style="background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;">
+<body style="background: url('static/png/back.jpeg') center center / cover no-repeat fixed !important;">
     <div id="snow-container"></div>
 
     <img src="static/png/Grinch.png" class="grinch-title" alt="Grinch">
@@ -160,9 +168,10 @@
         };
     </script>
     <script src="static/java/audio.js"></script>
-<script src="static/java/theme.js"></script>
-    <script src="static///java/effects.js"></script>
+    <script src="static/java/theme.js"></script>
+    <script src="static/java/effects.js"></script>
     <script src="static/java/noel-ui.js"></script>
-<script src="static/java/transitions.js"></script>
+    <script type="module" src="static/java/christmas-tree-3d.js"></script>
+    <script src="static/java/transitions.js"></script>
 </body>
 </html>
