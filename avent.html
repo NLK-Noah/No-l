@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calendrier de l'Avent 2026</title>
+    <link rel="icon" type="image/png" href="static/png/naima.png">
+    <link rel="stylesheet" href="static/css/avent.css">
+</head>
+<body>
+    <div class="snow-bg"></div>
+
+    <header>
+        <h1>🎄 Mon Calendrier de l'Avent 🎄</h1>
+        <p>Clique sur la case du jour pour découvrir ta surprise !</p>
+    </header>
+
+    <div class="calendar-grid" id="calendar">
+        <!-- Les 24 cases seront générées par JavaScript -->
+    </div>
+
+    <!-- Modal pour la surprise -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close-button">&times;</span>
+            <div id="surprise-content"></div>
+        </div>
+    </div>
+
+    <script src="static/java/avent.js"></script>
+    <script src="static/java/snow.js"></script>
+</body>
+</html>
