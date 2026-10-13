@@ -13,12 +13,12 @@ body {
     font-family: 'Comic Sans MS', 'Arial', sans-serif;
     margin: 0;
     min-height: 100vh;
-    overflow-x: hidden; /* Empêche le scroll horizontal */
-    overflow-y: auto;    /* Permet le scroll vertical */
+    overflow-x: hidden;
+    overflow-y: auto;
     position: relative;
 }
 
-/* Guirlandes - Fixed pour rester en haut/bas pendant le scroll */
+/* Guirlandes - Kept as they are festive and not "ice" */
 .guirlande {
     position: fixed;
     left: 0;
@@ -48,20 +48,6 @@ body {
     to { opacity: 1; transform: scale(1.1); }
 }
 
-/* Sol Enneigé - Fixed pour rester en bas */
-.snow-floor {
-    position: fixed;
-    bottom: -30px;
-    left: 0;
-    width: 100%;
-    height: 100px;
-    background: white;
-    border-radius: 50% 50% 0 0;
-    box-shadow: 0 -10px 30px rgba(255,255,255,0.8);
-    z-index: 1;
-    pointer-events: none;
-}
-
 /* Scène Parallaxe */
 .noel-scene {
     position: fixed;
@@ -83,16 +69,15 @@ body {
 .scene-element {
     position: absolute;
     filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
-    transition: width 0.3s ease, height 0.3s ease;
 }
 
-/* UI - Centrage et scroll */
+/* UI RESPONSIVE */
 .main-container {
     position: relative;
     z-index: 100;
     width: 90%;
     max-width: 1200px;
-    margin: 80px auto; /* Espace pour les guirlandes */
+    margin: 80px auto;
     padding: 20px 0;
     box-sizing: border-box;
 }
@@ -129,6 +114,10 @@ body {
     max-width: 120px;
     height: auto;
     transition: transform 0.3s;
+}
+
+.button-item img:hover {
+    transform: scale(1.1);
 }
 
 .btn-noel {
@@ -173,28 +162,22 @@ h1 {
     z-index: 100;
 }
 
-/* MEDIA QUERIES - OPTIMISATION MOBILE */
 @media (max-width: 768px) {
     .main-container {
         margin: 60px auto;
         width: 95%;
     }
-
     .button-container {
-        grid-template-columns: 1fr; /* Force une colonne sur mobile */
+        grid-template-columns: 1fr;
     }
-
     .container-3d {
         padding: 20px 10px;
     }
-
     .btn-noel {
         font-size: 1rem;
         width: 90%;
     }
-
-    /* DIMINUTION DE LA FORÊT SUR PETITS ÉCRANS */
     .scene-element {
-        width: 80px !important; /* Sapins beaucoup plus petits */
+        width: 80px !important;
     }
 }
