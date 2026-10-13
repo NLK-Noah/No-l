@@ -1,42 +1,136 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<link rel="icon" type="image/png" href="static/png/naima.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
-<title>Le Festin d'Hiver</title>
-
-<!-- CSS -->
-<link rel="stylesheet" href="static/css/rapporte.css">
-    
-    <link rel="stylesheet" href="static/css/noel-3d.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Rapport du Menu - Le Festin d'Hiver</title>
+<link rel="stylesheet" href="static/css/noel-3d.css">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;
+        font-family: 'Comic Sans MS', 'Arial', sans-serif;
+        overflow-x: hidden;
+    }
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100vw;
+        position: relative;
+        z-index: 100;
+    }
+    .messages-area {
+        flex: 1;
+        padding: 80px 20px 100px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+    .msg {
+        max-width: 85%;
+        padding: 12px 18px;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border: 2px solid var(--gold);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 10px;
+    }
+    .msg-me {
+        align-self: flex-end;
+        background: linear-gradient(135deg, var(--bright-red), var(--dark-red));
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+    .msg-them {
+        align-self: flex-start;
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 2px;
+    }
+    .like-btn {
+        background: none;
+        border: 1px solid var(--gold);
+        border-radius: 10px;
+        padding: 2px 8px;
+        cursor: pointer;
+        font-size: 0.9rem;
+        transition: all 0.2s;
+        color: inherit;
+    }
+    .like-btn.liked {
+        background: var(--gold);
+        color: var(--dark-red);
+    }
+    .input-bar {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 600px;
+        display: flex;
+        gap: 10px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 10px;
+        border-radius: 50px;
+        border: 3px solid var(--gold);
+        z-index: 1000;
+    }
+    .input-bar input {
+        flex: 1;
+        padding: 12px 20px;
+        border-radius: 25px;
+        border: none;
+        background: white;
+        color: #333;
+        font-size: 1rem;
+        outline: none;
+    }
+    .input-bar button {
+        background: var(--gold);
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: var(--dark-red);
+        box-shadow: 0 4px 0 #b8860b;
+    }
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        width: 50px;
+    }
+</style>
 </head>
 <body>
 
-
-
-<a href="menu.html">
-    <img id="back" src="static/png/back.png" class="back" />
+<a href="menu.html" class="back-btn">
+    <img src="static/png/back.png" style="width: 100%" alt="Retour">
 </a>
 
-<div class="header-space"></div>
-
-<div id="chat-container">
-
-    <ul id="messages"></ul>
-
-    <div id="input-area">
-        <input type="text" id="messageInput" placeholder="Écris un message...">
+<div class="chat-container">
+    <div class="messages-area" id="messages"></div>
+    <div class="input-bar">
+        <input type="text" id="messageInput" placeholder="Propose un plat pour le menu...">
         <button id="sendBtn">➤</button>
     </div>
-
 </div>
 
-<!-- Script JS -->
 <script type="module">
-import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove } 
-from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
+import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 
 const firebaseConfig = {
@@ -53,105 +147,66 @@ const db = getFirestore(app);
 
 const messagesRef = collection(db, "messages");
 const q = query(messagesRef, orderBy("timestamp", "asc"));
-
 const messagesList = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
-
 const currentUser = localStorage.getItem("username") || "Inconnu";
 
-
-// 🔹 FONCTION LIKE/UNLIKE 🔹
 async function toggleLike(messageId, currentLikesArray) {
     const messageDocRef = doc(db, "messages", messageId);
-
-    // Vérifie si l'utilisateur a déjà liké
     if (currentLikesArray.includes(currentUser)) {
-        // Si oui, on retire le like (unlike)
-        await updateDoc(messageDocRef, {
-            likes: arrayRemove(currentUser)
-        });
+        await updateDoc(messageDocRef, { likes: arrayRemove(currentUser) });
     } else {
-        // Si non, on ajoute le like
-        await updateDoc(messageDocRef, {
-            likes: arrayUnion(currentUser)
-        });
+        await updateDoc(messageDocRef, { likes: arrayUnion(currentUser) });
     }
 }
 
-
-// 🔹 AFFICHAGE EN TEMPS RÉEL (MIS À JOUR) 🔹
 onSnapshot(q, (snapshot) => {
-    // Comme nous utilisons docChanges, nous n'effaçons pas tout le innerHTML
-    // mais nous devons gérer les mises à jour (likes) sur les messages existants.
-    
-    // Une approche simple est de reconstruire la liste pour l'instant
-    // (pour un chat simple, c'est suffisant).
     messagesList.innerHTML = ""; 
-
     snapshot.forEach((doc) => {
         const msg = doc.data();
-        const li = document.createElement("li");
+        const li = document.createElement("div");
+        li.className = 'msg ' + (msg.sender === currentUser ? 'msg-me' : 'msg-them');
         
-        // Initialise likes comme un tableau vide si undefined
-        const likes = msg.likes || []; 
+        const likes = msg.likes || [];
         const isLiked = likes.includes(currentUser);
-        const likeButtonClass = isLiked ? 'liked' : '';
         
         li.innerHTML = `
-            <div>
-                <strong>${msg.sender}</strong> : ${msg.content}
-            </div>
-            <button class="like-btn ${likeButtonClass}" data-id="${doc.id}">
+            <span><strong>${msg.sender}</strong>: ${msg.content}</span>
+            <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${doc.id}">
                 ❤️ ${likes.length}
             </button>
         `;
         messagesList.appendChild(li);
     });
 
-    // Ajoute les écouteurs d'événements après avoir ajouté les éléments au DOM
     document.querySelectorAll('.like-btn').forEach(button => {
-        button.addEventListener('click', (e) => {
-            const messageId = e.target.dataset.id;
-            // Trouve le document original dans snapshot pour passer le tableau de likes actuel
-            const currentDoc = snapshot.docs.find(d => d.id === messageId);
-            if (currentDoc) {
-                toggleLike(messageId, currentDoc.data().likes || []);
-            }
-        });
+        button.onclick = (e) => {
+            const id = e.target.dataset.id;
+            const docData = snapshot.docs.find(d => d.id === id);
+            if (docData) toggleLike(id, docData.data().likes || []);
+        };
     });
-    
-    // auto scroll
     messagesList.scrollTop = messagesList.scrollHeight;
-
-    // NOTE: showNewMessageNotification() a été déplacée pour ne notifier que les *nouveaux* messages entrants
-    // (voir la prochaine mise à jour pour réintégrer proprement docChanges et notifications)
 });
 
-
-// 🔹 ENVOYER UN MESSAGE (MIS À JOUR AVEC CHAMP LIKES VIDE) 🔹
-sendBtn.addEventListener("click", async () => {
+sendBtn.onclick = async () => {
     const content = input.value.trim();
-
     if (content) {
         await addDoc(messagesRef, {
-            sender: currentUser, 
+            sender: currentUser,
             content: content,
             timestamp: serverTimestamp(),
-            likes: [] // Initialise le tableau de likes vide
+            likes: []
         });
         input.value = "";
     }
-});
+};
 
-// Touch ENTER
-input.addEventListener("keyup", (e) => {
-    if (e.key === "Enter") sendBtn.click();
-});
+input.onkeyup = (e) => { if (e.key === "Enter") sendBtn.click(); };
 </script>
-
-    <script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
-    <script src="static/java/noel-ui.js"></script>
+<script src="static/java/theme.js"></script>
+<script src="static/java/effects.js"></script>
+<script src="static/java/noel-ui.js"></script>
 </body>
 </html>
