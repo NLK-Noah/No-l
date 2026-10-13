@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <link rel="icon" type="image/png" href="static/png/naima.png">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta charset="UTF-8">
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&family=Chango&display=swap" rel="stylesheet">
   <title>Le Festin d'Hiver</title>
@@ -12,36 +12,38 @@
           display: flex;
           justify-content: center;
           align-items: center;
-          min-height: 100vh;
+          height: 100vh;
           margin: 0;
-          padding: 20px;
+          padding: 0;
           flex-direction: column;
           box-sizing: border-box;
+          overflow: hidden; /* Supprime tout scroll */
       }
       .grinch-title {
-          width: clamp(200px, 60vw, 450px);
+          width: clamp(180px, 50vw, 400px);
           height: auto;
-          margin-bottom: 20px;
+          margin-bottom: 10px;
           filter: drop-shadow(0 0 20px var(--bright-red));
           z-index: 100;
           animation: float 3s ease-in-out infinite;
           display: block;
           margin-left: auto;
           margin-right: auto;
+          flex-shrink: 0;
       }
       @keyframes float {
           0%, 100% { transform: translateY(0); }
-          50% { transform: translateY(-20px); }
+          50% { transform: translateY(-15px); }
       }
       .countdown-container {
           text-align: center;
-          padding: 30px 20px;
+          padding: 20px;
           background: rgba(0, 0, 0, 0.6);
           backdrop-filter: blur(15px);
           border: 6px solid var(--gold);
           border-radius: 40px;
-          width: 100%;
-          max-width: 600px;
+          width: 90%;
+          max-width: 550px;
           color: white;
           font-family: 'Chango', cursive;
           box-shadow: 0 20px 50px rgba(0,0,0,0.8);
@@ -54,49 +56,49 @@
           justify-content: center;
           gap: 10px;
           flex-wrap: wrap;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
       }
       .timer-item {
           display: flex;
           flex-direction: column;
           align-items: center;
-          min-width: 70px;
+          min-width: 60px;
       }
       .timer-val {
-          font-size: clamp(2rem, 8vw, 3.5rem);
+          font-size: clamp(1.8rem, 6vw, 3rem);
           font-weight: bold;
           color: white;
           text-shadow: 0 0 10px var(--bright-red);
       }
       .timer-label {
-          font-size: 0.8rem;
+          font-size: 0.7rem;
           color: var(--gold);
           text-transform: uppercase;
       }
       .login-section {
-          margin-top: 20px;
+          margin-top: 10px;
           display: flex;
           flex-direction: column;
           align-items: center;
-          gap: 15px;
+          gap: 10px;
           width: 100%;
       }
       .login-input {
-          padding: 12px 20px;
+          padding: 10px 20px;
           border-radius: 25px;
           border: 3px solid var(--gold);
           background: white;
           color: #333;
-          font-size: 1.1rem;
+          font-size: 1rem;
           text-align: center;
           outline: none;
           width: 100%;
-          max-width: 300px;
+          max-width: 280px;
           font-family: 'Poppins', sans-serif;
           box-sizing: border-box;
       }
       .entry-btn-wrapper {
-          margin-top: 10px;
+          margin-top: 5px;
           width: 100%;
           display: flex;
           justify-content: center;
@@ -104,7 +106,6 @@
   </style>
 </head>
 <body style="background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;">
-    <div class="header-space"></div>
     <div id="snow-container"></div>
 
     <img src="static/png/Grinch.png" class="grinch-title" alt="Grinch">
@@ -130,9 +131,7 @@
             const targetDate = new Date('December 24, 2026 00:00:00').getTime();
             const now = new Date().getTime();
             const diff = targetDate - now;
-            if (diff <= 0) {
-                return;
-            }
+            if (diff <= 0) return;
             const d = Math.floor(diff / (1000 * 60 * 60 * 24));
             const h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
             const m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
@@ -142,7 +141,6 @@
             document.getElementById('mins').innerText = m.toString().padStart(2, '0');
             document.getElementById('secs').innerText = s.toString().padStart(2, '0');
         }
-
         setInterval(updateCountdown, 1000);
         updateCountdown();
 
@@ -160,7 +158,7 @@
         };
     </script>
     <script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
+    <script src="static///java/effects.js"></script>
     <script src="static/java/noel-ui.js"></script>
 </body>
 </html>
