@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="static/css/menu.css">
     <link rel="stylesheet" href="static/css/global-effects.css">
     <link rel="stylesheet" href="static/css/noel-3d.css">
+<link rel="manifest" href="manifest.json">
 </head>
 
 <body>
@@ -70,5 +71,12 @@
     <script src="static/java/theme.js"></script>
     <script src="static/java/effects.js"></script>
     <script src="static/java/noel-ui.js"></script>
+<script>
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", () => {
+      navigator.serviceWorker.register("/static/java/sw.js").then(reg => console.log("SW registered!")).catch(err => console.log("SW failed", err));
+    });
+  }
+</script>
 </body>
 </html>

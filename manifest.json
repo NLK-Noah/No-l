@@ -1,0 +1,20 @@
+{
+  "name": "Le Festin d'Hiver 2026",
+  "short_name": "Noël 2026",
+  "start_url": "/menu.html",
+  "display": "standalone",
+  "background_color": "#052210",
+  "theme_color": "#ff0000",
+  "icons": [
+    {
+      "src": "static/png/naima.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "static/png/naima.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

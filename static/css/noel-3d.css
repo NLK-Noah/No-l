@@ -2,67 +2,67 @@
     --gold: #ffd700;
     --dark-red: #8b0000;
     --bright-red: #ff0000;
-    --snow-white: #f0f8ff;
-    --forest-green: #052210;
+    --snow-white: #ffffff;
+    --forest-green: #0a3d1c;
+    --sky-blue: #051e3a;
 }
 
 body {
-    background: radial-gradient(circle at center, #1a472a 0%, #052210 100%);
+    background: linear-gradient(to bottom, var(--sky-blue) 0%, var(--forest-green) 100%);
     color: white;
     font-family: 'Comic Sans MS', 'Arial', sans-serif;
     margin: 0;
     min-height: 100vh;
-    overflow-x: hidden;
+    overflow-x: hidden; /* Empêche le scroll horizontal */
+    overflow-y: auto;    /* Permet le scroll vertical */
     position: relative;
 }
 
+/* Guirlandes - Fixed pour rester en haut/bas pendant le scroll */
 .guirlande {
     position: fixed;
     left: 0;
     width: 100%;
-    height: 60px;
+    height: 40px;
     background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 20"><path d="M0 10 Q 25 0, 50 10 T 100 10" stroke="green" fill="none" stroke-width="2"/></svg>');
     background-repeat: repeat-x;
-    background-size: 100px 20px;
+    background-size: 50px 20px;
     z-index: 10000;
     display: flex;
     justify-content: space-around;
     pointer-events: none;
 }
-
 .guirlande-top { top: 0; }
 .guirlande-bottom { bottom: 0; transform: rotate(180deg); }
-
 .bulbe {
-    width: 15px;
-    height: 20px;
-    border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
-    position: relative;
+    width: 10px;
+    height: 15px;
+    border-radius: 50%;
     animation: clignoter 0.5s infinite alternate;
 }
-
-.bulbe:nth-child(odd) { background: var(--bright-red); box-shadow: 0 0 15px var(--bright-red); }
-.bulbe:nth-child(even) { background: var(--gold); box-shadow: 0 0 15px var(--gold); animation-delay: 0.25s; }
+.bulbe:nth-child(odd) { background: var(--bright-red); box-shadow: 0 0 10px var(--bright-red); }
+.bulbe:nth-child(even) { background: var(--gold); box-shadow: 0 0 10px var(--gold); animation-delay: 0.25s; }
 
 @keyframes clignoter {
     from { opacity: 0.5; transform: scale(0.9); }
     to { opacity: 1; transform: scale(1.1); }
 }
 
-h1 {
-    font-size: 4rem;
-    color: var(--bright-red);
-    text-transform: uppercase;
-    text-align: center;
-    display: inline-block;
-    text-shadow: 0 1px 0 #ccc, 0 2px 0 #c9c9c9, 0 3px 0 #bbb, 0 4px 0 #b9b9b9, 0 5px 0 #aaa, 0 6px 1px rgba(0,0,0,.1), 0 0 5px rgba(0,0,0,.1), 0 1px 3px rgba(0,0,0,.3), 0 3px 5px rgba(0,0,0,.2), 0 5px 10px rgba(0,0,0,.25), 0 10px 10px rgba(0,0,0,.2), 0 20px 20px rgba(0,0,0,.15);
-    transform: rotateX(10deg);
-    transition: transform 0.3s;
-    cursor: pointer;
+/* Sol Enneigé - Fixed pour rester en bas */
+.snow-floor {
+    position: fixed;
+    bottom: -30px;
+    left: 0;
+    width: 100%;
+    height: 100px;
+    background: white;
+    border-radius: 50% 50% 0 0;
+    box-shadow: 0 -10px 30px rgba(255,255,255,0.8);
+    z-index: 1;
+    pointer-events: none;
 }
 
-h1:hover { transform: rotateX(0deg) scale(1.1); }
-
+/* Scène Parallaxe */
 .noel-scene {
     position: fixed;
     top: 0;
@@ -70,58 +70,65 @@ h1:hover { transform: rotateX(0deg) scale(1.1); }
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 0;
-    overflow: hidden;
+    z-index: 2;
+}
+
+.parallax-layer {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.1s ease-out;
 }
 
 .scene-element {
     position: absolute;
-    filter: drop-shadow(0 15px 20px rgba(0,0,0,0.7));
-    transition: transform 0.3s ease;
+    filter: drop-shadow(0 10px 10px rgba(0,0,0,0.5));
+    transition: width 0.3s ease, height 0.3s ease;
 }
 
-.sapin {
-    bottom: 10%;
-    right: 5%;
-    width: 350px;
-    animation: sway 4s ease-in-out infinite;
-}
-
-.chalet {
-    bottom: 10%;
-    left: 5%;
-    width: 400px;
-}
-
-.pere-noel {
-    bottom: 15%;
-    left: 40%;
-    width: 200px;
-    animation: bob 3s ease-in-out infinite;
-}
-
-@keyframes sway {
-    0%, 100% { transform: rotate(-3deg); }
-    50% { transform: rotate(3deg); }
-}
-
-@keyframes bob {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-30px); }
+/* UI - Centrage et scroll */
+.main-container {
+    position: relative;
+    z-index: 100;
+    width: 90%;
+    max-width: 1200px;
+    margin: 80px auto; /* Espace pour les guirlandes */
+    padding: 20px 0;
+    box-sizing: border-box;
 }
 
 .container-3d {
     background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
-    border: 5px solid var(--gold);
+    backdrop-filter: blur(15px);
+    border: 6px solid var(--gold);
     border-radius: 30px;
-    padding: 30px;
-    width: 80%;
-    max-width: 1000px;
-    margin: 60px auto;
-    box-shadow: 0 20px 50px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,215,0,0.3);
+    padding: 30px 20px;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.5);
     position: relative;
-    z-index: 10;
+    z-index: 100;
+    text-align: center;
+}
+
+.button-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 30px;
+    justify-items: center;
+    width: 100%;
+}
+
+.button-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+}
+
+.button-item img {
+    max-width: 120px;
+    height: auto;
+    transition: transform 0.3s;
 }
 
 .btn-noel {
@@ -129,20 +136,65 @@ h1:hover { transform: rotateX(0deg) scale(1.1); }
     border: 4px solid var(--gold);
     border-radius: 15px;
     color: white;
-    padding: 15px 30px;
-    font-size: 1.5rem;
+    padding: 12px 20px;
+    font-size: 1.2rem;
     font-weight: bold;
     text-transform: uppercase;
     cursor: pointer;
-    box-shadow: 0 8px 0 #600, 0 15px 20px rgba(0,0,0,0.5);
+    box-shadow: 0 6px 0 #600, 0 10px 15px rgba(0,0,0,0.4);
     transition: all 0.1s;
     display: inline-block;
     text-decoration: none;
     margin: 10px;
     text-align: center;
+    width: 80%;
+    max-width: 300px;
 }
 
 .btn-noel:active {
-    box-shadow: 0 2px 0 #600, 0 5px 10px rgba(0,0,0,0.5);
-    transform: translateY(6px);
+    box-shadow: 0 2px 0 #600, 0 5px 10px rgba(0,0,0,0.4);
+    transform: translateY(4px);
+}
+
+h1 {
+    font-size: clamp(2rem, 8vw, 4rem);
+    color: var(--bright-red);
+    text-align: center;
+    text-shadow: 0 5px 0 var(--dark-red), 0 10px 20px rgba(0,0,0,0.5);
+    margin: 20px 0;
+    position: relative;
+    z-index: 101;
+}
+
+.footer {
+    text-align: center;
+    padding: 40px 20px;
+    position: relative;
+    z-index: 100;
+}
+
+/* MEDIA QUERIES - OPTIMISATION MOBILE */
+@media (max-width: 768px) {
+    .main-container {
+        margin: 60px auto;
+        width: 95%;
+    }
+
+    .button-container {
+        grid-template-columns: 1fr; /* Force une colonne sur mobile */
+    }
+
+    .container-3d {
+        padding: 20px 10px;
+    }
+
+    .btn-noel {
+        font-size: 1rem;
+        width: 90%;
+    }
+
+    /* DIMINUTION DE LA FORÊT SUR PETITS ÉCRANS */
+    .scene-element {
+        width: 80px !important; /* Sapins beaucoup plus petits */
+    }
 }
