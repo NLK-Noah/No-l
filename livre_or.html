@@ -125,6 +125,7 @@
           to { opacity: 1; transform: translateX(0); }
       }
   </style>
+<link rel="manifest" href="manifest.json">
 </head>
 <body style="background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;">
     <a href="menu.html" class="back-link">
@@ -149,7 +150,7 @@
     </div>
 
     <script type="module">
-        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"; 
 
         const firebaseConfig = {
@@ -161,7 +162,7 @@
             appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
         };
 
-        const app = initializePApp = initializeApp(firebaseConfig);
+        const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
         const guestbookRef = collection(db, "guestbook");
 
@@ -170,25 +171,28 @@
         const msgInput = document.getElementById('guestMessage');
         const list = document.getElementById('messagesList');
 
-        // Post a message
         postBtn.onclick = async () => {
             const name = nameInput.value.trim();
             const text = msgInput.value.trim();
             if (name && text) {
-                await addDoc(guestbookRef, {
-                    name: name,
-                    text: text,
-                    timestamp: serverTimestamp(),
-                    likes: []
-                });
-                nameInput.value = '';
-                msgInput.value = '';
+                try {
+                    await addDoc(guestbookRef, {
+                        name: name,
+                        text: text,
+                        timestamp: serverTimestamp(),
+                        likes: []
+                    });
+                    nameInput.value = '';
+                    msgInput.value = '';
+                } catch (e) {
+                    console.error("Error adding document: ", e);
+                    alert("Erreur lors de l'envoi. Vérifie tes règles Firestore !");
+                }
             } else {
                 alert("Remplis ton nom et ton message ! 🎅");
             }
         };
 
-        // Load messages in real-time
         const q = query(guestbookRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
             list.innerHTML = '';
@@ -198,7 +202,8 @@
                 const likes = data.likes || [];
                 
                 const div = document.createElement('div');
-                div.className = 'guest-message';
+                div.className = 'guest-//message'; // Fixed class name
+                div.classList.add('guest-message');
                 div.innerHTML = `
                     <div class="guest-info">
                         <h3>${data.name}</h3>
@@ -212,7 +217,6 @@
                 list.appendChild(div);
             });
 
-            // Like logic
             document.querySelectorAll('.like-btn').forEach(btn => {
                 btn.onclick = async (e) => {
                     const id = e.target.dataset.id;
