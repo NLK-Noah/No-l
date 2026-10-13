@@ -10,12 +10,40 @@
     z-index: 100;
 }
 
+/* Effet Parchemin / Papier Cadeau */
+.parchment {
+    background: #f4e4bc; /* Couleur papier ancien */
+    background-image: url('https://www.transparenttextures.com/patterns/paper-fibers.png'); /* Texture papier */
+    color: #5d4037; /* Encre marron foncé */
+    padding: 40px;
+    border-radius: 5px;
+    border: 1px solid #d2b48c;
+    box-shadow: 
+        5px 5px 0px #d2b48c, 
+        10px 10px 20px rgba(0,0,0,0.4);
+    position: relative;
+    max-width: 600px;
+    margin: 0 auto;
+    transform: rotate(-1deg);
+    // Bordure dentelée ou effet papier déchiré via mask ou border-image pourrait être ajouté ici
+}
+
+.parchment::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    border: 2px dashed #8b4513;
+    margin: 10px;
+    pointer-events: none;
+}
+
 .button-item p {
     font-size: 1.8rem;
-    color: var(--gold);
-    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+    color: #8b4513;
+    text-shadow: 1px 1px 1px rgba(0,0,0,0.1);
     margin: 0 0 10px 0;
     font-weight: bold;
+    font-family: 'Comic Sans MS', cursive;
 }
 
 .button-item a {
