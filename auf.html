@@ -1,50 +1,120 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
-<link rel="icon" type="image/png" href="static/png/naima.png">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta charset="UTF-8">
-<link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
-<title>Le Festin d'Hiver</title>
-
-<!-- CSS -->
-<link rel="stylesheet" href="static/css/aup.css">
-    
-    <link rel="stylesheet" href="static/css/noel-3d.css">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chat Secret - Le Festin d'Hiver</title>
+<link rel="stylesheet" href="static/css/noel-3d.css">
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;
+        font-family: 'Comic Sans MS', 'Arial', sans-serif;
+        overflow-x: hidden;
+    }
+    .chat-container {
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        width: 100vw;
+        position: relative;
+        z-index: 100;
+    }
+    .messages-area {
+        flex: 1;
+        padding: 80px 20px 100px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        overflow-y: auto;
+        box-sizing: border-box;
+    }
+    .msg {
+        max-width: 85%;
+        padding: 12px 18px;
+        border-radius: 15px;
+        font-size: 1.1rem;
+        position: relative;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        border: 2px solid var(--gold);
+    }
+    .msg-me {
+        align-self: flex-end;
+        background: linear-gradient(135deg, var(--bright-red), var(--dark-red));
+        color: white;
+        border-bottom-right-radius: 2px;
+    }
+    .msg-them {
+        align-self: flex-start;
+        background: white;
+        color: #333;
+        border-bottom-left-radius: 2px;
+    }
+    .input-bar {
+        position: fixed;
+        bottom: 40px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 90%;
+        max-width: 600px;
+        display: flex;
+        gap: 10px;
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        padding: 10px;
+        border-radius: 50px;
+        border: 3px solid var(--gold);
+        z-index: 1000;
+    }
+    .input-bar input {
+        flex: 1;
+        padding: 12px 20px;
+        border-radius: 25px;
+        border: none;
+        background: white;
+        color: #333;
+        font-size: 1rem;
+        outline: none;
+    }
+    .input-bar button {
+        background: var(--gold);
+        border: none;
+        width: 45px;
+        height: 45px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.2rem;
+        color: var(--dark-red);
+        box-shadow: 0 4px 0 #b8860b;
+    }
+    .back-btn {
+        position: fixed;
+        top: 20px;
+        left: 20px;
+        z-index: 1000;
+        width: 50px;
+    }
+</style>
 </head>
 <body>
 
-
-
-<a href="lpn.html">
-    <img id="back" src="static/png/back.png" class="back" />
+<a href="lpn.html" class="back-btn">
+    <img src="static/png/back.png" style="width: 100%" alt="Retour">
 </a>
 
-<div id="chat-container">
-
-    <ul id="messages"></ul>
-
-    <div id="input-area">
+<div class="chat-container">
+    <div class="messages-area" id="messages"></div>
+    <div class="input-bar">
         <input type="text" id="messageInput" placeholder="Écris un message...">
         <button id="sendBtn">➤</button>
     </div>
 </div>
-<!-- Script JS -->
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"; 
 
-
-import { 
-    getFirestore,
-    collection,
-    query,
-    where,
-    getDocs,
-    addDoc,
-    serverTimestamp,
-    onSnapshot,
-    orderBy  
-} from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 const firebaseConfig = {
     apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
     authDomain: "santa-secret-3c1f4.firebaseapp.com",
@@ -56,104 +126,62 @@ const firebaseConfig = {
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
+const currentUser = localStorage.getItem("username");
+let assignedPlayer = null;
 
-// L'utilisateur actuel de cette page EST le Père Noël.
-const currentUser = localStorage.getItem("username"); 
-let assignedPlayer = null; // C'est l'autre personne (qui ne doit pas voir "Père Noël" comme expéditeur)
-
-// DOM elements
 const messagesList = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
 
-// 1. Fonction pour récupérer l'autre personne
 async function fetchAssignedPlayer() {
     const resultsRef = collection(db, "results");
-    // On cherche l'entrée où 'player' (Père Noël) est notre utilisateur actuel
     const q = query(resultsRef, where("player", "==", currentUser));
     const querySnapshot = await getDocs(q);
-
     if (!querySnapshot.empty) {
-        // L'assignedPlayer est la personne 'picked' par le Père Noël
         assignedPlayer = querySnapshot.docs[0].data().picked;
-        console.log("Talking to:", assignedPlayer);
         setupChat();
-    } else {
-        console.log("No one picked you yet.");
     }
 }
 
-// 2. Fonction pour déterminer un ID de chat unique et cohérent
-function getChatId(user1, user2) {
-    return [user1, user2].sort().join('_');
-}
+function getChatId(u1, u2) { return [u1, u2].sort().join('_'); }
 
-// 3. Fonction principale pour configurer l'écoute et l'envoi de messages
 function setupChat() {
     if (!currentUser || !assignedPlayer) return;
-
     const chatId = getChatId(currentUser, assignedPlayer);
-    const messagesRef = collection(db, `chats/${chatId}/messages`);
-    const q = query(messagesRef, orderBy("timestamp", "asc"));
-
+    const q = query(collection(db, "chats/" + chatId + "/messages"), orderBy("timestamp", "asc")); 
     onSnapshot(q, (snapshot) => {
         snapshot.docChanges().forEach((change) => {
-            if (change.type === "added") {
-                displayMessage(change.doc.data());
-            }
+            if (change.type === "added") displayMessage(change.doc.data());
         });
     });
-
-    sendBtn.addEventListener('click', sendMessage);
-    messageInput.addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') {
-            sendMessage();
-        }
-    });
+    sendBtn.onclick = sendMessage;
 }
 
-// 4. Fonction pour envoyer un nouveau message
 async function sendMessage() {
     const content = messageInput.value.trim();
-
     if (content && currentUser && assignedPlayer) {
         const chatId = getChatId(currentUser, assignedPlayer);
-        const messagesRef = collection(db, `chats/${chatId}/messages`);
-
-        await addDoc(messagesRef, {
-            sender: currentUser, // Le nom réel de l'utilisateur (Père Noël)
-            receiver: assignedPlayer,
+        await addDoc(collection(db, "chats/" + chatId + "/messages"), {
+            sender: currentUser,
             content: content,
             timestamp: serverTimestamp()
         });
-
         messageInput.value = '';
     }
 }
 
-// 5. Fonction pour afficher un message dans l'interface utilisateur (CORRIGÉE)
-function displayMessage(message) {
-    const li = document.createElement('li');
-
-    if (message.sender === currentUser) {
-        // Si c'est NOUS (Père Noël) qui envoyons, on masque le nom de l'expéditeur.
-        li.textContent = `${message.content}`;
-        li.classList.add('my-message'); // Classe CSS pour style bulle droite
-    } else {
-        // Si c'est l'autre personne qui envoie, on affiche son nom (l'autre personne n'est pas le Père Noël)
-        li.textContent = `${message.sender}: ${message.content}`;
-        li.classList.add('other-message'); // Classe CSS pour style bulle gauche
-    }
-
-    messagesList.appendChild(li);
+function displayMessage(msg) {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (msg.sender === currentUser ? 'msg-me' : 'msg-them');
+    div.textContent = msg.content;
+    messagesList.appendChild(div);
     messagesList.scrollTop = messagesList.scrollHeight;
 }
 
-// Initialise le processus
 fetchAssignedPlayer();
 </script>
-    <script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
-    <script src="static/java/noel-ui.js"></script>
+<script src="static/java/theme.js"></script>
+<script src="static/java/effects.js"></script>
+<script src="static/java/noel-ui.js"></script>
 </body>
 </html>
