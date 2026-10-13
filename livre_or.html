@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Livre d'Or - Le Festin d'Hiver</title>
+  <link rel="stylesheet" href="static/css/noel-3d.css">
+  <style>
+      body {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          min-height: 100vh;
+          margin: 0;
+          padding: 20px;
+          box-sizing: border-box;
+      }
+      .guestbook-container {
+          width: 90%;
+          max-width: 700px;
+          background: rgba(0, 0, 0, 0.6);
+          backdrop-filter: blur(15px);
+          border: 6px solid var(--gold);
+          border-radius: 40px;
+          padding: 30px;
+          color: white;
+          font-family: 'Comic Sans MS', 'Arial', sans-serif;
+          box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+          position: relative;
+          z-index: 100;
+          margin-top: 80px;
+      }
+      .guestbook-header {
+          text-align: center;
+          margin-bottom: 30px;
+      }
+      .guestbook-header h1 {
+          font-family: 'Chango', cursive;
+          color: var(--gold);
+          font-size: 2.5rem;
+          text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+          margin: 0;
+      }
+      .post-form {
+          display: flex;
+          flex-direction: column;
+          gap: 15px;
+          margin-bottom: 40px;
+          padding: 20px;
+          background: rgba(255,255,255,0.1);
+          border-radius: 20px;
+          border: 2px solid var(--gold);
+      }
+      .post-form input, .post-form textarea {
+          padding: 12px;
+          border-radius: 10px;
+          border: 2px solid var(--gold);
+          background: white;
+          color: #333;
+          font-family: 'Poppins', sans-serif;
+          outline: none;
+      }
+      .post-form button {
+          background: var(--gold);
+          border: none;
+          padding: 12px;
+          border-radius: 10px;
+          font-weight: bold;
+          cursor: pointer;
+          color: var(--dark-red);
+          text-transform: uppercase;
+      }
+      .messages-list {
+          display: flex;
+          flex-direction: column;
+          gap: 20px;
+      }
+      .guest-message {
+          background: rgba(255,255,255,0.1);
+          padding: 20px;
+          border-radius: 20px;
+          border-left: 5px solid var(--gold);
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          animation: slideIn 0.4s ease-out;
+      }
+      .guest-info h3 {
+          margin: 0;
+          color: var(--gold);
+          font-size: 1.2rem;
+      }
+      .guest-info p {
+          margin: 5px 0 0 0;
+          font-size: 1.1rem;
+          line-height: 1.4;
+      }
+      .like-section {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 5px;
+      }
+      .like-btn {
+          background: none;
+          border: 1px solid var(--gold);
+          color: var(--gold);
+          border-radius: 50%;
+          width: 40px;
+          height: 40px;
+          cursor: pointer;
+          transition: all 0.2s;
+      }
+      .like-btn.liked {
+          background: var(--bright-red);
+          color: white;
+          border-color: var(--bright-red);
+      }
+      .like-count {
+          font-size: 0.8rem;
+          font-weight: bold;
+      }
+      @keyframes slideIn {
+          from { opacity: 0; transform: translateX(-20px); }
+          to { opacity: 1; transform: translateX(0); }
+      }
+  </style>
+</head>
+<body style="background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;">
+    <a href="menu.html" class="back-link">
+        <img id="back" src="static/png/back.png" class="back" alt="Retour" />
+    </a>
+
+    <div class="guestbook-container">
+        <div class="guestbook-header">
+            <h1>📖 Livre d'Or de Noël 📖</h1>
+            <p>Laissez un souvenir ou un message pour la famille !</p>
+        </div>
+
+        <div class="post-form">
+            <input type="text" id="guestName" placeholder="Ton prénom...">
+            <textarea id="guestMessage" rows="3" placeholder="Ton message secret..."></textarea>
+            <button id="postBtn">Publier mon souvenir ✨</button>
+        </div>
+
+        <div class="messages-list" id="messagesList">
+            <!-- Messages will appear here -->
+        </div>
+    </div>
+
+    <script type="module">
+        import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"; 
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+            authDomain: "santa-secret-3c1f4.firebaseapp.com",
+            projectId: "santa-secret-3c1f4",
+            storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+            messagingSenderId: "238129661360",
+            appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+        };
+
+        const app = initializePApp = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const guestbookRef = collection(db, "guestbook");
+
+        const postBtn = document.getElementById('postBtn');
+        const nameInput = document.getElementById('guestName');
+        const msgInput = document.getElementById('guestMessage');
+        const list = document.getElementById('messagesList');
+
+        // Post a message
+        postBtn.onclick = async () => {
+            const name = nameInput.value.trim();
+            const text = msgInput.value.trim();
+            if (name && text) {
+                await addDoc(guestbookRef, {
+                    name: name,
+                    text: text,
+                    timestamp: serverTimestamp(),
+                    likes: []
+                });
+                nameInput.value = '';
+                msgInput.value = '';
+            } else {
+                alert("Remplis ton nom et ton message ! 🎅");
+            }
+        };
+
+        // Load messages in real-time
+        const q = query(guestbookRef, orderBy("timestamp", "desc"));
+        onSnapshot(q, (snapshot) => {
+            list.innerHTML = '';
+            snapshot.forEach(docSnap => {
+                const data = docSnap.data();
+                const id = docSnap.id;
+                const likes = data.likes || [];
+                
+                const div = document.createElement('div');
+                div.className = 'guest-message';
+                div.innerHTML = `
+                    <div class="guest-info">
+                        <h3>${data.name}</h3>
+                        <p>${data.text}</p>
+                    </div>
+                    <div class="like-section">
+                        <button class="like-btn ${likes.includes(localStorage.getItem('username')) ? 'liked' : ''}" data-id="${id}">❤️</button>
+                        <span class="like-count">${likes.length}</span>
+                    </div>
+                `;
+                list.appendChild(div);
+            });
+
+            // Like logic
+            document.querySelectorAll('.like-btn').forEach(btn => {
+                btn.onclick = async (e) => {
+                    const id = e.target.dataset.id;
+                    const docRef = doc(db, "guestbook", id);
+                    const currentLikes = snapshot.docs.find(d => d.id === id).data().likes || [];
+                    const user = localStorage.getItem('username') || 'Anonyme';
+
+                    if (currentLikes.includes(user)) {
+                        await updateDoc(docRef, { likes: arrayRemove(user) });
+                    } else {
+                        await updateDoc(docRef, { likes: arrayUnion(user) });
+                    }
+                };
+            });
+        });
+    </script>
+    <script src="static/java/theme.js"></script>
+    <script src="static/java/effects.js"></script>
+    <script src="static/java/noel-ui.js"></script>
+</body>
+</html>
