@@ -13,24 +13,16 @@ function createGuirlande(position) {
 }
 
 function setupMenuScene() {
-    if (window.location.pathname.includes('menu.html')) {
+    // We use window.location.href to be more robust than pathname
+    if (window.location.href.includes('menu.html')) {
         const scene = document.createElement('div');
         scene.classList.add('noel-scene');
         
-        // On utilise des emojis géants ou des images si elles existent, 
-        // mais pour l'effet immédiat, on crée des éléments visuels stylisés
         scene.innerHTML = `
             <div class="scene-element sapin">🎄</div>
             <div class="scene-element chalet">🏡</div>
             <div class="scene-element pere-noel">🎅</div>
         `;
-        
-        // On stylise les emojis pour qu'ils soient énormes
-        const elements = scene.querySelectorAll('.scene-element');
-        elements.forEach(el => {
-            el.style.fontSize = "200px";
-            el.style.textAlign = "center";
-        });
         
         document.body.appendChild(scene);
     }
