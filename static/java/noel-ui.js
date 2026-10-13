@@ -13,15 +13,15 @@ function createGuirlande(position) {
 }
 
 function setupMenuScene() {
-    // We use window.location.href to be more robust than pathname
     if (window.location.href.includes('menu.html')) {
         const scene = document.createElement('div');
         scene.classList.add('noel-scene');
         
+        // Using high-quality PNG assets instead of emojis
         scene.innerHTML = `
-            <div class="scene-element sapin">🎄</div>
-            <div class="scene-element chalet">🏡</div>
-            <div class="scene-element pere-noel">🎅</div>
+            <img src="static/png/sapin.png" class="scene-element sapin" alt="Sapin">
+            <img src="static/png/back.png" class="scene-element chalet" alt="Chalet">
+            <img src="static/png/naima.png" class="scene-element pere-noel" alt="Pere Noel">
         `;
         
         document.body.appendChild(scene);
