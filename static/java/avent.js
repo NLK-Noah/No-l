@@ -50,7 +50,7 @@ function initCalendar() {
     }
 }
 
-function openDay(day, isLocked) {
+function openDay(day, isLocked) { if(!isLocked) { playSound("bell"); }
     if (isLocked) {
         alert("Patience ! Cette case ne s'ouvre que le " + day + " décembre.");
         return;

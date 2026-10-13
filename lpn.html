@@ -8,6 +8,7 @@
 <title>Lettres Secrètes - Le Festin d'Hiver</title>
 <link rel="stylesheet" href="static/css/lpn.css">
 <link rel="stylesheet" href="static/css/noel-3d.css">
+<link rel="stylesheet" href="static/css/transitions.css">
 </head>
 <body style="background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;">
 
@@ -18,21 +19,23 @@
 <div class="button-item">
     <div class="parchment">
         <p>Contacter mon Santa secret</p>
-        <a href="aup.html">
+        <a href="aup.html" onclick="playSound("paper")">
             <img src="static/png/lettre.png" alt="Lettre Santa">
         </a>
     </div>
     
     <div class="parchment" style="margin-top: 40px; transform: rotate(1deg);">
         <p>Contacter mon lutin secret</p>
-        <a href="auf.html">
+        <a href="auf.html" onclick="playSound("paper")">
             <img src="static/png/file.png" alt="Lettre Lutin">
         </a>
     </div>
 </div>
 
+<script src="static/java/audio.js"></script>
 <script src="static/java/theme.js"></script>
 <script src="static/java/effects.js"></script>
 <script src="static/java/noel-ui.js"></script>
+<script src="static/java/transitions.js"></script>
 </body>
 </html>
