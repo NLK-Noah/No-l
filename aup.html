@@ -30,26 +30,62 @@
         overflow-y: auto;
         box-sizing: border-box;
     }
-    .msg {
+    .msg-wrapper {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
         max-width: 85%;
-        padding: 12px 18px;
+    }
+    .msg-me-wrapper {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    .msg-them-wrapper {
+        align-self: flex-start;
+        flex-direction: row;
+    }
+    .chat-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.4);
+    }
+    .msg {
+        padding: 10px 16px;
         border-radius: 15px;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         position: relative;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         border: 2px solid var(--gold);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        word-break: break-word;
+    }
+    .msg-sender-name {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: var(--gold);
     }
     .msg-me {
-        align-self: flex-end;
         background: linear-gradient(135deg, var(--bright-red), var(--dark-red));
         color: white;
         border-bottom-right-radius: 2px;
     }
+    .msg-me .msg-sender-name {
+        color: #ffd700;
+    }
     .msg-them {
-        align-self: flex-start;
         background: white;
         color: #333;
         border-bottom-left-radius: 2px;
+    }
+    .msg-them .msg-sender-name {
+        color: #8b0000;
     }
     .input-bar {
         position: fixed;

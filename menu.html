@@ -15,10 +15,8 @@
     }
   </script>
 
-  <!-- CSS -->
-  <link rel="stylesheet" href="static/css/menu.css">
-
     <link rel="stylesheet" href="static/css/noel-3d.css">
+    <link rel="stylesheet" href="static/css/menu.css">
 
 <link rel="apple-touch-icon" href="static/png/naima.png">
 <link rel="stylesheet" href="static/css/transitions.css">
@@ -34,38 +32,43 @@
   <div class="header-space"></div>
   <div id="snow-container"></div>
 
+  <!-- Photo de profil en haut à gauche -->
+  <a href="profile.html" class="profile-badge" title="Mon Profil">
+    <img id="menuUserAvatar" src="static/png/naima.png" alt="Photo de profil">
+  </a>
+
 <div class="main-container">
 
 <div class="button-container">
   <div class="button-item">
-  <p style="color: #ffd700; font-weight: bold; font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Menu</p>
-  <a href="men.html">
-    <img src="static/png/mai.png" alt="Menu">
-  </a>
+    <p>Menu</p>
+    <a href="men.html">
+      <img src="static/png/mai.png" alt="Menu">
+    </a>
   </div>
   <div class="button-item">
-    <p style="color: var(--gold); font-weight: bold; font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Secret Santa</p>
+    <p>Secret Santa</p>
     <a href="resultat.html">
-        <img src="static/png/et.png" alt="Button 2">
+      <img src="static/png/et.png" alt="Secret Santa">
     </a>
   </div>
   <div class="button-item">
-    <p style="color: var(--gold); font-weight: bold; font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Lettre au Père Noël</p>
+    <p>Lettre au Père Noël</p>
     <a href="lpn.html">
-    <img src="static/png/cad.png" alt="Button 3">
+      <img src="static/png/cad.png" alt="Lettre au Père Noël">
     </a>
   </div>
   <div class="button-item">
-    <p style="color: var(--gold); font-weight: bold; font-size: 1.5rem; text-shadow: 2px 2px 4px rgba(0,0,0,0.8);">Qu'est ce que je prépare pour le menu ?</p>
+    <p>Discussion</p>
     <a href="rapporte.html">
-    <img src="static/png/pl.png" alt="Button 4">
+      <img src="static/png/pl.png" alt="Qu'est ce que je prépare pour le menu ?">
     </a>
   </div>
 </div>
 </div>
 
-  <div style="text-align:center; margin-bottom: 40px; position: relative; z-index: 100;">
-    <p style="font-size: 2rem; color: #ffd700; margin-bottom: 20px;">✨ Nouvelles Activités ✨</p>
+  <div class="activities-section">
+    <p class="activities-title">✨ Nouvelles Activités ✨</p>
     <a href="avent.html" class="btn-noel">📅 Calendrier de l'Avent</a>
     <a href="jeux.html" class="btn-noel">🎮 Jeux de Noël</a>
     <a href="livre_or.html" class="btn-noel">📖 Livre d'Or</a>
@@ -78,7 +81,6 @@
 </div>
 
   <!-- JS -->
-  <script src="static/java/home.js"></script>
   <script src="static/java/snow.js"></script>
     <script src="static/java/audio.js"></script>
     <script src="static/java/theme.js"></script>
@@ -86,6 +88,13 @@
     <script src="static/java/noel-ui.js"></script>
     <script type="module" src="static/java/christmas-tree-3d.js"></script>
 <script>
+  // Charger la photo de profil en haut à gauche
+  const savedUserAvatar = localStorage.getItem('userAvatar');
+  if (savedUserAvatar) {
+    const avatarEl = document.getElementById('menuUserAvatar');
+    if (avatarEl) avatarEl.src = savedUserAvatar;
+  }
+
   if ("serviceWorker" in navigator) {
     window.addEventListener("load", () => {
       navigator.serviceWorker.register("/static/java/sw.js").then(reg => console.log("SW registered!")).catch(err => console.log("SW failed", err));

@@ -30,11 +30,34 @@
         overflow-y: auto;
         box-sizing: border-box;
     }
-    .msg {
+    .msg-wrapper {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
         max-width: 85%;
-        padding: 12px 18px;
+    }
+    .msg-me-wrapper {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    .msg-them-wrapper {
+        align-self: flex-start;
+        flex-direction: row;
+    }
+    .chat-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.4);
+    }
+    .msg {
+        padding: 10px 14px;
         border-radius: 15px;
-        font-size: 1.1rem;
+        font-size: 1rem;
         position: relative;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         border: 2px solid var(--gold);
@@ -42,15 +65,14 @@
         justify-content: space-between;
         align-items: center;
         gap: 10px;
+        word-break: break-word;
     }
     .msg-me {
-        align-self: flex-end;
         background: linear-gradient(135deg, var(--bright-red), var(--dark-red));
         color: white;
         border-bottom-right-radius: 2px;
     }
     .msg-them {
-        align-self: flex-start;
         background: white;
         color: #333;
         border-bottom-left-radius: 2px;
@@ -167,19 +189,24 @@ onSnapshot(q, (snapshot) => {
     messagesList.innerHTML = ""; 
     snapshot.forEach((doc) => {
         const msg = doc.data();
-        const li = document.createElement("div");
-        li.className = 'msg ' + (msg.sender === currentUser ? 'msg-me' : 'msg-them');
+        const isMe = msg.sender === currentUser;
+        const wrapper = document.createElement("div");
+        wrapper.className = 'msg-wrapper ' + (isMe ? 'msg-me-wrapper' : 'msg-them-wrapper');
         
+        const avatarSrc = msg.avatar || (isMe ? (localStorage.getItem('userAvatar') || 'static/png/naima.png') : 'static/png/naima.png');
         const likes = msg.likes || [];
         const isLiked = likes.includes(currentUser);
         
-        li.innerHTML = `
-            <span><strong>${msg.sender}</strong>: ${msg.content}</span>
-            <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${doc.id}">
-                ❤️ ${likes.length}
-            </button>
+        wrapper.innerHTML = `
+            <img src="${avatarSrc}" class="chat-avatar" alt="${msg.sender}">
+            <div class="msg ${isMe ? 'msg-me' : 'msg-them'}">
+                <span><strong>${msg.sender}</strong>: ${msg.content}</span>
+                <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${doc.id}">
+                    ❤️ ${likes.length}
+                </button>
+            </div>
         `;
-        messagesList.appendChild(li);
+        messagesList.appendChild(wrapper);
     });
 
     document.querySelectorAll('.like-btn').forEach(button => {
@@ -195,11 +222,13 @@ onSnapshot(q, (snapshot) => {
 sendBtn.onclick = async () => {
     const content = input.value.trim();
     if (content) {
+        const userAvatar = localStorage.getItem('userAvatar') || '';
         await addDoc(messagesRef, {
             sender: currentUser,
             content: content,
             timestamp: serverTimestamp(),
-            likes: []
+            likes: [],
+            avatar: userAvatar
         });
         input.value = "";
     }

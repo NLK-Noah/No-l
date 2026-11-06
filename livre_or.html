@@ -94,7 +94,24 @@
           display: flex;
           justify-content: space-between;
           align-items: center;
+          gap: 15px;
           animation: slideIn 0.4s ease-out;
+      }
+      .guest-content {
+          display: flex;
+          align-items: flex-start;
+          gap: 12px;
+          flex: 1;
+      }
+      .guest-avatar {
+          width: 44px;
+          height: 44px;
+          border-radius: 50%;
+          border: 2px solid var(--gold);
+          object-fit: cover;
+          flex-shrink: 0;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+          background: rgba(0,0,0,0.4);
       }
       .guest-info h3 {
           margin: 0;
@@ -192,11 +209,13 @@
             const text = msgInput.value.trim();
             if (name && text) {
                 try {
+                    const userAvatar = localStorage.getItem('userAvatar') || '';
                     await addDoc(guestbookRef, {
                         name: name,
                         text: text,
                         timestamp: serverTimestamp(),
-                        likes: []
+                        likes: [],
+                        avatar: userAvatar
                     });
                     nameInput.value = '';
                     msgInput.value = '';
@@ -216,13 +235,17 @@
                 const data = docSnap.data();
                 const id = docSnap.id;
                 const likes = data.likes || [];
+                const avatarSrc = data.avatar || (data.name === localStorage.getItem('username') ? (localStorage.getItem('userAvatar') || 'static/png/naima.png') : 'static/png/naima.png');
 
                 const div = document.createElement('div');
                 div.className = 'guest-message';
                 div.innerHTML = `
-                    <div class="guest-info">
-                        <h3>${data.name}</h3>
-                        <p>${data.text}</p>
+                    <div class="guest-content">
+                        <img src="${avatarSrc}" class="guest-avatar" alt="${data.name}">
+                        <div class="guest-info">
+                            <h3>${data.name}</h3>
+                            <p>${data.text}</p>
+                        </div>
                     </div>
                     <div class="like-section">
                         <button class="like-btn ${likes.includes(localStorage.getItem('username')) ? 'liked' : ''}" data-id="${id}">❤️</button>

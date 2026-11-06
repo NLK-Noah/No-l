@@ -7,6 +7,29 @@ body {
     overflow-x: hidden;
 }
 
+.back, #back, a.back {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    width: 45px !important;
+    max-width: 45px !important;
+    height: auto !important;
+    z-index: 1000;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+.back:hover, #back:hover, a.back:hover {
+    transform: scale(1.1);
+}
+
+.back img, a.back img {
+    width: 100% !important;
+    max-width: 45px !important;
+    height: auto !important;
+    display: block;
+}
+
 .content {
     position: relative;
     z-index: 100;
