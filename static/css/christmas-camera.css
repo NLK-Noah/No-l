@@ -1,0 +1,365 @@
+/* Modal Appareil Photo & Filtres de Noël */
+.noel-camera-modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    z-index: 20000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    padding: 15px 15px 25px 15px;
+    box-sizing: border-box;
+    color: white;
+    font-family: 'Comic Sans MS', 'Arial', sans-serif;
+    animation: fadeInModal 0.25s ease-out;
+}
+
+@keyframes fadeInModal {
+    from { opacity: 0; transform: scale(0.96); }
+    to { opacity: 1; transform: scale(1); }
+}
+
+/* En-tête du modal */
+.noel-camera-header {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 5px 0 10px 0;
+}
+
+.noel-camera-title {
+    font-size: 1.15rem;
+    font-weight: bold;
+    color: #ffd700;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.8);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.noel-camera-close {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid #ffd700;
+    color: #ffd700;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.2s, background 0.2s;
+}
+
+.noel-camera-close:hover {
+    transform: scale(1.1);
+    background: rgba(255, 0, 0, 0.4);
+}
+
+/* Zone du viseur / aperçu */
+.noel-camera-viewport {
+    position: relative;
+    width: 100%;
+    max-width: 420px;
+    aspect-ratio: 1 / 1;
+    max-height: 52vh;
+    border-radius: 25px;
+    overflow: hidden;
+    border: 4px solid #ffd700;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8), 0 0 20px rgba(255, 215, 0, 0.3);
+    background: #111;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.noel-camera-viewport video,
+.noel-camera-viewport canvas,
+.noel-camera-viewport img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+}
+
+/* Overlay du filtre au-dessus de la vidéo */
+.noel-filter-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 10;
+}
+
+/* Bouton pour basculer avant/arrière caméra */
+.noel-flip-btn {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 2px solid #ffd700;
+    color: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1.2rem;
+    cursor: pointer;
+    z-index: 20;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+.noel-flip-btn:hover {
+    transform: rotate(180deg);
+}
+
+/* Carrousel de sélection des filtres de Noël */
+.noel-filters-bar {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding: 10px 5px;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+    justify-content: flex-start;
+}
+
+.noel-filters-bar::-webkit-scrollbar {
+    display: none;
+}
+
+.noel-filter-btn {
+    flex: 0 0 auto;
+    background: rgba(255, 255, 255, 0.1);
+    border: 2px solid transparent;
+    border-radius: 16px;
+    padding: 8px 12px;
+    color: white;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.noel-filter-btn span.filter-emoji {
+    font-size: 1.5rem;
+}
+
+.noel-filter-btn.active {
+    background: rgba(255, 215, 0, 0.25);
+    border-color: #ffd700;
+    box-shadow: 0 0 15px rgba(255, 215, 0, 0.4);
+    transform: scale(1.05);
+}
+
+/* Zone d'actions en bas */
+.noel-camera-controls {
+    width: 100%;
+    max-width: 480px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 10px 0;
+    gap: 15px;
+}
+
+.noel-snap-btn {
+    width: 65px;
+    height: 65px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff0000, #8b0000);
+    border: 4px solid #ffd700;
+    color: white;
+    font-size: 1.8rem;
+    cursor: pointer;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.6), 0 0 15px rgba(255, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.noel-snap-btn:active {
+    transform: scale(0.92);
+}
+
+.noel-gallery-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid #ffd700;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 20px;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    transition: background 0.2s;
+}
+
+.noel-gallery-btn:hover {
+    background: rgba(255, 215, 0, 0.3);
+}
+
+.noel-confirm-btn {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    border: 3px solid #ffd700;
+    color: white;
+    padding: 12px 24px;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+    transition: transform 0.2s;
+}
+
+.noel-confirm-btn:hover {
+    transform: scale(1.05);
+}
+
+.noel-retake-btn {
+    background: rgba(255, 255, 255, 0.15);
+    border: 2px solid white;
+    color: white;
+    padding: 12px 20px;
+    border-radius: 25px;
+    font-size: 0.95rem;
+    cursor: pointer;
+}
+
+/* Boutons média dans les chats */
+.chat-media-btn {
+    background: rgba(255, 215, 0, 0.15);
+    border: 2px solid var(--gold, #ffd700);
+    color: #ffd700;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-size: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+    transition: transform 0.2s, background 0.2s;
+}
+
+.chat-media-btn:hover {
+    transform: scale(1.1);
+    background: rgba(255, 215, 0, 0.3);
+}
+
+/* Prévisualisation d'image attachée au-dessus de la barre de saisie */
+.chat-attached-preview {
+    position: fixed;
+    bottom: 95px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 90%;
+    max-width: 600px;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 2px solid #ffd700;
+    border-radius: 16px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    z-index: 999;
+    box-shadow: 0 6px 15px rgba(0,0,0,0.6);
+}
+
+.chat-attached-preview img {
+    width: 55px;
+    height: 55px;
+    border-radius: 10px;
+    object-fit: cover;
+    border: 2px solid #ffd700;
+}
+
+.chat-attached-preview span {
+    color: #ffd700;
+    font-size: 0.85rem;
+    flex: 1;
+}
+
+.chat-attached-remove {
+    background: #ff4444;
+    color: white;
+    border: none;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    cursor: pointer;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Affichage d'image dans les messages du chat */
+.chat-photo-img {
+    max-width: 220px;
+    max-height: 220px;
+    border-radius: 12px;
+    border: 2px solid #ffd700;
+    object-fit: cover;
+    display: block;
+    margin-top: 6px;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.4);
+    transition: transform 0.2s;
+}
+
+.chat-photo-img:hover {
+    transform: scale(1.03);
+}
+
+/* Lightbox pour zoomer sur une image */
+.noel-lightbox {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.94);
+    backdrop-filter: blur(10px);
+    z-index: 30000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: zoom-out;
+    animation: fadeInModal 0.2s ease-out;
+}
+
+.noel-lightbox img {
+    max-width: 92vw;
+    max-height: 88vh;
+    border-radius: 15px;
+    border: 3px solid #ffd700;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+    object-fit: contain;
+}

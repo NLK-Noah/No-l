@@ -6,6 +6,7 @@
   <title>Mon Profil - Le Festin d'Hiver</title>
   <link rel="stylesheet" href="static/css/noel-3d.css">
   <link rel="stylesheet" href="static/css/transitions.css">
+  <link rel="stylesheet" href="static/css/christmas-camera.css">
   <style>
       body {
           display: flex;
@@ -187,15 +188,19 @@
         <p class="subtitle">Choisis ta photo pour apparaître dans le menu et le chat !</p>
 
         <div class="avatar-preview-section">
-            <div class="photo-wrapper" id="photoWrapper" title="Clique pour importer une photo">
+            <div class="photo-wrapper" id="photoWrapper" title="Prendre ou modifier ma photo">
                 <img id="currentAvatarPreview" src="static/png/naima.png" class="profile-photo-circle" alt="Photo de profil">
                 <div class="photo-badge">📷</div>
             </div>
 
-            <input type="file" id="photoInput" accept="image/*" style="display: none;">
-            <button type="button" class="btn-upload" id="choosePhotoBtn">
-                📷 Choisir depuis ma bibliothèque
-            </button>
+            <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; align-items: center;">
+                <button type="button" class="btn-upload" id="openCameraWithFiltersBtn" style="background: linear-gradient(135deg, #ff0000, #8b0000); color: white; border: 2px solid #ffd700;">
+                    🎅 Photo avec filtres de Noël
+                </button>
+                <button type="button" class="btn-upload" id="choosePhotoBtn">
+                    📁 Choisir depuis ma bibliothèque
+                </button>
+            </div>
         </div>
 
         <div class="presets-title">Ou choisis un avatar :</div>
@@ -204,6 +209,7 @@
         <button class="save-btn" id="saveAvatar">Enregistrer mon profil ✨</button>
     </div>
 
+    <script src="static/java/christmas-camera.js"></script>
     <script>
         const DEFAULT_PHOTO = 'static/png/naima.png';
         const presets = [
@@ -214,58 +220,46 @@
 
         let currentAvatar = localStorage.getItem('userAvatar') || DEFAULT_PHOTO;
         const previewImg = document.getElementById('currentAvatarPreview');
-        const photoInput = document.getElementById('photoInput');
         const choosePhotoBtn = document.getElementById('choosePhotoBtn');
+        const openCameraWithFiltersBtn = document.getElementById('openCameraWithFiltersBtn');
         const photoWrapper = document.getElementById('photoWrapper');
         const grid = document.getElementById('avatarGrid');
 
         // Initialiser l'aperçu actuel
         previewImg.src = currentAvatar;
 
-        // Ouvrir le sélecteur de fichier
-        const openPicker = () => photoInput.click();
-        choosePhotoBtn.addEventListener('click', openPicker);
-        photoWrapper.addEventListener('click', openPicker);
+        // Ouvrir l'appareil photo avec filtres de Noël
+        function openCameraUI() {
+            ChristmasCamera.open({
+                title: "Photo de Profil de Noël 🎅",
+                maxDim: 220,
+                onCapture: (base64) => {
+                    currentAvatar = base64;
+                    previewImg.src = base64;
+                    document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+                }
+            });
+        }
 
-        // Traiter l'image sélectionnée (redimensionnement + compression en canvas)
-        photoInput.addEventListener('change', (e) => {
+        openCameraWithFiltersBtn.addEventListener('click', openCameraUI);
+        photoWrapper.addEventListener('click', openCameraUI);
+
+        // Choisir une photo depuis la bibliothèque (sans filtres)
+        const libraryInput = document.createElement('input');
+        libraryInput.type = 'file';
+        libraryInput.accept = 'image/*';
+        libraryInput.style.display = 'none';
+        document.body.appendChild(libraryInput);
+
+        choosePhotoBtn.addEventListener('click', () => libraryInput.click());
+        libraryInput.addEventListener('change', (e) => {
             const file = e.target.files && e.target.files[0];
             if (!file) return;
-
             const reader = new FileReader();
             reader.onload = (event) => {
-                const img = new Image();
-                img.onload = () => {
-                    const canvas = document.createElement('canvas');
-                    const maxDim = 150;
-                    let width = img.width;
-                    let height = img.height;
-
-                    if (width > height) {
-                        if (width > maxDim) {
-                            height = Math.round((height * maxDim) / width);
-                            width = maxDim;
-                        }
-                    } else {
-                        if (height > maxDim) {
-                            width = Math.round((width * maxDim) / height);
-                            height = maxDim;
-                        }
-                    }
-
-                    canvas.width = width;
-                    canvas.height = height;
-                    const ctx = canvas.getContext('2d');
-                    ctx.drawImage(img, 0, 0, width, height);
-
-                    const compressedBase64 = canvas.toDataURL('image/jpeg', 0.85);
-                    currentAvatar = compressedBase64;
-                    previewImg.src = compressedBase64;
-
-                    // Déselectionner les presets
-                    document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
-                };
-                img.src = event.target.result;
+                currentAvatar = event.target.result;
+                previewImg.src = event.target.result;
+                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
             };
             reader.readAsDataURL(file);
         });

@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Livre d'Or - Le Festin d'Hiver</title>
   <link rel="stylesheet" href="static/css/noel-3d.css">
+  <link rel="stylesheet" href="static/css/christmas-camera.css">
   <style>
       body {
           display: flex;
@@ -174,6 +175,10 @@
         <div class="post-form">
             <input type="text" id="guestName" placeholder="Ton prénom...">
             <textarea id="guestMessage" rows="3" placeholder="Ton message secret..."></textarea>
+            <div style="display: flex; gap: 10px; align-items: center;">
+                <button type="button" class="chat-media-btn" id="guestPhotoBtn" title="Ajouter une photo" style="flex-shrink: 0;">📷</button>
+                <div id="guestPhotoPreview" style="flex: 1;"></div>
+            </div>
             <button id="postBtn">Publier mon souvenir ✨</button>
         </div>
 
@@ -182,6 +187,7 @@
         </div>
     </div>
 
+    <script src="static/java/christmas-camera.js"></script>
     <script type="module">
         import { getFirestore, collection, addDoc, query, orderBy, onSnapshot, updateDoc, doc, arrayUnion, arrayRemove, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -204,21 +210,29 @@
         const msgInput = document.getElementById('guestMessage');
         const list = document.getElementById('messagesList');
 
+        let pendingGuestPhoto = null;
+
         postBtn.onclick = async () => {
             const name = nameInput.value.trim();
             const text = msgInput.value.trim();
-            if (name && text) {
+            if (name && (text || pendingGuestPhoto)) {
                 try {
                     const userAvatar = localStorage.getItem('userAvatar') || '';
-                    await addDoc(guestbookRef, {
+                    const docData = {
                         name: name,
                         text: text,
                         timestamp: serverTimestamp(),
                         likes: [],
                         avatar: userAvatar
-                    });
+                    };
+                    if (pendingGuestPhoto) {
+                        docData.photo = pendingGuestPhoto;
+                    }
+                    await addDoc(guestbookRef, docData);
                     nameInput.value = '';
                     msgInput.value = '';
+                    pendingGuestPhoto = null;
+                    guestPhotoPreview.innerHTML = '';
                 } catch (e) {
                     console.error("Error adding document: ", e);
                     alert("Erreur lors de l'envoi. Vérifie tes règles Firestore !");
@@ -227,6 +241,30 @@
                 alert("Remplis ton nom et ton message ! 🎅");
             }
         };
+
+        // Photo pour le livre d'or
+        const guestPhotoBtn = document.getElementById('guestPhotoBtn');
+        const guestPhotoPreview = document.getElementById('guestPhotoPreview');
+
+        guestPhotoBtn.onclick = () => {
+            ChristmasCamera.open({
+                title: "Photo pour le Livre d'Or 📖",
+                maxDim: 600,
+                onCapture: (base64) => {
+                    pendingGuestPhoto = base64;
+                    guestPhotoPreview.innerHTML = `
+                        <div style="display: flex; align-items: center; gap: 8px; background: rgba(255,215,0,0.15); border: 1px solid #ffd700; border-radius: 10px; padding: 6px 10px;">
+                            <img src="${base64}" style="width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 2px solid #ffd700;">
+                            <span style="color: #ffd700; font-size: 0.8rem; flex: 1;">📷 Photo prête</span>
+                            <button type="button" onclick="document.getElementById('guestPhotoPreview').innerHTML=''; window._clearGuestPhoto();" style="background: #ff4444; color: white; border: none; width: 22px; height: 22px; border-radius: 50%; cursor: pointer; font-size: 0.7rem;">✕</button>
+                        </div>
+                    `;
+                }
+            });
+        };
+
+        // Expose clear function globally for the inline onclick
+        window._clearGuestPhoto = () => { pendingGuestPhoto = null; };
 
         const q = query(guestbookRef, orderBy("timestamp", "desc"));
         onSnapshot(q, (snapshot) => {
@@ -245,6 +283,7 @@
                         <div class="guest-info">
                             <h3>${data.name}</h3>
                             <p>${data.text}</p>
+                            ${data.photo ? `<img src="${data.photo}" class="chat-photo-img" onclick="ChristmasCamera.openLightbox(this.src)" alt="Photo" style="margin-top: 8px;">` : ''}
                         </div>
                     </div>
                     <div class="like-section">

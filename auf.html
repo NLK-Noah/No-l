@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Chat Secret - Le Festin d'Hiver</title>
 <link rel="stylesheet" href="static/css/noel-3d.css">
+<link rel="stylesheet" href="static/css/christmas-camera.css">
 <style>
     body {
         margin: 0;
@@ -30,26 +31,62 @@
         overflow-y: auto;
         box-sizing: border-box;
     }
-    .msg {
+    .msg-wrapper {
+        display: flex;
+        align-items: flex-end;
+        gap: 8px;
         max-width: 85%;
-        padding: 12px 18px;
+    }
+    .msg-me-wrapper {
+        align-self: flex-end;
+        flex-direction: row-reverse;
+    }
+    .msg-them-wrapper {
+        align-self: flex-start;
+        flex-direction: row;
+    }
+    .chat-avatar {
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        border: 2px solid var(--gold);
+        object-fit: cover;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.5);
+        background: rgba(0,0,0,0.4);
+    }
+    .msg {
+        padding: 10px 16px;
         border-radius: 15px;
-        font-size: 1.1rem;
+        font-size: 1.05rem;
         position: relative;
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         border: 2px solid var(--gold);
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+        word-break: break-word;
+    }
+    .msg-sender-name {
+        font-size: 0.8rem;
+        font-weight: bold;
+        color: var(--gold);
     }
     .msg-me {
-        align-self: flex-end;
         background: linear-gradient(135deg, var(--bright-red), var(--dark-red));
         color: white;
         border-bottom-right-radius: 2px;
     }
+    .msg-me .msg-sender-name {
+        color: #ffd700;
+    }
     .msg-them {
-        align-self: flex-start;
         background: white;
         color: #333;
         border-bottom-left-radius: 2px;
+    }
+    .msg-them .msg-sender-name {
+        color: #8b0000;
     }
     .input-bar {
         position: fixed;
@@ -107,12 +144,15 @@
 
 <div class="chat-container">
     <div class="messages-area" id="messages"></div>
+    <div id="attachedPreview"></div>
     <div class="input-bar">
+        <button type="button" class="chat-media-btn" id="chatPhotoBtn" title="Envoyer une photo">📷</button>
         <input type="text" id="messageInput" placeholder="Écris un message...">
         <button id="sendBtn">➤</button>
     </div>
 </div>
 
+<script src="static/java/christmas-camera.js"></script>
 <script type="module">
 import { getFirestore, collection, query, where, getDocs, addDoc, serverTimestamp, onSnapshot, orderBy } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"; 
@@ -134,6 +174,7 @@ let assignedPlayer = null;
 const messagesList = document.getElementById('messages');
 const messageInput = document.getElementById('messageInput');
 const sendBtn = document.getElementById('sendBtn');
+let pendingPhotoBase64 = null;
 
 async function fetchAssignedPlayer() {
     const resultsRef = collection(db, "results");
@@ -159,26 +200,78 @@ function setupChat() {
     sendBtn.onclick = sendMessage;
 }
 
+const SANTA_AVATAR = "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%238b0000' stroke='%23ffd700' stroke-width='4'/><text x='50' y='67' font-size='52' text-anchor='middle'>🎅</text></svg>";
+
 async function sendMessage() {
     const content = messageInput.value.trim();
-    if (content && currentUser && assignedPlayer) {
+    if ((content || pendingPhotoBase64) && currentUser && assignedPlayer) {
         const chatId = getChatId(currentUser, assignedPlayer);
-        await addDoc(collection(db, "chats/" + chatId + "/messages"), {
+        const docData = {
             sender: currentUser,
             content: content,
-            timestamp: serverTimestamp()
-        });
+            timestamp: serverTimestamp(),
+            avatar: 'santa'
+        };
+        if (pendingPhotoBase64) {
+            docData.photo = pendingPhotoBase64;
+        }
+        await addDoc(collection(db, "chats/" + chatId + "/messages"), docData);
         messageInput.value = '';
+        pendingPhotoBase64 = null;
+        if (attachedPreview) attachedPreview.innerHTML = '';
     }
 }
 
 function displayMessage(msg) {
-    const div = document.createElement('div');
-    div.className = 'msg ' + (msg.sender === currentUser ? 'msg-me' : 'msg-them');
-    div.textContent = msg.content;
-    messagesList.appendChild(div);
+    const isMe = msg.sender === currentUser;
+    const wrapper = document.createElement('div');
+    wrapper.className = 'msg-wrapper ' + (isMe ? 'msg-me-wrapper' : 'msg-them-wrapper');
+
+    // Dans auf.html, currentUser est le Père Noël secret
+    const isSanta = isMe;
+    const senderName = isSanta ? 'Père Noël 🎅 (Toi - Secret)' : assignedPlayer;
+    const avatarSrc = isSanta 
+        ? SANTA_AVATAR 
+        : (msg.avatar && msg.avatar !== 'santa' ? msg.avatar : 'static/png/naima.png');
+
+    wrapper.innerHTML = `
+        <img class="chat-avatar" src="${avatarSrc}" alt="${senderName}">
+        <div class="msg ${isMe ? 'msg-me' : 'msg-them'}">
+            <span class="msg-sender-name">${senderName}</span>
+            <span class="msg-text">${msg.content}</span>
+            ${msg.photo ? `<img src="${msg.photo}" class="chat-photo-img" onclick="ChristmasCamera.openLightbox(this.src)" alt="Photo">` : ''}
+        </div>
+    `;
+    messagesList.appendChild(wrapper);
     messagesList.scrollTop = messagesList.scrollHeight;
 }
+
+messageInput.onkeyup = (e) => { if (e.key === "Enter") sendBtn.click(); };
+
+// Photo attachment
+const chatPhotoBtn = document.getElementById('chatPhotoBtn');
+const attachedPreview = document.getElementById('attachedPreview');
+
+chatPhotoBtn.onclick = () => {
+    ChristmasCamera.open({
+        title: "Photo de Noël 📸",
+        maxDim: 600,
+        onCapture: (base64) => {
+            pendingPhotoBase64 = base64;
+            attachedPreview.innerHTML = `
+                <div class="chat-attached-preview">
+                    <img src="${base64}" alt="Photo attachée">
+                    <span>📷 Photo prête à envoyer</span>
+                    <button class="chat-attached-remove" id="removeAttached">✕</button>
+                </div>
+            `;
+            document.getElementById('removeAttached').onclick = () => {
+                pendingPhotoBase64 = null;
+                attachedPreview.innerHTML = '';
+            };
+        }
+    });
+};
 
 fetchAssignedPlayer();
 </script>

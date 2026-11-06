@@ -137,6 +137,7 @@
     }
 </style>
 <link rel="stylesheet" href="static/css/transitions.css">
+<link rel="stylesheet" href="static/css/christmas-camera.css">
 <link rel="manifest" href="manifest.json">
 </head>
 <body>
@@ -147,12 +148,15 @@
 
 <div class="chat-container">
     <div class="messages-area" id="messages"></div>
+    <div id="attachedPreview"></div>
     <div class="input-bar">
+        <button type="button" class="chat-media-btn" id="chatPhotoBtn" title="Envoyer une photo">📷</button>
         <input type="text" id="messageInput" placeholder="Propose un plat pour le menu...">
         <button id="sendBtn">➤</button>
     </div>
 </div>
 
+<script src="static/java/christmas-camera.js"></script>
 <script type="module">
 import { getFirestore, collection, query, orderBy, onSnapshot, addDoc, serverTimestamp, updateDoc, doc, arrayUnion, arrayRemove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"; 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
@@ -175,6 +179,9 @@ const messagesList = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const currentUser = localStorage.getItem("username") || "Inconnu";
+let pendingPhotoBase64 = null;
+const chatPhotoBtn = document.getElementById('chatPhotoBtn');
+const attachedPreview = document.getElementById('attachedPreview');
 
 async function toggleLike(messageId, currentLikesArray) {
     const messageDocRef = doc(db, "messages", messageId);
@@ -201,6 +208,7 @@ onSnapshot(q, (snapshot) => {
             <img src="${avatarSrc}" class="chat-avatar" alt="${msg.sender}">
             <div class="msg ${isMe ? 'msg-me' : 'msg-them'}">
                 <span><strong>${msg.sender}</strong>: ${msg.content}</span>
+                ${msg.photo ? `<img src="${msg.photo}" class="chat-photo-img" onclick="ChristmasCamera.openLightbox(this.src)" alt="Photo">` : ''}
                 <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${doc.id}">
                     ❤️ ${likes.length}
                 </button>
@@ -221,20 +229,49 @@ onSnapshot(q, (snapshot) => {
 
 sendBtn.onclick = async () => {
     const content = input.value.trim();
-    if (content) {
+    if (content || pendingPhotoBase64) {
         const userAvatar = localStorage.getItem('userAvatar') || '';
-        await addDoc(messagesRef, {
+        const docData = {
             sender: currentUser,
             content: content,
             timestamp: serverTimestamp(),
             likes: [],
             avatar: userAvatar
-        });
+        };
+        if (pendingPhotoBase64) {
+            docData.photo = pendingPhotoBase64;
+        }
+        await addDoc(messagesRef, docData);
         input.value = "";
+        pendingPhotoBase64 = null;
+        attachedPreview.innerHTML = '';
     }
 };
 
 input.onkeyup = (e) => { if (e.key === "Enter") sendBtn.click(); };
+
+// Photo attachment
+
+chatPhotoBtn.onclick = () => {
+    ChristmasCamera.open({
+        title: "Photo de Noël 📸",
+        maxDim: 600,
+        onCapture: (base64) => {
+            pendingPhotoBase64 = base64;
+            attachedPreview.innerHTML = `
+                <div class="chat-attached-preview">
+                    <img src="${base64}" alt="Photo attachée">
+                    <span>📷 Photo prête à envoyer</span>
+                    <button class="chat-attached-remove" id="removeAttached">✕</button>
+                </div>
+            `;
+            document.getElementById('removeAttached').onclick = () => {
+                pendingPhotoBase64 = null;
+                attachedPreview.innerHTML = '';
+            };
+        }
+    });
+};
 </script>
 <script src="static/java/audio.js"></script>
 <script src="static/java/theme.js"></script>
