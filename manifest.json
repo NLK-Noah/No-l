@@ -1,20 +1,31 @@
 {
   "name": "Le Festin d'Hiver 2026",
   "short_name": "Noël 2026",
-  "start_url": "/menu.html",
+  "description": "L'application de Noël familiale : Secret Santa, Calendrier de l'Avent et Jeux",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#052210",
-  "theme_color": "#ff0000",
+  "orientation": "portrait",
+  "background_color": "#830303",
+  "theme_color": "#830303",
   "icons": [
     {
-      "src": "static/png/Grinch.png",
-      "sizes": "192x192",
-      "type": "image/png"
+      "src": "static/png/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
-      "src": "static/png/Grinch.png",
+      "src": "static/png/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "static/png/icon-512.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }

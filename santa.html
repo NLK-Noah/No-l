@@ -1,47 +1,53 @@
 <!DOCTYPE html>
-<html>
+<html lang="fr">
 <head>
   <link rel="icon" type="image/png" href="static/png/naima.png">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
-  <title>Le Festin d'Hiver</title>
+  <link href="https://fonts.googleapis.com/css2?family=Chango&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <title>Le Festin d'Hiver - Secret Santa 🎅</title>
 
   <!-- CSS -->
   <link rel="stylesheet" href="static/css/santa.css">
-    
-    <link rel="stylesheet" href="static/css/noel-3d.css">
-<link rel="stylesheet" href="static/css/transitions.css">
-<link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="static/css/noel-3d.css">
+  <link rel="stylesheet" href="static/css/transitions.css">
+  <link rel="stylesheet" href="static/css/pwa-notifications.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="static/png/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/png/apple-touch-icon.png">
+  <!-- Configuration PWA & iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Noël 2026">
 </head>
-<body>
+<body style="background: url('static/png/back.jpeg') center center / cover no-repeat fixed !important;">
   <div id="snow-container"></div>
-  <!-- Espace sous la guirlande -->
   <div class="header-space"></div>
 
   <a href="menu.html">
-    <img id="back" src="static/png/back.png" class="back" />
+    <img id="back" src="static/png/back.png" class="back" alt="Retour" />
   </a>
 
-  <img id="logo" src="static/png/et.png" class="logo" />
+  <img id="logo" src="static/png/et.png" class="logo" alt="Secret Santa" />
 
+  <div id="rules" class="rules" style="display: none;">
+    <h2>Règles du jeu 🎅</h2>
+    <p>1. Chaque joueur tire au sort le prénom d'un membre de la famille à qui offrir un cadeau.</p>
+    <p>2. Le budget maximum pour le cadeau est de <strong>15€</strong>.</p>
+    <p>3. Les cadeaux doivent être 100% anonymes : garde précieusement le secret ! 🤫</p>
+    <p>4. Les cadeaux seront échangés tous ensemble lors de la fête de Noël.</p>
+    <p>5. Amusez-vous bien et profitez de la magie de Noël ! ✨</p>
 
-  <div id="rules" class="rules">
-    <h2>Règles du jeu</h2>
-    <p>1. Chaque joueur tire au sort le nom d'une personne à qui il devra offrir un cadeau.</p></br>
-    <p>2. Le budget maximum pour le cadeau est de 15€.</p></br>
-    <p>3. Les cadeaux doivent être anonymes, les joueurs ne doivent pas révéler à qui ils offrent un cadeau.</p></br>
-    <p>4. Les cadeaux seront échangés lors de la fête de Noël.</p></br>
-    <p>5. Amusez-vous bien et profitez de l'esprit de Noël !</p></br>
+    <button id="start" type="button">J'accepte et je lance mon tirage 🎁</button>
   </div>
   
-  <button id="start">J'accepte et je lance le tirage</button>
-    <script src="static/java/audio.js"></script>
-<script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
-    <script src="static/java/noel-ui.js"></script>
-<script src="static/java/transitions.js"></script>
+  <script src="static/java/audio.js"></script>
+  <script src="static/java/theme.js"></script>
+  <script src="static/java/effects.js"></script>
+  <script src="static/java/noel-ui.js"></script>
+  <script src="static/java/transitions.js"></script>
+  <script type="module" src="static/java/rules.js"></script>
+  <script src="static/java/snow.js"></script>
+  <script src="static/java/pwa-notifications.js"></script>
 </body>
-<script  type="module" src="static/java/rules.js"></script>
-<script src="static/java/snow.js"></script>
-</html> 
+</html>

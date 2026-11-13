@@ -563,6 +563,13 @@
       }
   </style>
   <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="static/png/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/png/apple-touch-icon.png">
+  <link rel="stylesheet" href="static/css/pwa-notifications.css">
+  <!-- Configuration PWA & iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Noël 2026">
 </head>
 <body style="background: radial-gradient(circle at center, #1a472a 0%, #052210 100%) !important;">
     <a href="menu.html" class="back">
@@ -604,6 +611,21 @@
                 <button type="button" id="btnUpdatePassword" class="btn-change-pwd">Mettre à jour mon mot de passe 🔑</button>
             </div>
             <div id="pwdMessage" style="display: none; font-size: 0.85rem; margin-top: 8px;"></div>
+        </div>
+
+        <div class="security-card" style="margin-top: 15px;">
+            <div class="presets-title">🔔 Notifications de Noël</div>
+            <p style="font-size: 0.82rem; opacity: 0.85; margin: 0 0 10px 0;">
+                Reçois les alertes du Calendrier de l'Avent et les annonces du réveillon directement sur ton téléphone.
+            </p>
+            <div style="display: flex; flex-direction: column; gap: 8px;">
+                <button type="button" id="btnProfileEnableNotif" class="btn-change-pwd" style="background: linear-gradient(135deg, #ffd700, #ff9900); color: #333;">
+                    Activer les notifications 🔔
+                </button>
+                <button type="button" id="btnProfileTestNotif" class="btn-change-pwd" style="background: rgba(255,255,255,0.15); color: white;">
+                    Tester une notification 🎅
+                </button>
+            </div>
         </div>
 
         <button class="save-btn" id="saveAvatar">Enregistrer mon profil ✨</button>
@@ -2018,10 +2040,37 @@
             closeBitmojiModal();
             alert("Ton Bitmoji de Noël est prêt et défini comme photo de profil ! 🎅✨");
         };
+
+        // Boutons notifications profil
+        const btnProfileEnableNotif = document.getElementById('btnProfileEnableNotif');
+        const btnProfileTestNotif = document.getElementById('btnProfileTestNotif');
+
+        if (btnProfileEnableNotif && window.ChristmasNotifications) {
+            if (Notification.permission === 'granted') {
+                btnProfileEnableNotif.textContent = 'Notifications déjà activées ✅';
+            }
+            btnProfileEnableNotif.onclick = async () => {
+                const res = await window.ChristmasNotifications.requestPermission();
+                if (res === 'granted') {
+                    btnProfileEnableNotif.textContent = 'Notifications activées ✅';
+                }
+            };
+        }
+
+        if (btnProfileTestNotif && window.ChristmasNotifications) {
+            btnProfileTestNotif.onclick = async () => {
+                if (Notification.permission !== 'granted') {
+                    const res = await window.ChristmasNotifications.requestPermission();
+                    if (res !== 'granted') return;
+                }
+                window.ChristmasNotifications.sendTestNotification();
+            };
+        }
     </script>
     <script src="static/java/theme.js"></script>
     <script src="static/java/effects.js"></script>
     <script src="static/java/noel-ui.js"></script>
     <script src="static/java/transitions.js"></script>
+    <script src="static/java/pwa-notifications.js"></script>
 </body>
 </html>

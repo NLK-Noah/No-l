@@ -3,61 +3,72 @@ body {
   padding: 0;
   text-align: center;
   background-color: #830303;
-  font-family: 'Chango', sans-serif;
+  font-family: 'Poppins', sans-serif;
   position: relative;
   overflow-x: hidden;
-  overflow: hidden;
+  min-height: 100vh;
 }
 
-.coming-soon-regular {
-  font-family: "Coming Soon", cursive;
-  font-weight: 400;
-  font-style: normal;
-}
-
-
-.header-space{
+.header-space {
   height: 40px;
 }
 
-img#logo{
-  margin-top: 20px;
-  margin: 0 auto;
-  display: flex;
-  width: 100px;
+img#logo {
+  margin: 20px auto 10px auto;
+  display: block;
+  width: 90px;
 }
 
-
-
-img#back{
+img#back {
   position: absolute;
-  top: 0;
-  left: 0;
-  width: 150px;
+  top: 15px;
+  left: 15px;
+  width: 120px;
+  cursor: pointer;
+  z-index: 10;
 }
 
-.result h2{
+.result {
+  background: rgba(255, 255, 255, 0.95);
+  border: 3px solid #DAA520;
+  border-radius: 24px;
+  max-width: 460px;
+  margin: 20px auto;
+  padding: 25px 20px;
+  box-shadow: 0 10px 35px rgba(0, 0, 0, 0.5);
+  box-sizing: border-box;
+}
+
+.result h2 {
   font-family: 'Chango', sans-serif;
-  color: #DAA520;
-  font-size: 30px;
+  color: #c0392b;
+  font-size: 26px;
+  margin: 0 0 10px 0;
 }
 
-.result p{
-  font-family: 'Chango', sans-serif;
-  color: #DAA520;
-  font-size: 24px;
-}
-.result p#resultName{
-  font-family: "Coming Soon", cursive;
-  color: #000;
-  font-size: 64px;
+.result p {
+  font-family: 'Poppins', sans-serif;
+  color: #555;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin: 5px 0;
 }
 
-img#tr{
-  position: absolute;
-  width: 300px;
-  display: flex;
-  left: 50px;
+.result p#resultName {
+  font-family: 'Chango', cursive;
+  color: #c0392b;
+  font-size: clamp(2rem, 8vw, 3.2rem);
+  margin: 15px 0 5px 0;
+  text-shadow: 0 2px 8px rgba(192, 57, 43, 0.3);
+  letter-spacing: 1px;
+}
+
+img#tr {
+  position: relative;
+  width: 250px;
+  max-width: 80%;
+  margin: 20px auto 0 auto;
+  display: block;
 }
 
 #snow-container {
@@ -87,16 +98,15 @@ img#tr{
   }
 }
 
-@media (max-width: 480px){
+@media (max-width: 480px) {
+  .result {
+    margin: 15px;
+    padding: 20px 15px;
+  }
 
-    button{
-      width: 70%;
-      margin-right: 40px;
-      margin-left: 60px;
-    }
-
-    img#back{
-        margin-top: 20px;
-        width: 100px;
-    }
+  img#back {
+    top: 10px;
+    left: 10px;
+    width: 90px;
+  }
 }

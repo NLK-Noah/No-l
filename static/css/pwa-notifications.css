@@ -1,0 +1,248 @@
+/* Styles pour le bandeau d'installation iOS et les notifications */
+
+/* Bandeau d'installation iOS */
+.ios-install-banner {
+  position: fixed;
+  bottom: 15px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: calc(100% - 30px);
+  max-width: 440px;
+  background: rgba(20, 20, 20, 0.95);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 2px solid #DAA520;
+  border-radius: 20px;
+  padding: 16px 18px;
+  color: white;
+  z-index: 99999;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.7);
+  font-family: 'Poppins', -apple-system, BlinkMacSystemFont, sans-serif;
+  animation: slideUpBanner 0.4s ease-out;
+  box-sizing: border-box;
+}
+
+@keyframes slideUpBanner {
+  from {
+    transform: translate(-50%, 100%);
+    opacity: 0;
+  }
+  to {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.ios-install-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.ios-install-title {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: #ffd700;
+}
+
+.ios-install-close {
+  background: transparent;
+  border: none;
+  color: #aaa;
+  font-size: 1.2rem;
+  cursor: pointer;
+  padding: 2px 8px;
+  line-height: 1;
+}
+
+.ios-install-body {
+  font-size: 0.85rem;
+  line-height: 1.45;
+  color: #eee;
+}
+
+.ios-install-steps {
+  margin: 8px 0 0 0;
+  padding-left: 20px;
+  font-size: 0.83rem;
+}
+
+.ios-install-steps li {
+  margin-bottom: 4px;
+}
+
+.ios-install-icon-share {
+  display: inline-block;
+  background: #333;
+  padding: 2px 7px;
+  border-radius: 6px;
+  color: #3897f0;
+  font-weight: bold;
+}
+
+/* Modale de gestion des notifications */
+.notif-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  z-index: 100000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  box-sizing: border-box;
+  animation: fadeIn 0.25s ease-out;
+}
+
+.notif-modal-card {
+  background: radial-gradient(circle at top, #830303 0%, #3a0000 100%);
+  border: 3px solid #DAA520;
+  border-radius: 24px;
+  max-width: 440px;
+  width: 100%;
+  padding: 25px 22px;
+  color: white;
+  text-align: center;
+  box-shadow: 0 15px 50px rgba(0, 0, 0, 0.8);
+  font-family: 'Poppins', sans-serif;
+  box-sizing: border-box;
+  position: relative;
+}
+
+.notif-modal-close {
+  position: absolute;
+  top: 12px;
+  right: 15px;
+  background: transparent;
+  border: none;
+  color: #ffd700;
+  font-size: 1.4rem;
+  cursor: pointer;
+}
+
+.notif-modal-icon {
+  font-size: 3rem;
+  margin-bottom: 8px;
+  animation: ringBell 2s infinite ease-in-out;
+  display: inline-block;
+}
+
+@keyframes ringBell {
+  0%, 100% { transform: rotate(0); }
+  10%, 30% { transform: rotate(15deg); }
+  20%, 40% { transform: rotate(-15deg); }
+  50% { transform: rotate(0); }
+}
+
+.notif-modal-title {
+  font-family: 'Chango', sans-serif;
+  font-size: 1.35rem;
+  color: #ffd700;
+  margin: 0 0 10px 0;
+}
+
+.notif-modal-desc {
+  font-size: 0.88rem;
+  line-height: 1.5;
+  color: #f1f1f1;
+  margin-bottom: 18px;
+}
+
+.notif-ios-warning {
+  background: rgba(255, 215, 0, 0.15);
+  border: 1px solid #ffd700;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+  text-align: left;
+  line-height: 1.4;
+}
+
+.notif-modal-btn {
+  display: block;
+  width: 100%;
+  padding: 12px;
+  margin: 8px 0;
+  border-radius: 50px;
+  border: 2px solid #DAA520;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  box-sizing: border-box;
+}
+
+.notif-btn-enable {
+  background: linear-gradient(135deg, #ffd700, #ff9900);
+  color: #333;
+  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.4);
+}
+
+.notif-btn-test {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+}
+
+.notif-btn-enable:hover, .notif-btn-test:hover {
+  transform: scale(1.02);
+}
+
+.notif-btn-enable:active, .notif-btn-test:active {
+  transform: scale(0.98);
+}
+
+/* Bouton flottant / badge discret pour les notifications */
+.notif-floating-btn {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #c0392b, #8b0000);
+  border: 2px solid #ffd700;
+  color: white;
+  font-size: 1.4rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+  z-index: 9998;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.notif-floating-btn:hover {
+  transform: scale(1.1);
+  box-shadow: 0 8px 25px rgba(255, 215, 0, 0.6);
+}
+
+.notif-floating-btn.has-badge::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 12px;
+  height: 12px;
+  background: #ffd700;
+  border-radius: 50%;
+  border: 2px solid #8b0000;
+  animation: pulseDot 1.5s infinite;
+}
+
+@keyframes pulseDot {
+  0% { transform: scale(0.8); opacity: 0.8; }
+  50% { transform: scale(1.3); opacity: 1; }
+  100% { transform: scale(0.8); opacity: 0.8; }
+}

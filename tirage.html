@@ -4,69 +4,162 @@
   <link rel="icon" type="image/png" href="static/png/naima.png">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tirage Secret Santa</title>
-    
-    <link rel="stylesheet" href="static/css/noel-3d.css">
-<link rel="stylesheet" href="static/css/transitions.css">
-<link rel="manifest" href="manifest.json">
+  <title>Tirage Secret Santa 🎅</title>
+  <link href="https://fonts.googleapis.com/css2?family=Chango&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="static/css/noel-3d.css">
+  <link rel="stylesheet" href="static/css/transitions.css">
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      background: radial-gradient(circle at center, #830303 0%, #400101 100%);
+      font-family: 'Poppins', sans-serif;
+      color: white;
+      box-sizing: border-box;
+      overflow: hidden;
+    }
+    .tirage-card {
+      background: rgba(255, 255, 255, 0.95);
+      color: #333;
+      padding: 35px 25px;
+      border-radius: 24px;
+      border: 3px solid #DAA520;
+      box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+      max-width: 420px;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    .tirage-card h2 {
+      font-family: 'Chango', sans-serif;
+      color: #c0392b;
+      font-size: 1.5rem;
+      margin: 0 0 15px 0;
+    }
+    .tirage-spinner {
+      font-size: 3.5rem;
+      display: inline-block;
+      animation: spin-and-pulse 1.4s infinite ease-in-out;
+      margin: 10px 0;
+    }
+    @keyframes spin-and-pulse {
+      0% { transform: scale(0.9) rotate(0deg); }
+      50% { transform: scale(1.15) rotate(180deg); }
+      100% { transform: scale(0.9) rotate(360deg); }
+    }
+    .tirage-status {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #555;
+      margin: 10px 0 0 0;
+    }
+  </style>
 </head>
-<body>
-  <p>Chargement du tirage…</p>
+<body style="background: url('static/png/back.jpeg') center center / cover no-repeat fixed !important;">
+  <div id="snow-container"></div>
+
+  <div class="tirage-card">
+    <div class="tirage-spinner">🎁</div>
+    <h2>Tirage au sort...</h2>
+    <p class="tirage-status" id="statusText">Les lutins du Père Noël mélangent le chapeau ✨</p>
+  </div>
 
   <script type="module">
     import { db } from "./static/java/firebase-init.js";
-import { collection, getDocs, addDoc, query, where } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+    import { collection, getDocs, addDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-async function startTirage() {
-  const username = localStorage.getItem("username");
+    async function startTirage() {
+      const statusText = document.getElementById("statusText");
+      const username = localStorage.getItem("username");
 
-  // Récupérer tous les participants
-  const participantsSnapshot = await getDocs(collection(db, "participants"));
-  let participants = participantsSnapshot.docs.map(doc => doc.data().name);
+      if (!username) {
+        window.location.href = "index.html";
+        return;
+      }
 
-  // Récupérer tous les tirages existants
-  const resultsSnapshot = await getDocs(collection(db, "results"));
-  const alreadyPicked = resultsSnapshot.docs.map(doc => doc.data().picked);
+      const userUpper = username.trim().toUpperCase();
 
-  // Filtrer : enlever le joueur actuel + les déjà tirés
-  participants = participants.filter(p => p !== username && !alreadyPicked.includes(p));
+      try {
+        // 1. Vérifier si le joueur a déjà un tirage
+        const resultsSnapshot = await getDocs(collection(db, "results"));
+        const existingDoc = resultsSnapshot.docs.find(doc => {
+          const p = (doc.data().player || "").trim().toUpperCase();
+          return p === userUpper;
+        });
 
-  if (participants.length === 0) {
-    alert("Plus aucun participant disponible pour le tirage !");
-    return;
-  }
+        if (existingDoc) {
+          statusText.textContent = "Tirage déjà effectué ! Redirection...";
+          setTimeout(() => {
+            window.location.href = "resultat.html";
+          }, 600);
+          return;
+        }
 
-  // Tirage aléatoire
-  const randomIndex = Math.floor(Math.random() * participants.length);
-  const picked = participants[randomIndex];
+        // 2. Récupérer tous les participants
+        const participantsSnapshot = await getDocs(collection(db, "participants"));
+        let participants = participantsSnapshot.docs
+          .map(doc => doc.data().name)
+          .filter(Boolean);
 
-  // Enregistrer le résultat
-  await addDoc(collection(db, "results"), {
-    player: username,
-    picked: picked
-  });
+        const alreadyPicked = resultsSnapshot.docs
+          .map(doc => doc.data().picked)
+          .filter(Boolean)
+          .map(p => p.trim().toUpperCase());
 
-  window.location.href = "resultat.html";
-}
+        // Filtrer : enlever le joueur actuel + les personnes déjà tirées
+        const available = participants.filter(p => {
+          const pUpper = p.trim().toUpperCase();
+          return pUpper !== userUpper && !alreadyPicked.includes(pUpper);
+        });
 
-startTirage();
+        if (available.length === 0) {
+          statusText.textContent = "Aucun participant disponible pour le tirage.";
+          alert("Plus aucun participant disponible pour le tirage ! Contacte l'organisateur.");
+          window.location.href = "menu.html";
+          return;
+        }
+
+        // Petit délai festif
+        await new Promise(r => setTimeout(r, 1400));
+
+        // 3. Tirage aléatoire
+        const randomIndex = Math.floor(Math.random() * available.length);
+        const picked = available[randomIndex];
+
+        // 4. Enregistrer dans Firestore
+        await addDoc(collection(db, "results"), {
+          player: username,
+          picked: picked,
+          timestamp: new Date().toISOString()
+        });
+
+        statusText.textContent = "C'est prêt ! Découverte de ton tirage... 🎉";
+        setTimeout(() => {
+          window.location.href = "resultat.html";
+        }, 600);
+
+      } catch (err) {
+        console.error("Erreur tirage :", err);
+        statusText.textContent = "Une erreur est survenue. Réessaie !";
+        setTimeout(() => {
+          window.location.href = "santa.html";
+        }, 2000);
+      }
+    }
+
+    startTirage();
   </script>
-    <script src="static/java/audio.js"></script>
-<script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
-    <script src="static/java/noel-ui.js"></script>
-<script src="static/java/transitions.js"></script>
+  <script src="static/java/snow.js"></script>
+  <script src="static/java/audio.js"></script>
+  <script src="static/java/theme.js"></script>
+  <script src="static/java/effects.js"></script>
+  <script src="static/java/noel-ui.js"></script>
+  <script src="static/java/transitions.js"></script>
 </body>
-<style>
-  body {
-  margin: 0;
-  padding: 0;
-  text-align: center;
-  background-color: #830303;
-  font-family: 'Chango', sans-serif;
-  position: relative;
-  overflow-x: hidden;
-  overflow: hidden;
-}
-</style>
 </html>

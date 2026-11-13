@@ -3,39 +3,49 @@
 <head>
   <link rel="icon" type="image/png" href="static/png/naima.png">
   <meta charset="UTF-8">
-  <link href="https://fonts.googleapis.com/css2?family=Chango&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Chango&family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Coming+Soon&display=swap" rel="stylesheet">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Résultat Secret Santa</title>
+  <title>Résultat Secret Santa 🎅</title>
   <link rel="stylesheet" href="static/css/resultat.css">
-    
-    <link rel="stylesheet" href="static/css/noel-3d.css">
-<link rel="stylesheet" href="static/css/transitions.css">
-<link rel="manifest" href="manifest.json">
+  <link rel="stylesheet" href="static/css/noel-3d.css">
+  <link rel="stylesheet" href="static/css/transitions.css">
+  <link rel="stylesheet" href="static/css/pwa-notifications.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="static/png/apple-touch-icon.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="static/png/apple-touch-icon.png">
+  <!-- Configuration PWA & iOS Safari -->
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Noël 2026">
 </head>
-<body>
+<body style="background: url('static/png/back.jpeg') center center / cover no-repeat fixed !important;">
   <div id="snow-container"></div>
   <a href="menu.html">
-    <img id="back" src="static/png/back.png" class="back" />
+    <img id="back" src="static/png/back.png" class="back" alt="Retour" />
   </a>
 
-  <img id="logo" src="static/png/et.png" class="logo" />
+  <img id="logo" src="static/png/et.png" class="logo" alt="Secret Santa" />
 
   <div class="result">
     <h2>Ton tirage</h2>
     <p>Tu dois offrir un cadeau à :</p>
-    <p id="resultName" class="highlight"></p>
+    <p id="resultName" class="highlight">Chargement... 🎁</p>
   </div>
 
-  <a href="https://www.amazon.com.be/b?node=212919107031&pf_rd_p=26857562-04e2-4bc1-b6e2-c1208342ac9d&pf_rd_r=5V042GZ4E57EA2W6VJPJ&ref_=eu_xmas25_mvn">Idée de cadeaux à moins de 15€</a>
+  <div style="text-align: center; margin-top: 15px; position: relative; z-index: 10;">
+    <a href="https://www.amazon.com.be/b?node=212919107031&pf_rd_p=26857562-04e2-4bc1-b6e2-c1208342ac9d&pf_rd_r=5V042GZ4E57EA2W6VJPJ&ref_=eu_xmas25_mvn" target="_blank" style="color: #ffd700; font-family: 'Poppins', sans-serif; font-weight: 700; font-size: 1rem; text-decoration: underline; text-shadow: 0 2px 4px rgba(0,0,0,0.8); background: rgba(0,0,0,0.4); padding: 8px 16px; border-radius: 20px;">
+      🎁 Idée de cadeaux à moins de 15€
+    </a>
+  </div>
 
-  <img id="tr" src="static/png/tr.png" class="tr" />
+  <img id="tr" src="static/png/tr.png" class="tr" alt="Décoration" />
 
   <script type="module">
     import { db } from "./static/java/firebase-init.js";
-    import { collection, query, where, getDocs } 
+    import { collection, getDocs } 
       from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
     async function showResult() {
@@ -45,29 +55,36 @@
         return;
       }
 
-      // Chercher le tirage correspondant
-      const q = query(collection(db, "results"), where("player", "==", username));
-      const snapshot = await getDocs(q);
+      try {
+        const userUpper = username.trim().toUpperCase();
+        const snapshot = await getDocs(collection(db, "results"));
+        const matchDoc = snapshot.docs.find(d => {
+          const p = (d.data().player || "").trim().toUpperCase();
+          return p === userUpper;
+        });
 
-      if (snapshot.size === 0) {
-        // Si pas encore tiré → retourner aux règles
-        window.location.href = "santasecret.html";
-        return;
+        if (!matchDoc) {
+          // Si pas encore tiré → aller aux règles et au tirage
+          window.location.href = "santa.html";
+          return;
+        }
+
+        const result = matchDoc.data().picked;
+        document.getElementById("resultName").textContent = result;
+      } catch (err) {
+        console.error("Erreur récupération tirage :", err);
+        document.getElementById("resultName").textContent = "Erreur de connexion";
       }
-
-      const result = snapshot.docs[0].data().picked;
-
-      document.getElementById("resultName").textContent = result;
     }
 
     showResult();
   </script>
   <script src="static/java/snow.js"></script>
-
-    <script src="static/java/audio.js"></script>
-<script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
-    <script src="static/java/noel-ui.js"></script>
-<script src="static/java/transitions.js"></script>
+  <script src="static/java/audio.js"></script>
+  <script src="static/java/theme.js"></script>
+  <script src="static/java/effects.js"></script>
+  <script src="static/java/noel-ui.js"></script>
+  <script src="static/java/transitions.js"></script>
+  <script src="static/java/pwa-notifications.js"></script>
 </body>
 </html>
