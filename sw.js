@@ -1,4 +1,32 @@
-const CACHE_NAME = 'festin-hiver-v2';
+importScripts(
+  'https://www.gstatic.com/firebasejs/12.6.0/firebase-app-compat.js',
+  'https://www.gstatic.com/firebasejs/12.6.0/firebase-messaging-compat.js'
+);
+
+firebase.initializeApp({
+  apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+  authDomain: "santa-secret-3c1f4.firebaseapp.com",
+  projectId: "santa-secret-3c1f4",
+  storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+  messagingSenderId: "238129661360",
+  appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+});
+
+const messaging = firebase.messaging();
+messaging.onBackgroundMessage(payload => {
+  const data = payload.data || {};
+  const title = data.title || "Le Festin d'Hiver 🎄";
+  return self.registration.showNotification(title, {
+    body: data.body || "Tu as reçu un nouveau message.",
+    icon: './static/png/apple-touch-icon.png',
+    badge: './static/png/apple-touch-icon.png',
+    data: { url: data.url || './menu.html' },
+    tag: data.tag || undefined,
+    vibrate: [200, 100, 200]
+  });
+});
+
+const CACHE_NAME = 'festin-hiver-v3';
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -89,7 +117,9 @@ self.addEventListener('push', event => {
 
   if (event.data) {
     try {
-      data = Object.assign(data, event.data.json());
+      const payload = event.data.json();
+      if (payload.from && payload.data) return;
+      data = Object.assign(data, payload);
     } catch (e) {
       data.body = event.data.text();
     }
@@ -115,17 +145,16 @@ self.addEventListener('push', event => {
 
 self.addEventListener('notificationclick', event => {
   event.notification.close();
-  const targetUrl = (event.notification.data && event.notification.data.url) ? event.notification.data.url : './menu.html';
+  const requestedUrl = (event.notification.data && event.notification.data.url) ? event.notification.data.url : './menu.html';
+  const requestedTarget = new URL(requestedUrl, self.registration.scope);
+  const targetUrl = requestedTarget.origin === self.location.origin
+    ? requestedTarget.href
+    : new URL('./menu.html', self.registration.scope).href;
 
   event.waitUntil(
     clients.matchAll({ type: 'window', includeUncontrolled: true }).then(clientList => {
       for (const client of clientList) {
-        if (client.url.includes('menu.html') || client.url.includes('index.html')) {
-          if ('focus' in client) {
-            client.navigate(targetUrl);
-            return client.focus();
-          }
-        }
+        return client.navigate(targetUrl).then(() => client.focus());
       }
       if (clients.openWindow) {
         return clients.openWindow(targetUrl);
