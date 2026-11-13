@@ -23,7 +23,7 @@
     }
     .messages-area {
         flex: 1;
-        padding: 80px 20px 100px;
+        padding: 80px 20px 120px;
         display: flex;
         flex-direction: column;
         gap: 15px;
@@ -62,10 +62,18 @@
         box-shadow: 0 4px 10px rgba(0,0,0,0.3);
         border: 2px solid var(--gold);
         display: flex;
+        flex-direction: column;
+        gap: 8px;
+        word-break: break-word;
+        max-width: 100%;
+        box-sizing: border-box;
+    }
+    .msg-content-row {
+        display: flex;
         justify-content: space-between;
         align-items: center;
         gap: 10px;
-        word-break: break-word;
+        width: 100%;
     }
     .msg-me {
         background: linear-gradient(135deg, var(--bright-red), var(--dark-red));
@@ -77,6 +85,14 @@
         color: #333;
         border-bottom-left-radius: 2px;
     }
+    .msg-them .poll-author,
+    .msg-them .poll-question {
+        color: #1a472a;
+    }
+    .msg-me .poll-author,
+    .msg-me .poll-question {
+        color: #fff8e7;
+    }
     .like-btn {
         background: none;
         border: 1px solid var(--gold);
@@ -86,47 +102,93 @@
         font-size: 0.9rem;
         transition: all 0.2s;
         color: inherit;
+        align-self: flex-end;
     }
     .like-btn.liked {
         background: var(--gold);
         color: var(--dark-red);
     }
+
+    /* Barre de saisie */
     .input-bar {
         position: fixed;
-        bottom: 40px;
+        bottom: 25px;
         left: 50%;
         transform: translateX(-50%);
-        width: 90%;
-        max-width: 600px;
+        width: 92%;
+        max-width: 650px;
         display: flex;
-        gap: 10px;
-        background: rgba(255,255,255,0.1);
-        backdrop-filter: blur(10px);
-        padding: 10px;
+        align-items: center;
+        gap: 8px;
+        background: rgba(10, 35, 20, 0.88);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        padding: 8px 12px;
         border-radius: 50px;
         border: 3px solid var(--gold);
-        z-index: 1000;
+        z-index: 1001;
+        box-shadow: 0 8px 25px rgba(0,0,0,0.6);
+        box-sizing: border-box;
+    }
+    .input-actions {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+    .chat-media-btn {
+        background: rgba(255, 215, 0, 0.15);
+        border: 2px solid var(--gold);
+        color: var(--gold);
+        width: 38px;
+        height: 38px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1.1rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-shrink: 0;
+        box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+        transition: transform 0.2s, background 0.2s;
+        padding: 0;
+    }
+    .chat-media-btn:hover {
+        transform: scale(1.1);
+        background: rgba(255, 215, 0, 0.35);
+    }
+    .chat-media-btn span {
+        pointer-events: none;
     }
     .input-bar input {
         flex: 1;
-        padding: 12px 20px;
+        min-width: 80px;
+        padding: 10px 16px;
         border-radius: 25px;
-        border: none;
+        border: 1.5px solid var(--gold);
         background: white;
-        color: #333;
-        font-size: 1rem;
+        color: #222;
+        font-size: 0.95rem;
         outline: none;
+        box-sizing: border-box;
     }
-    .input-bar button {
+    .input-bar button#sendBtn {
         background: var(--gold);
         border: none;
-        width: 45px;
-        height: 45px;
+        width: 42px;
+        height: 42px;
         border-radius: 50%;
         cursor: pointer;
         font-size: 1.2rem;
         color: var(--dark-red);
-        box-shadow: 0 4px 0 #b8860b;
+        box-shadow: 0 3px 0 #b8860b;
+        flex-shrink: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.15s;
+    }
+    .input-bar button#sendBtn:active {
+        transform: translateY(2px);
     }
     .back-btn {
         position: fixed;
@@ -134,6 +196,532 @@
         left: 20px;
         z-index: 1000;
         width: 50px;
+    }
+
+    /* Style des GIFs dans les messages */
+    .chat-media-container {
+        position: relative;
+        display: inline-block;
+        margin-top: 4px;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid var(--gold);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+        cursor: pointer;
+    }
+    .chat-gif-img, .chat-photo-img {
+        max-width: 240px;
+        max-height: 200px;
+        width: auto;
+        height: auto;
+        object-fit: cover;
+        display: block;
+        transition: transform 0.2s;
+    }
+    .chat-media-container:hover .chat-gif-img,
+    .chat-media-container:hover .chat-photo-img {
+        transform: scale(1.02);
+    }
+    .gif-tag {
+        position: absolute;
+        top: 6px;
+        left: 6px;
+        background: rgba(0, 0, 0, 0.7);
+        color: var(--gold);
+        font-size: 0.7rem;
+        font-weight: bold;
+        padding: 2px 6px;
+        border-radius: 6px;
+        border: 1px solid var(--gold);
+        letter-spacing: 0.5px;
+    }
+
+    /* Style du Sondage dans le chat */
+    .poll-card {
+        width: 100%;
+        min-width: 220px;
+        max-width: 320px;
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .poll-header-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        font-size: 0.75rem;
+        font-weight: bold;
+        text-transform: uppercase;
+        background: rgba(255, 215, 0, 0.25);
+        color: var(--gold);
+        border: 1px solid var(--gold);
+        padding: 2px 8px;
+        border-radius: 12px;
+        align-self: flex-start;
+    }
+    .msg-them .poll-header-badge {
+        background: #1a472a;
+        color: var(--gold);
+        border-color: #1a472a;
+    }
+    .poll-question {
+        font-size: 1.05rem;
+        font-weight: bold;
+        margin: 2px 0 0 0;
+        line-height: 1.3;
+    }
+    .poll-author {
+        font-size: 0.8rem;
+        opacity: 0.85;
+    }
+    .poll-options-box {
+        display: flex;
+        flex-direction: column;
+        gap: 7px;
+        margin-top: 4px;
+    }
+    .poll-option-row {
+        position: relative;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1.5px solid rgba(255, 215, 0, 0.5);
+        border-radius: 12px;
+        padding: 8px 12px;
+        cursor: pointer;
+        overflow: hidden;
+        transition: transform 0.15s, border-color 0.2s, box-shadow 0.2s;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        user-select: none;
+    }
+    .msg-them .poll-option-row {
+        background: #f4f8f4;
+        border-color: #c0d8c0;
+        color: #222;
+    }
+    .poll-option-row:hover {
+        transform: translateY(-1px);
+        border-color: var(--gold);
+        box-shadow: 0 2px 8px rgba(255, 215, 0, 0.25);
+    }
+    .poll-option-row.voted {
+        border: 2px solid var(--gold);
+        box-shadow: 0 0 10px rgba(255, 215, 0, 0.4);
+    }
+    .msg-them .poll-option-row.voted {
+        background: #e8f5e9;
+        border-color: #1b5e20;
+    }
+    .poll-bar-fill {
+        position: absolute;
+        top: 0;
+        left: 0;
+        bottom: 0;
+        background: linear-gradient(90deg, rgba(255, 215, 0, 0.3), rgba(255, 215, 0, 0.6));
+        border-radius: 10px;
+        transition: width 0.35s ease;
+        z-index: 1;
+        pointer-events: none;
+    }
+    .msg-them .poll-bar-fill {
+        background: linear-gradient(90deg, rgba(76, 175, 80, 0.25), rgba(76, 175, 80, 0.45));
+    }
+    .poll-option-content {
+        position: relative;
+        z-index: 2;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        width: 100%;
+        gap: 8px;
+    }
+    .poll-option-title {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-weight: 600;
+        font-size: 0.95rem;
+        flex: 1;
+        word-break: break-word;
+    }
+    .poll-option-stats {
+        font-size: 0.85rem;
+        font-weight: bold;
+        white-space: nowrap;
+        opacity: 0.95;
+    }
+    .poll-footer-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-top: 4px;
+        font-size: 0.8rem;
+        opacity: 0.9;
+    }
+
+    /* Modal générique de Noël */
+    .noel-modal-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.82);
+        backdrop-filter: blur(10px);
+        -webkit-backdrop-filter: blur(10px);
+        z-index: 20000;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        box-sizing: border-box;
+        animation: modalFadeIn 0.2s ease-out;
+    }
+    @keyframes modalFadeIn {
+        from { opacity: 0; transform: scale(0.96); }
+        to { opacity: 1; transform: scale(1); }
+    }
+    .noel-modal-card {
+        background: linear-gradient(135deg, #133c1d 0%, #081d0f 100%);
+        border: 3px solid var(--gold);
+        border-radius: 24px;
+        width: 100%;
+        max-width: 480px;
+        max-height: 85vh;
+        display: flex;
+        flex-direction: column;
+        color: white;
+        box-shadow: 0 15px 40px rgba(0,0,0,0.8), inset 0 0 20px rgba(255,215,0,0.15);
+        overflow: hidden;
+    }
+    .noel-modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 14px 18px;
+        border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+        background: rgba(0, 0, 0, 0.2);
+    }
+    .noel-modal-header h3 {
+        margin: 0;
+        font-size: 1.2rem;
+        color: var(--gold);
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .noel-modal-close {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1.5px solid var(--gold);
+        color: white;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        font-size: 1rem;
+        font-weight: bold;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: background 0.2s, transform 0.2s;
+    }
+    .noel-modal-close:hover {
+        background: var(--bright-red);
+        transform: rotate(90deg);
+    }
+    .noel-modal-body {
+        padding: 16px 18px;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+    }
+    .noel-modal-footer {
+        padding: 12px 18px;
+        border-top: 2px solid rgba(255, 215, 0, 0.3);
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.2);
+    }
+    .modal-label {
+        font-size: 0.95rem;
+        color: var(--gold);
+        font-weight: bold;
+        margin-bottom: 4px;
+        display: block;
+    }
+    .modal-text-input {
+        width: 100%;
+        padding: 10px 14px;
+        border-radius: 12px;
+        border: 2px solid var(--gold);
+        background: white;
+        color: #222;
+        font-family: inherit;
+        font-size: 0.95rem;
+        outline: none;
+        box-sizing: border-box;
+    }
+    .poll-options-inputs {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+    }
+    .poll-option-input-row {
+        display: flex;
+        gap: 8px;
+        align-items: center;
+    }
+    .poll-option-input-row input {
+        flex: 1;
+    }
+    .poll-remove-opt-btn {
+        background: rgba(255, 0, 0, 0.2);
+        border: 1.5px solid #ff4444;
+        color: #ff6666;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        transition: all 0.2s;
+    }
+    .poll-remove-opt-btn:hover {
+        background: #ff4444;
+        color: white;
+    }
+    .add-option-btn {
+        background: rgba(255, 215, 0, 0.15);
+        border: 2px dashed var(--gold);
+        color: var(--gold);
+        padding: 8px 14px;
+        border-radius: 12px;
+        cursor: pointer;
+        font-weight: bold;
+        font-size: 0.9rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 6px;
+        transition: background 0.2s, transform 0.15s;
+    }
+    .add-option-btn:hover {
+        background: rgba(255, 215, 0, 0.3);
+        transform: translateY(-1px);
+    }
+    .btn-cancel {
+        background: rgba(255, 255, 255, 0.15);
+        border: 1px solid white;
+        color: white;
+        padding: 8px 16px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+    }
+    .btn-submit {
+        background: linear-gradient(135deg, var(--gold), #daa520);
+        border: none;
+        color: var(--dark-red);
+        font-weight: bold;
+        padding: 8px 18px;
+        border-radius: 20px;
+        cursor: pointer;
+        font-family: inherit;
+        box-shadow: 0 3px 0 #b8860b;
+        transition: transform 0.15s;
+    }
+    .btn-submit:hover {
+        filter: brightness(1.1);
+    }
+    .btn-submit:active {
+        transform: translateY(2px);
+    }
+
+    /* Modal GIF */
+    .gif-search-box {
+        position: relative;
+    }
+    .gif-search-box input {
+        width: 100%;
+        padding: 10px 14px 10px 36px;
+        border-radius: 20px;
+        border: 2px solid var(--gold);
+        background: rgba(255,255,255,0.95);
+        color: #222;
+        font-size: 0.9rem;
+        outline: none;
+        box-sizing: border-box;
+    }
+    .gif-search-icon {
+        position: absolute;
+        left: 12px;
+        top: 50%;
+        transform: translateY(-50%);
+        font-size: 1rem;
+        pointer-events: none;
+    }
+    .gif-categories-bar {
+        display: flex;
+        gap: 6px;
+        overflow-x: auto;
+        padding-bottom: 4px;
+        scrollbar-width: thin;
+    }
+    .gif-cat-chip {
+        background: rgba(255, 255, 255, 0.12);
+        border: 1px solid rgba(255, 215, 0, 0.5);
+        color: white;
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.78rem;
+        cursor: pointer;
+        white-space: nowrap;
+        transition: background 0.2s, border-color 0.2s;
+    }
+    .gif-cat-chip:hover, .gif-cat-chip.active {
+        background: var(--gold);
+        color: var(--dark-red);
+        font-weight: bold;
+        border-color: var(--gold);
+    }
+    .gif-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+        gap: 8px;
+        max-height: 48vh;
+        overflow-y: auto;
+        padding: 4px;
+        box-sizing: border-box;
+    }
+    .gif-card-item {
+        position: relative;
+        border-radius: 12px;
+        overflow: hidden;
+        border: 2px solid transparent;
+        cursor: pointer;
+        background: rgba(0, 0, 0, 0.4);
+        aspect-ratio: 1;
+        transition: transform 0.2s, border-color 0.2s, box-shadow 0.2s;
+    }
+    .gif-card-item:hover {
+        transform: scale(1.04);
+        border-color: var(--gold);
+        box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+        z-index: 2;
+    }
+    .gif-card-item img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
+    .gif-card-title {
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: linear-gradient(to top, rgba(0,0,0,0.85), transparent);
+        color: white;
+        font-size: 0.7rem;
+        padding: 6px 4px 3px;
+        text-align: center;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+    }
+    .gif-quick-send {
+        position: absolute;
+        top: 5px;
+        right: 5px;
+        background: var(--gold);
+        color: var(--dark-red);
+        border: none;
+        border-radius: 50%;
+        width: 26px;
+        height: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.75rem;
+        font-weight: bold;
+        cursor: pointer;
+        opacity: 0;
+        transition: opacity 0.2s, transform 0.15s;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+    }
+    .gif-card-item:hover .gif-quick-send {
+        opacity: 1;
+    }
+    .gif-quick-send:hover {
+        transform: scale(1.15);
+    }
+    .gif-custom-url-box {
+        margin-top: 4px;
+        background: rgba(0,0,0,0.25);
+        border-radius: 12px;
+        padding: 8px 12px;
+        border: 1px dashed rgba(255,215,0,0.4);
+    }
+    .gif-custom-url-box summary {
+        cursor: pointer;
+        color: var(--gold);
+        font-size: 0.85rem;
+        font-weight: bold;
+        outline: none;
+    }
+    .gif-custom-form {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+    }
+    .gif-custom-form input {
+        flex: 1;
+        padding: 6px 10px;
+        border-radius: 10px;
+        border: 1px solid var(--gold);
+        font-size: 0.85rem;
+        outline: none;
+    }
+    .gif-custom-form button {
+        background: var(--gold);
+        color: var(--dark-red);
+        border: none;
+        border-radius: 10px;
+        font-weight: bold;
+        padding: 6px 12px;
+        cursor: pointer;
+        font-size: 0.85rem;
+    }
+
+    @media (max-width: 480px) {
+        .input-bar {
+            width: 95%;
+            padding: 6px 8px;
+            gap: 6px;
+            bottom: 18px;
+        }
+        .chat-media-btn {
+            width: 34px;
+            height: 34px;
+            font-size: 1rem;
+        }
+        .input-bar input {
+            padding: 8px 12px;
+            font-size: 0.9rem;
+        }
+        .input-bar button#sendBtn {
+            width: 36px;
+            height: 36px;
+            font-size: 1.1rem;
+        }
+        .poll-card {
+            max-width: 260px;
+        }
+        .chat-gif-img, .chat-photo-img {
+            max-width: 190px;
+            max-height: 160px;
+        }
     }
 </style>
 <link rel="stylesheet" href="static/css/transitions.css">
@@ -150,9 +738,77 @@
     <div class="messages-area" id="messages"></div>
     <div id="attachedPreview"></div>
     <div class="input-bar">
-        <button type="button" class="chat-media-btn" id="chatPhotoBtn" title="Envoyer une photo">📷</button>
+        <div class="input-actions">
+            <button type="button" class="chat-media-btn" id="chatPhotoBtn" title="Envoyer une photo"><span>📷</span></button>
+            <button type="button" class="chat-media-btn" id="chatGifBtn" title="GIFs de Noël"><span>🎬</span></button>
+            <button type="button" class="chat-media-btn" id="chatPollBtn" title="Créer un sondage"><span>📊</span></button>
+        </div>
         <input type="text" id="messageInput" placeholder="Propose un plat pour le menu...">
-        <button id="sendBtn">➤</button>
+        <button id="sendBtn" title="Envoyer">➤</button>
+    </div>
+</div>
+
+<!-- Modal Sondage de Noël -->
+<div id="pollModal" class="noel-modal-overlay" style="display: none;">
+    <div class="noel-modal-card">
+        <div class="noel-modal-header">
+            <h3>📊 Nouveau Sondage de Noël 🎄</h3>
+            <button type="button" class="noel-modal-close" id="closePollModalBtn">✕</button>
+        </div>
+        <div class="noel-modal-body">
+            <div>
+                <label class="modal-label" for="pollQuestionInput">Question du sondage :</label>
+                <input type="text" id="pollQuestionInput" class="modal-text-input" placeholder="Ex: Quel plat principal pour le réveillon ?" maxlength="120">
+            </div>
+            <div>
+                <label class="modal-label">Options de réponse (2 à 6) :</label>
+                <div id="pollOptionsList" class="poll-options-inputs"></div>
+            </div>
+            <button type="button" id="addOptionBtn" class="add-option-btn">➕ Ajouter une option</button>
+        </div>
+        <div class="noel-modal-footer">
+            <button type="button" class="btn-cancel" id="cancelPollModalBtn">Annuler</button>
+            <button type="button" class="btn-submit" id="submitPollModalBtn">Lancer le sondage 🎅</button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal GIFs de Noël -->
+<div id="gifModal" class="noel-modal-overlay" style="display: none;">
+    <div class="noel-modal-card" style="max-width: 520px;">
+        <div class="noel-modal-header">
+            <h3>🎬 GIFs de Noël 🎅✨</h3>
+            <button type="button" class="noel-modal-close" id="closeGifModalBtn">✕</button>
+        </div>
+        <div class="noel-modal-body" style="gap: 10px;">
+            <div class="gif-search-box">
+                <span class="gif-search-icon">🔍</span>
+                <input type="text" id="gifSearchInput" placeholder="Filtrer (ex: père noël, danse, festin, grinch...)" />
+            </div>
+            <div class="gif-categories-bar" id="gifCategoriesBar">
+                <button type="button" class="gif-cat-chip active" data-cat="all">🌟 Tous</button>
+                <button type="button" class="gif-cat-chip" data-cat="santa">🎅 Père Noël</button>
+                <button type="button" class="gif-cat-chip" data-cat="feast">🍽️ Festin</button>
+                <button type="button" class="gif-cat-chip" data-cat="tree">🎄 Sapin</button>
+                <button type="button" class="gif-cat-chip" data-cat="grinch">😈 Grinch</button>
+                <button type="button" class="gif-cat-chip" data-cat="cute">🐾 Mignon</button>
+                <button type="button" class="gif-cat-chip" data-cat="snow">❄️ Neige</button>
+                <button type="button" class="gif-cat-chip" data-cat="party">🎉 Fête</button>
+            </div>
+            <div class="gif-grid" id="gifGrid"></div>
+            <div class="gif-custom-url-box">
+                <details>
+                    <summary>🔗 Coller l'URL d'un GIF externe</summary>
+                    <div class="gif-custom-form">
+                        <input type="url" id="customGifUrlInput" placeholder="https://media.giphy.com/... ou lien .gif" />
+                        <button type="button" id="useCustomGifBtn">Valider</button>
+                    </div>
+                </details>
+            </div>
+        </div>
+        <div class="noel-modal-footer">
+            <button type="button" class="btn-cancel" id="cancelGifModalBtn">Fermer</button>
+        </div>
     </div>
 </div>
 
@@ -179,9 +835,106 @@ const messagesList = document.getElementById("messages");
 const input = document.getElementById("messageInput");
 const sendBtn = document.getElementById("sendBtn");
 const currentUser = localStorage.getItem("username") || "Inconnu";
+
 let pendingPhotoBase64 = null;
+let pendingGifUrl = null;
+
 const chatPhotoBtn = document.getElementById('chatPhotoBtn');
+const chatGifBtn = document.getElementById('chatGifBtn');
+const chatPollBtn = document.getElementById('chatPollBtn');
 const attachedPreview = document.getElementById('attachedPreview');
+
+// Modals
+const pollModal = document.getElementById('pollModal');
+const closePollModalBtn = document.getElementById('closePollModalBtn');
+const cancelPollModalBtn = document.getElementById('cancelPollModalBtn');
+const submitPollModalBtn = document.getElementById('submitPollModalBtn');
+const pollQuestionInput = document.getElementById('pollQuestionInput');
+const pollOptionsList = document.getElementById('pollOptionsList');
+const addOptionBtn = document.getElementById('addOptionBtn');
+
+const gifModal = document.getElementById('gifModal');
+const closeGifModalBtn = document.getElementById('closeGifModalBtn');
+const cancelGifModalBtn = document.getElementById('cancelGifModalBtn');
+const gifSearchInput = document.getElementById('gifSearchInput');
+const gifCategoriesBar = document.getElementById('gifCategoriesBar');
+const gifGrid = document.getElementById('gifGrid');
+const customGifUrlInput = document.getElementById('customGifUrlInput');
+const useCustomGifBtn = document.getElementById('useCustomGifBtn');
+
+// Collection de GIFs de Noël
+const CHRISTMAS_GIFS = [
+    { id: "12vvS2n8WLAuaA", title: "Père Noël qui danse", tags: ["santa", "party", "danse", "perenoel"] },
+    { id: "3ofT5EtPNBpIjC8jTy", title: "Père Noël Ho Ho Ho", tags: ["santa", "perenoel", "coucou"] },
+    { id: "3o6wrx8vEKCTDCJMnm", title: "Traîneau dans le ciel", tags: ["santa", "snow", "perenoel", "ciel"] },
+    { id: "d2Z9QYzA2azDWcpa", title: "Père Noël swag", tags: ["santa", "party", "danse", "fun"] },
+    { id: "3o6fJ1BM7R2EBRrnxK", title: "Sapin scintillant", tags: ["tree", "sapin", "lumieres", "etoile"] },
+    { id: "l2YWhZXEupms58g9y", title: "Sapin magique", tags: ["tree", "sapin", "party", "magie"] },
+    { id: "l4EoX23aJaUsf4F8Y", title: "Boules de Noël", tags: ["tree", "sapin", "deco"] },
+    { id: "26tnhnKRq42808AWk", title: "Festin de Noël dinde", tags: ["feast", "festin", "repas", "dinde", "miam"] },
+    { id: "3o6fIS1318cx2rRhpm", title: "Banquet gourmand", tags: ["feast", "festin", "repas", "plat"] },
+    { id: "3o6fJd6O8D6QGg0QDe", title: "Desserts & Gourmandises", tags: ["feast", "festin", "buche", "dessert", "gateau"] },
+    { id: "l0MYC0LajbaPoEADu", title: "Pain d'épices dansant", tags: ["feast", "party", "gateau", "miam", "danse"] },
+    { id: "K9rNo8b0qzk0o", title: "Cheminée feu de bois cosy", tags: ["feast", "tree", "feu", "cosy", "reveillon"] },
+    { id: "3o7TKLhb4764Z15g2I", title: "Toast & Champagne", tags: ["party", "feast", "toast", "tchin", "apero"] },
+    { id: "3oz8xALpV1X2QZfoAg", title: "Grinch sourire malicieux", tags: ["grinch", "sourire", "fun", "humour"] },
+    { id: "y0NFayaBeiWEU", title: "Grinch grincheux", tags: ["grinch", "humour", "fete"] },
+    { id: "xUPOqfgZf8o7G5V9G8", title: "Chien mignon de Noël", tags: ["cute", "animaux", "chien"] },
+    { id: "14adw42Z7jVp96", title: "Chat avec bonnet de Noël", tags: ["cute", "animaux", "chat"] },
+    { id: "3o6wrt16m18m9g9160", title: "Renne Rudolph", tags: ["cute", "animaux", "renne"] },
+    { id: "ZtPGF4p4rP7iM", title: "Chat dans le sapin", tags: ["cute", "tree", "animaux", "chat"] },
+    { id: "gNke2UrUTopOg", title: "Snoopy fête Noël", tags: ["cute", "party", "danse", "snoopy"] },
+    { id: "x7gjmBuaHrWak", title: "Neige qui tombe doucement", tags: ["snow", "neige", "hiver", "flocons"] },
+    { id: "10t5tAgK2GUuOA", title: "Bonhomme de neige dansant", tags: ["snow", "neige", "danse", "party"] },
+    { id: "3ohhwj45j4e23kLd4Y", title: "Danse des lutins", tags: ["party", "danse", "lutins", "elfe"] },
+    { id: "3ofT5CzWVv50SXjo7C", title: "Cadeaux surprises", tags: ["party", "cadeau", "surprise"] },
+    { id: "l2JhL0G8b5b5PTtxC", title: "Maman j'ai raté l'avion !", tags: ["party", "film", "fun"] },
+    { id: "3o6fIUuO95K2Zc5j0k", title: "Feux d'artifice de fête", tags: ["party", "lumieres", "fete"] }
+];
+
+let selectedCategory = "all";
+let currentSearchQuery = "";
+let latestDocsCache = [];
+
+function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
+
+function updateAttachedPreview() {
+    if (pendingPhotoBase64) {
+        attachedPreview.innerHTML = `
+            <div class="chat-attached-preview">
+                <img src="${pendingPhotoBase64}" alt="Photo attachée">
+                <span>📷 Photo prête à envoyer</span>
+                <button class="chat-attached-remove" id="removeAttached">✕</button>
+            </div>
+        `;
+        document.getElementById('removeAttached').onclick = () => {
+            pendingPhotoBase64 = null;
+            attachedPreview.innerHTML = '';
+        };
+    } else if (pendingGifUrl) {
+        attachedPreview.innerHTML = `
+            <div class="chat-attached-preview">
+                <img src="${pendingGifUrl}" alt="GIF prêt">
+                <span>🎬 GIF de Noël prêt à envoyer</span>
+                <button class="chat-attached-remove" id="removeAttached">✕</button>
+            </div>
+        `;
+        document.getElementById('removeAttached').onclick = () => {
+            pendingGifUrl = null;
+            attachedPreview.innerHTML = '';
+        };
+    } else {
+        attachedPreview.innerHTML = '';
+    }
+}
 
 async function toggleLike(messageId, currentLikesArray) {
     const messageDocRef = doc(db, "messages", messageId);
@@ -192,10 +945,51 @@ async function toggleLike(messageId, currentLikesArray) {
     }
 }
 
+async function votePoll(messageId, optionIdx) {
+    let voter = currentUser;
+    if (voter === "Inconnu") {
+        const name = prompt("Entre ton prénom pour voter :");
+        if (name && name.trim()) {
+            voter = name.trim();
+            localStorage.setItem("username", voter);
+            location.reload();
+            return;
+        } else {
+            return;
+        }
+    }
+
+    const docData = latestDocsCache.find(d => d.id === messageId)?.data;
+    if (!docData || !docData.poll || !Array.isArray(docData.poll.options)) return;
+
+    const options = JSON.parse(JSON.stringify(docData.poll.options));
+    if (!options[optionIdx]) return;
+
+    const optVotes = Array.isArray(options[optionIdx].votes) ? options[optionIdx].votes : [];
+    const alreadyVotedThis = optVotes.includes(voter);
+
+    // Vote unique : retirer l'utilisateur de toutes les options
+    options.forEach(opt => {
+        opt.votes = (opt.votes || []).filter(u => u !== voter);
+    });
+
+    // Si pas encore voté pour cette option, on l'ajoute (sinon le clic dévote)
+    if (!alreadyVotedThis) {
+        options[optionIdx].votes.push(voter);
+    }
+
+    const messageDocRef = doc(db, "messages", messageId);
+    await updateDoc(messageDocRef, {
+        "poll.options": options
+    });
+}
+
 onSnapshot(q, (snapshot) => {
     messagesList.innerHTML = ""; 
-    snapshot.forEach((doc) => {
-        const msg = doc.data();
+    latestDocsCache = snapshot.docs.map(d => ({ id: d.id, data: d.data() }));
+
+    snapshot.forEach((docSnap) => {
+        const msg = docSnap.data();
         const isMe = msg.sender === currentUser;
         const wrapper = document.createElement("div");
         wrapper.className = 'msg-wrapper ' + (isMe ? 'msg-me-wrapper' : 'msg-them-wrapper');
@@ -203,33 +997,125 @@ onSnapshot(q, (snapshot) => {
         const avatarSrc = msg.avatar || (isMe ? (localStorage.getItem('userAvatar') || 'static/png/naima.png') : 'static/png/naima.png');
         const likes = msg.likes || [];
         const isLiked = likes.includes(currentUser);
+
+        let contentBodyHtml = '';
+
+        if (msg.type === "poll" && msg.poll) {
+            // Affichage interactif du Sondage
+            const poll = msg.poll;
+            const options = poll.options || [];
+            let totalVotes = 0;
+            options.forEach(opt => {
+                totalVotes += (opt.votes || []).length;
+            });
+
+            let optionsHtml = '';
+            options.forEach((opt, idx) => {
+                const votes = opt.votes || [];
+                const count = votes.length;
+                const pct = totalVotes > 0 ? Math.round((count / totalVotes) * 100) : 0;
+                const userVoted = votes.includes(currentUser);
+                const votersNames = votes.length > 0 ? `Voté par: ${votes.join(', ')}` : 'Aucun vote';
+
+                optionsHtml += `
+                    <div class="poll-option-row ${userVoted ? 'voted' : ''}" data-msg-id="${docSnap.id}" data-opt-idx="${idx}" title="${votersNames}">
+                        <div class="poll-bar-fill" style="width: ${pct}%"></div>
+                        <div class="poll-option-content">
+                            <span class="poll-option-title">
+                                <span>${userVoted ? '✅' : '⚪'}</span>
+                                <span>${escapeHtml(opt.text)}</span>
+                            </span>
+                            <span class="poll-option-stats">${pct}% (${count})</span>
+                        </div>
+                    </div>
+                `;
+            });
+
+            contentBodyHtml = `
+                <div class="poll-card">
+                    <div class="poll-header-badge">📊 Sondage de Noël</div>
+                    <div class="poll-question">${escapeHtml(poll.question || msg.content)}</div>
+                    <div class="poll-author">Proposé par <strong>${escapeHtml(msg.sender)}</strong></div>
+                    <div class="poll-options-box">
+                        ${optionsHtml}
+                    </div>
+                    <div class="poll-footer-row">
+                        <span>👥 ${totalVotes} vote${totalVotes > 1 ? 's' : ''}</span>
+                        <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${docSnap.id}">
+                            ❤️ ${likes.length}
+                        </button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // Message standard (texte, photo, gif)
+            const textContent = msg.content ? `<span><strong>${escapeHtml(msg.sender)}</strong>: ${escapeHtml(msg.content)}</span>` : `<span><strong>${escapeHtml(msg.sender)}</strong></span>`;
+            
+            let photoHtml = '';
+            if (msg.photo) {
+                photoHtml = `
+                    <div class="chat-media-container" onclick="ChristmasCamera.openLightbox('${msg.photo}')" title="Agrandir la photo">
+                        <img src="${msg.photo}" class="chat-photo-img" alt="Photo" loading="lazy">
+                    </div>
+                `;
+            }
+
+            let gifHtml = '';
+            if (msg.gif) {
+                gifHtml = `
+                    <div class="chat-media-container" onclick="ChristmasCamera.openLightbox('${msg.gif}')" title="Agrandir le GIF">
+                        <img src="${msg.gif}" class="chat-gif-img" alt="GIF de Noël" loading="lazy">
+                        <span class="gif-tag">GIF</span>
+                    </div>
+                `;
+            }
+
+            contentBodyHtml = `
+                <div class="msg-content-row">
+                    ${textContent}
+                    <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${docSnap.id}">
+                        ❤️ ${likes.length}
+                    </button>
+                </div>
+                ${photoHtml}
+                ${gifHtml}
+            `;
+        }
         
         wrapper.innerHTML = `
-            <img src="${avatarSrc}" class="chat-avatar" alt="${msg.sender}">
+            <img src="${avatarSrc}" class="chat-avatar" alt="${escapeHtml(msg.sender)}">
             <div class="msg ${isMe ? 'msg-me' : 'msg-them'}">
-                <span><strong>${msg.sender}</strong>: ${msg.content}</span>
-                ${msg.photo ? `<img src="${msg.photo}" class="chat-photo-img" onclick="ChristmasCamera.openLightbox(this.src)" alt="Photo">` : ''}
-                <button class="like-btn ${isLiked ? 'liked' : ''}" data-id="${doc.id}">
-                    ❤️ ${likes.length}
-                </button>
+                ${contentBodyHtml}
             </div>
         `;
         messagesList.appendChild(wrapper);
     });
 
+    // Écouteurs pour les likes
     document.querySelectorAll('.like-btn').forEach(button => {
         button.onclick = (e) => {
-            const id = e.target.dataset.id;
-            const docData = snapshot.docs.find(d => d.id === id);
-            if (docData) toggleLike(id, docData.data().likes || []);
+            const id = e.currentTarget.dataset.id;
+            const docObj = latestDocsCache.find(d => d.id === id);
+            if (docObj) toggleLike(id, docObj.data.likes || []);
         };
     });
+
+    // Écouteurs pour les options de vote des sondages
+    document.querySelectorAll('.poll-option-row').forEach(row => {
+        row.onclick = (e) => {
+            const msgId = row.dataset.msgId;
+            const optIdx = parseInt(row.dataset.optIdx, 10);
+            votePoll(msgId, optIdx);
+        };
+    });
+
     messagesList.scrollTop = messagesList.scrollHeight;
 });
 
+// Envoi de message
 sendBtn.onclick = async () => {
     const content = input.value.trim();
-    if (content || pendingPhotoBase64) {
+    if (content || pendingPhotoBase64 || pendingGifUrl) {
         const userAvatar = localStorage.getItem('userAvatar') || '';
         const docData = {
             sender: currentUser,
@@ -241,36 +1127,277 @@ sendBtn.onclick = async () => {
         if (pendingPhotoBase64) {
             docData.photo = pendingPhotoBase64;
         }
+        if (pendingGifUrl) {
+            docData.gif = pendingGifUrl;
+        }
         await addDoc(messagesRef, docData);
         input.value = "";
         pendingPhotoBase64 = null;
+        pendingGifUrl = null;
         attachedPreview.innerHTML = '';
     }
 };
 
 input.onkeyup = (e) => { if (e.key === "Enter") sendBtn.click(); };
 
-// Photo attachment
-
+// Gestion de la Photo (ChristmasCamera)
 chatPhotoBtn.onclick = () => {
     ChristmasCamera.open({
         title: "Photo de Noël 📸",
         maxDim: 600,
         onCapture: (base64) => {
             pendingPhotoBase64 = base64;
-            attachedPreview.innerHTML = `
-                <div class="chat-attached-preview">
-                    <img src="${base64}" alt="Photo attachée">
-                    <span>📷 Photo prête à envoyer</span>
-                    <button class="chat-attached-remove" id="removeAttached">✕</button>
-                </div>
-            `;
-            document.getElementById('removeAttached').onclick = () => {
-                pendingPhotoBase64 = null;
-                attachedPreview.innerHTML = '';
-            };
+            pendingGifUrl = null;
+            updateAttachedPreview();
         }
     });
+};
+
+// ================= GESTION DU SONDAGE =================
+function renderPollOptionInputs() {
+    const currentValues = [];
+    pollOptionsList.querySelectorAll('input').forEach(inp => currentValues.push(inp.value));
+
+    if (currentValues.length < 2) {
+        currentValues.push("", "");
+    }
+
+    pollOptionsList.innerHTML = '';
+    currentValues.forEach((val, idx) => {
+        const row = document.createElement('div');
+        row.className = 'poll-option-input-row';
+        row.innerHTML = `
+            <input type="text" class="modal-text-input" placeholder="Option ${idx + 1}" value="${escapeHtml(val)}" maxlength="80">
+            ${currentValues.length > 2 ? `<button type="button" class="poll-remove-opt-btn" title="Supprimer l'option">✕</button>` : ''}
+        `;
+        if (currentValues.length > 2) {
+            row.querySelector('.poll-remove-opt-btn').onclick = () => {
+                currentValues.splice(idx, 1);
+                rebuildPollInputs(currentValues);
+            };
+        }
+        pollOptionsList.appendChild(row);
+    });
+
+    addOptionBtn.style.display = currentValues.length >= 6 ? 'none' : 'flex';
+}
+
+function rebuildPollInputs(values) {
+    pollOptionsList.innerHTML = '';
+    values.forEach((val, idx) => {
+        const row = document.createElement('div');
+        row.className = 'poll-option-input-row';
+        row.innerHTML = `
+            <input type="text" class="modal-text-input" placeholder="Option ${idx + 1}" value="${escapeHtml(val)}" maxlength="80">
+            ${values.length > 2 ? `<button type="button" class="poll-remove-opt-btn" title="Supprimer l'option">✕</button>` : ''}
+        `;
+        if (values.length > 2) {
+            row.querySelector('.poll-remove-opt-btn').onclick = () => {
+                values.splice(idx, 1);
+                rebuildPollInputs(values);
+            };
+        }
+        pollOptionsList.appendChild(row);
+    });
+    addOptionBtn.style.display = values.length >= 6 ? 'none' : 'flex';
+}
+
+addOptionBtn.onclick = () => {
+    const currentValues = [];
+    pollOptionsList.querySelectorAll('input').forEach(inp => currentValues.push(inp.value));
+    if (currentValues.length < 6) {
+        currentValues.push("");
+        rebuildPollInputs(currentValues);
+        const allInputs = pollOptionsList.querySelectorAll('input');
+        if (allInputs.length > 0) allInputs[allInputs.length - 1].focus();
+    }
+};
+
+chatPollBtn.onclick = () => {
+    pollQuestionInput.value = "";
+    renderPollOptionInputs();
+    pollModal.style.display = 'flex';
+    pollQuestionInput.focus();
+};
+
+function closePollModal() {
+    pollModal.style.display = 'none';
+}
+closePollModalBtn.onclick = closePollModal;
+cancelPollModalBtn.onclick = closePollModal;
+pollModal.onclick = (e) => {
+    if (e.target === pollModal) closePollModal();
+};
+
+submitPollModalBtn.onclick = async () => {
+    const question = pollQuestionInput.value.trim();
+    if (!question) {
+        alert("Entre une question pour ton sondage ! 🎅");
+        pollQuestionInput.focus();
+        return;
+    }
+
+    const optionsValues = [];
+    pollOptionsList.querySelectorAll('input').forEach(inp => {
+        const txt = inp.value.trim();
+        if (txt) optionsValues.push(txt);
+    });
+
+    if (optionsValues.length < 2) {
+        alert("Ajoute au moins 2 options valides pour le sondage ! 🎄");
+        return;
+    }
+
+    const userAvatar = localStorage.getItem('userAvatar') || '';
+    const pollDoc = {
+        sender: currentUser,
+        content: `📊 ${question}`,
+        type: "poll",
+        poll: {
+            question: question,
+            options: optionsValues.map((optText, index) => ({
+                id: index,
+                text: optText,
+                votes: []
+            }))
+        },
+        timestamp: serverTimestamp(),
+        likes: [],
+        avatar: userAvatar
+    };
+
+    submitPollModalBtn.disabled = true;
+    submitPollModalBtn.textContent = "Publication...";
+
+    try {
+        await addDoc(messagesRef, pollDoc);
+        closePollModal();
+    } catch (err) {
+        console.error("Erreur lors de la création du sondage :", err);
+        alert("Erreur lors de la publication. Réessaie !");
+    } finally {
+        submitPollModalBtn.disabled = false;
+        submitPollModalBtn.textContent = "Lancer le sondage 🎅";
+    }
+};
+
+// ================= GESTION DES GIFS =================
+function getGifUrl(id) {
+    return `https://media.giphy.com/media/${id}/giphy.gif`;
+}
+
+function renderGifs() {
+    gifGrid.innerHTML = '';
+    const qLower = currentSearchQuery.toLowerCase().trim();
+
+    const filtered = CHRISTMAS_GIFS.filter(gif => {
+        const matchesCategory = (selectedCategory === "all") || (gif.tags && gif.tags.includes(selectedCategory));
+        const matchesSearch = !qLower || gif.title.toLowerCase().includes(qLower) || (gif.tags && gif.tags.some(t => t.toLowerCase().includes(qLower)));
+        return matchesCategory && matchesSearch;
+    });
+
+    if (filtered.length === 0) {
+        gifGrid.innerHTML = `
+            <div style="grid-column: 1/-1; text-align: center; padding: 25px 10px; color: var(--gold);">
+                🎄 Aucun GIF trouvé pour cette recherche. Essaie un autre mot !
+            </div>
+        `;
+        return;
+    }
+
+    filtered.forEach(gif => {
+        const url = getGifUrl(gif.id);
+        const card = document.createElement('div');
+        card.className = 'gif-card-item';
+        card.title = `${gif.title} (Cliquer pour sélectionner)`;
+
+        card.innerHTML = `
+            <img src="${url}" alt="${escapeHtml(gif.title)}" loading="lazy">
+            <span class="gif-card-title">${escapeHtml(gif.title)}</span>
+            <button type="button" class="gif-quick-send" title="Envoyer directement">🚀</button>
+        `;
+
+        // Clic sur le GIF : attacher au message
+        card.onclick = (e) => {
+            if (e.target.closest('.gif-quick-send')) return;
+            selectGif(url, gif.title);
+        };
+
+        // Clic sur le bouton fusée : envoi instantané
+        const quickSendBtn = card.querySelector('.gif-quick-send');
+        quickSendBtn.onclick = async (e) => {
+            e.stopPropagation();
+            await sendGifDirectly(url);
+        };
+
+        gifGrid.appendChild(card);
+    });
+}
+
+function selectGif(url, title) {
+    pendingGifUrl = url;
+    pendingPhotoBase64 = null;
+    updateAttachedPreview();
+    closeGifModal();
+    input.focus();
+}
+
+async function sendGifDirectly(url) {
+    const userAvatar = localStorage.getItem('userAvatar') || '';
+    const docData = {
+        sender: currentUser,
+        content: "",
+        gif: url,
+        timestamp: serverTimestamp(),
+        likes: [],
+        avatar: userAvatar
+    };
+    await addDoc(messagesRef, docData);
+    closeGifModal();
+}
+
+chatGifBtn.onclick = () => {
+    currentSearchQuery = "";
+    gifSearchInput.value = "";
+    selectedCategory = "all";
+    gifCategoriesBar.querySelectorAll('.gif-cat-chip').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.cat === "all");
+    });
+    renderGifs();
+    gifModal.style.display = 'flex';
+};
+
+function closeGifModal() {
+    gifModal.style.display = 'none';
+}
+closeGifModalBtn.onclick = closeGifModal;
+cancelGifModalBtn.onclick = closeGifModal;
+gifModal.onclick = (e) => {
+    if (e.target === gifModal) closeGifModal();
+};
+
+gifCategoriesBar.querySelectorAll('.gif-cat-chip').forEach(btn => {
+    btn.onclick = () => {
+        gifCategoriesBar.querySelectorAll('.gif-cat-chip').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        selectedCategory = btn.dataset.cat;
+        renderGifs();
+    };
+});
+
+gifSearchInput.oninput = (e) => {
+    currentSearchQuery = e.target.value;
+    renderGifs();
+};
+
+useCustomGifBtn.onclick = () => {
+    const url = customGifUrlInput.value.trim();
+    if (!url) {
+        alert("Colle une URL valide de GIF !");
+        return;
+    }
+    selectGif(url, "GIF personnalisé");
+    customGifUrlInput.value = "";
 };
 </script>
 <script src="static/java/audio.js"></script>

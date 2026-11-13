@@ -115,12 +115,21 @@
           transition: transform 0.2s ease, box-shadow 0.2s ease;
           display: inline-flex;
           align-items: center;
+          justify-content: center;
           gap: 8px;
-          margin-bottom: 20px;
+          width: 100%;
+          box-sizing: border-box;
       }
       .btn-upload:hover {
           transform: translateY(-2px);
           box-shadow: 0 6px 16px rgba(255, 215, 0, 0.5);
+      }
+      .btn-bitmoji {
+          background: linear-gradient(135deg, #fffc00 0%, #ff9800 100%);
+          color: #1a1a1a;
+          border: 2px solid #ffffff;
+          font-weight: 800;
+          box-shadow: 0 4px 16px rgba(255, 215, 0, 0.55);
       }
       .presets-title {
           font-size: 0.9rem;
@@ -132,6 +141,7 @@
       .avatar-grid {
           display: flex;
           justify-content: center;
+          flex-wrap: wrap;
           gap: 15px;
           margin-bottom: 25px;
       }
@@ -175,6 +185,331 @@
           box-shadow: 0 2px 0 #600, 0 4px 8px rgba(0,0,0,0.4);
           transform: translateY(4px);
       }
+
+      /* ================= MODAL STUDIO BITMOJI ================= */
+      .bitmoji-modal-overlay {
+          position: fixed;
+          inset: 0;
+          background: rgba(0, 0, 0, 0.88);
+          backdrop-filter: blur(12px);
+          -webkit-backdrop-filter: blur(12px);
+          z-index: 20000;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 12px;
+          box-sizing: border-box;
+          animation: modalFadeIn 0.2s ease-out;
+      }
+      @keyframes modalFadeIn {
+          from { opacity: 0; transform: scale(0.96); }
+          to { opacity: 1; transform: scale(1); }
+      }
+      .bitmoji-modal-card {
+          background: linear-gradient(135deg, #133c1d 0%, #071f0f 100%);
+          border: 3px solid var(--gold);
+          border-radius: 28px;
+          width: 100%;
+          max-width: 780px;
+          max-height: 92vh;
+          display: flex;
+          flex-direction: column;
+          color: white;
+          box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 0 25px rgba(255,215,0,0.2);
+          overflow: hidden;
+      }
+      .bitmoji-modal-header {
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          padding: 14px 20px;
+          border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+          background: rgba(0, 0, 0, 0.25);
+      }
+      .bitmoji-modal-header h3 {
+          margin: 0;
+          font-size: 1.25rem;
+          color: var(--gold);
+          display: flex;
+          align-items: center;
+          gap: 8px;
+      }
+      .bitmoji-modal-close {
+          background: rgba(255, 255, 255, 0.15);
+          border: 1.5px solid var(--gold);
+          color: white;
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          cursor: pointer;
+          font-size: 1rem;
+          font-weight: bold;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          transition: background 0.2s, transform 0.2s;
+      }
+      .bitmoji-modal-close:hover {
+          background: var(--bright-red);
+          transform: rotate(90deg);
+      }
+      .bitmoji-modal-body {
+          display: flex;
+          flex-direction: row;
+          padding: 16px 20px;
+          gap: 20px;
+          overflow-y: auto;
+          flex: 1;
+          box-sizing: border-box;
+      }
+      @media (max-width: 680px) {
+          .bitmoji-modal-body {
+              flex-direction: column;
+              align-items: center;
+              padding: 12px;
+              gap: 14px;
+          }
+      }
+      .bitmoji-preview-col {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: 12px;
+          flex-shrink: 0;
+          width: 200px;
+      }
+      @media (max-width: 680px) {
+          .bitmoji-preview-col {
+              width: 100%;
+              flex-direction: row;
+              justify-content: center;
+              flex-wrap: wrap;
+              gap: 15px;
+          }
+      }
+      #bitmojiCanvas {
+          width: 180px;
+          height: 180px;
+          border-radius: 50%;
+          border: 4px solid var(--gold);
+          box-shadow: 0 8px 30px rgba(255, 215, 0, 0.45);
+          display: block;
+          background: #000;
+      }
+      .bitmoji-quick-btns {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          width: 100%;
+          max-width: 180px;
+      }
+      @media (max-width: 680px) {
+          .bitmoji-quick-btns {
+              flex-direction: row;
+              max-width: none;
+              width: auto;
+          }
+      }
+      .btn-random-avatar {
+          background: linear-gradient(135deg, #fffc00, #ff9800);
+          color: #1a1a1a;
+          border: 2px solid white;
+          border-radius: 16px;
+          font-weight: bold;
+          padding: 8px 14px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          box-shadow: 0 4px 12px rgba(255, 215, 0, 0.4);
+          transition: transform 0.15s;
+      }
+      .btn-random-avatar:hover {
+          transform: scale(1.05);
+      }
+      .btn-random-avatar:active {
+          transform: scale(0.96);
+      }
+      .btn-reset-avatar {
+          background: rgba(255, 255, 255, 0.15);
+          color: white;
+          border: 1px solid rgba(255, 255, 255, 0.4);
+          border-radius: 16px;
+          padding: 6px 12px;
+          cursor: pointer;
+          font-size: 0.82rem;
+          transition: background 0.2s;
+      }
+      .btn-reset-avatar:hover {
+          background: rgba(255, 255, 255, 0.3);
+      }
+      .bitmoji-controls-col {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 10px;
+          min-width: 0;
+          width: 100%;
+      }
+      .bitmoji-tabs-nav {
+          display: flex;
+          gap: 6px;
+          overflow-x: auto;
+          padding-bottom: 6px;
+          scrollbar-width: thin;
+      }
+      .bitmoji-tab-btn {
+          background: rgba(255, 255, 255, 0.12);
+          border: 1.5px solid rgba(255, 215, 0, 0.4);
+          color: white;
+          padding: 6px 12px;
+          border-radius: 16px;
+          cursor: pointer;
+          font-size: 0.82rem;
+          white-space: nowrap;
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          transition: all 0.2s;
+      }
+      .bitmoji-tab-btn:hover {
+          background: rgba(255, 215, 0, 0.25);
+          border-color: var(--gold);
+      }
+      .bitmoji-tab-btn.active {
+          background: var(--gold);
+          color: var(--dark-red);
+          font-weight: bold;
+          border-color: var(--gold);
+          box-shadow: 0 2px 8px rgba(255, 215, 0, 0.4);
+      }
+      .bitmoji-panel {
+          display: none;
+          flex-direction: column;
+          gap: 12px;
+          max-height: 350px;
+          overflow-y: auto;
+          padding-right: 4px;
+      }
+      .bitmoji-panel.active {
+          display: flex;
+      }
+      .bitmoji-section-title {
+          font-size: 0.85rem;
+          color: var(--gold);
+          font-weight: bold;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+          margin: 6px 0 2px;
+      }
+      .bitmoji-options-grid {
+          display: grid;
+          grid-template-columns: repeat(auto-fill, minmax(95px, 1fr));
+          gap: 8px;
+      }
+      .bitmoji-option-card {
+          background: rgba(0, 0, 0, 0.3);
+          border: 2px solid rgba(255, 215, 0, 0.3);
+          border-radius: 14px;
+          padding: 8px 4px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          gap: 4px;
+          cursor: pointer;
+          transition: all 0.2s;
+          user-select: none;
+      }
+      .bitmoji-option-card:hover {
+          border-color: var(--gold);
+          background: rgba(255, 215, 0, 0.15);
+          transform: translateY(-2px);
+      }
+      .bitmoji-option-card.active {
+          border-color: var(--gold);
+          background: rgba(255, 215, 0, 0.3);
+          box-shadow: 0 0 12px rgba(255, 215, 0, 0.4);
+          transform: scale(1.03);
+      }
+      .bitmoji-card-icon {
+          font-size: 1.5rem;
+      }
+      .bitmoji-card-label {
+          font-size: 0.75rem;
+          text-align: center;
+          line-height: 1.2;
+          color: #fff;
+      }
+      .bitmoji-color-swatches {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 8px;
+          padding: 4px 0;
+      }
+      .bitmoji-color-swatch {
+          width: 32px;
+          height: 32px;
+          border-radius: 50%;
+          cursor: pointer;
+          border: 2.5px solid transparent;
+          transition: transform 0.15s, border-color 0.15s, box-shadow 0.15s;
+          box-shadow: 0 2px 6px rgba(0,0,0,0.4);
+      }
+      .bitmoji-color-swatch:hover {
+          transform: scale(1.15);
+      }
+      .bitmoji-color-swatch.active {
+          border-color: #ffffff;
+          box-shadow: 0 0 10px #ffffff, 0 0 14px var(--gold);
+          transform: scale(1.18);
+      }
+      .bitmoji-toggle-row {
+          display: flex;
+          align-items: center;
+          gap: 10px;
+          cursor: pointer;
+          user-select: none;
+          background: rgba(0,0,0,0.25);
+          padding: 8px 12px;
+          border-radius: 12px;
+          border: 1px solid rgba(255,215,0,0.3);
+      }
+      .bitmoji-toggle-row input {
+          width: 18px;
+          height: 18px;
+          accent-color: var(--gold);
+          cursor: pointer;
+      }
+      .bitmoji-modal-footer {
+          display: flex;
+          justify-content: flex-end;
+          align-items: center;
+          gap: 10px;
+          padding: 12px 20px;
+          border-top: 2px solid rgba(255, 215, 0, 0.3);
+          background: rgba(0, 0, 0, 0.25);
+      }
+      .btn-save-bitmoji {
+          background: linear-gradient(135deg, #fffc00 0%, #ff9800 100%);
+          color: #1a1a1a;
+          border: 2px solid #ffffff;
+          font-weight: 800;
+          padding: 10px 22px;
+          border-radius: 20px;
+          cursor: pointer;
+          font-size: 0.95rem;
+          box-shadow: 0 4px 15px rgba(255, 215, 0, 0.5);
+          transition: transform 0.15s;
+      }
+      .btn-save-bitmoji:hover {
+          transform: scale(1.03);
+      }
+      .btn-save-bitmoji:active {
+          transform: scale(0.97);
+      }
   </style>
   <link rel="manifest" href="manifest.json">
 </head>
@@ -194,6 +529,9 @@
             </div>
 
             <div style="display: flex; flex-direction: column; gap: 10px; width: 100%; max-width: 320px; align-items: center;">
+                <button type="button" class="btn-upload btn-bitmoji" id="openBitmojiStudioBtn">
+                    ✨ Créer mon Bitmoji de Noël 🎨
+                </button>
                 <button type="button" class="btn-upload" id="openCameraWithFiltersBtn" style="background: linear-gradient(135deg, #ff0000, #8b0000); color: white; border: 2px solid #ffd700;">
                     🎅 Photo avec filtres de Noël
                 </button>
@@ -209,6 +547,120 @@
         <button class="save-btn" id="saveAvatar">Enregistrer mon profil ✨</button>
     </div>
 
+    <!-- MODAL STUDIO BITMOJI -->
+    <div id="bitmojiModal" class="bitmoji-modal-overlay" style="display: none;">
+        <div class="bitmoji-modal-card">
+            <div class="bitmoji-modal-header">
+                <h3>🎨 Studio Bitmoji de Noël 🎅✨</h3>
+                <button type="button" class="bitmoji-modal-close" id="closeBitmojiModalBtn">✕</button>
+            </div>
+
+            <div class="bitmoji-modal-body">
+                <!-- Colonne Gauche : Aperçu & Actions -->
+                <div class="bitmoji-preview-col">
+                    <div class="bitmoji-canvas-wrapper">
+                        <canvas id="bitmojiCanvas" width="320" height="320"></canvas>
+                    </div>
+                    <div class="bitmoji-quick-btns">
+                        <button type="button" class="btn-random-avatar" id="randomBitmojiBtn">
+                            🎲 Aléatoire
+                        </button>
+                        <button type="button" class="btn-reset-avatar" id="resetBitmojiBtn">
+                            🔄 Réinitialiser
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Colonne Droite : Onglets & Contrôles -->
+                <div class="bitmoji-controls-col">
+                    <!-- Barre d'onglets -->
+                    <div class="bitmoji-tabs-nav" id="bitmojiTabsNav">
+                        <button type="button" class="bitmoji-tab-btn active" data-tab="tab-skin">🎨 Teint</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-hair">💇 Cheveux</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-eyes">👀 Regard</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-mouth">👄 Sourire</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-beard">🧔 Barbe</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-hat">🎄 Chapeau</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-outfit">👕 Tenue</button>
+                        <button type="button" class="bitmoji-tab-btn" data-tab="tab-bg">❄️ Décor</button>
+                    </div>
+
+                    <!-- Panneau 1 : Teint -->
+                    <div class="bitmoji-panel active" id="tab-skin">
+                        <div class="bitmoji-section-title">Couleur de peau</div>
+                        <div class="bitmoji-color-swatches" id="skinColorSwatches"></div>
+
+                        <div class="bitmoji-section-title">Détails festifs</div>
+                        <label class="bitmoji-toggle-row">
+                            <input type="checkbox" id="toggleBlush" checked>
+                            <span>🍎 Pommettes rouges d'hiver (Blush de Noël)</span>
+                        </label>
+                        <label class="bitmoji-toggle-row">
+                            <input type="checkbox" id="toggleFreckles">
+                            <span>✨ Petites taches de rousseur</span>
+                        </label>
+                    </div>
+
+                    <!-- Panneau 2 : Cheveux -->
+                    <div class="bitmoji-panel" id="tab-hair">
+                        <div class="bitmoji-section-title">Coupe de cheveux</div>
+                        <div class="bitmoji-options-grid" id="hairStyleGrid"></div>
+
+                        <div class="bitmoji-section-title">Couleur des cheveux</div>
+                        <div class="bitmoji-color-swatches" id="hairColorSwatches"></div>
+                    </div>
+
+                    <!-- Panneau 3 : Regard & Lunettes -->
+                    <div class="bitmoji-panel" id="tab-eyes">
+                        <div class="bitmoji-section-title">Forme des yeux</div>
+                        <div class="bitmoji-options-grid" id="eyeShapeGrid"></div>
+
+                        <div class="bitmoji-section-title">Couleur des yeux</div>
+                        <div class="bitmoji-color-swatches" id="eyeColorSwatches"></div>
+
+                        <div class="bitmoji-section-title">Lunettes de fête</div>
+                        <div class="bitmoji-options-grid" id="glassesGrid"></div>
+                    </div>
+
+                    <!-- Panneau 4 : Sourire & Bouche -->
+                    <div class="bitmoji-panel" id="tab-mouth">
+                        <div class="bitmoji-section-title">Expression de la bouche</div>
+                        <div class="bitmoji-options-grid" id="mouthStyleGrid"></div>
+                    </div>
+
+                    <!-- Panneau 5 : Barbe & Pilosité -->
+                    <div class="bitmoji-panel" id="tab-beard">
+                        <div class="bitmoji-section-title">Barbe & Moustache</div>
+                        <div class="bitmoji-options-grid" id="facialHairGrid"></div>
+                    </div>
+
+                    <!-- Panneau 6 : Chapeau & Couvre-chef de Noël -->
+                    <div class="bitmoji-panel" id="tab-hat">
+                        <div class="bitmoji-section-title">Couvre-chef festif</div>
+                        <div class="bitmoji-options-grid" id="hatGrid"></div>
+                    </div>
+
+                    <!-- Panneau 7 : Tenue & Vêtements -->
+                    <div class="bitmoji-panel" id="tab-outfit">
+                        <div class="bitmoji-section-title">Tenue de Noël</div>
+                        <div class="bitmoji-options-grid" id="outfitGrid"></div>
+                    </div>
+
+                    <!-- Panneau 8 : Arrière-plan -->
+                    <div class="bitmoji-panel" id="tab-bg">
+                        <div class="bitmoji-section-title">Ambiance de fond</div>
+                        <div class="bitmoji-options-grid" id="bgGrid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="bitmoji-modal-footer">
+                <button type="button" class="btn-reset-avatar" id="cancelBitmojiBtn">Annuler</button>
+                <button type="button" class="btn-save-bitmoji" id="applyBitmojiBtn">✨ Utiliser ce Bitmoji ! 🎅</button>
+            </div>
+        </div>
+    </div>
+
     <script src="static/java/christmas-camera.js"></script>
     <script>
         const DEFAULT_PHOTO = 'static/png/naima.png';
@@ -222,6 +674,7 @@
         const previewImg = document.getElementById('currentAvatarPreview');
         const choosePhotoBtn = document.getElementById('choosePhotoBtn');
         const openCameraWithFiltersBtn = document.getElementById('openCameraWithFiltersBtn');
+        const openBitmojiStudioBtn = document.getElementById('openBitmojiStudioBtn');
         const photoWrapper = document.getElementById('photoWrapper');
         const grid = document.getElementById('avatarGrid');
 
@@ -265,25 +718,1152 @@
         });
 
         // Afficher les presets
-        presets.forEach(p => {
-            const div = document.createElement('div');
-            const isSelected = (currentAvatar === p.img);
-            div.className = `avatar-option ${isSelected ? 'selected' : ''}`;
-            div.innerHTML = `<img src="${p.img}" alt="${p.label}">`;
-            div.onclick = () => {
-                document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
-                div.classList.add('selected');
-                currentAvatar = p.img;
-                previewImg.src = p.img;
-            };
-            grid.appendChild(div);
-        });
+        function renderPresets() {
+            grid.innerHTML = '';
+            presets.forEach(p => {
+                const div = document.createElement('div');
+                const isSelected = (currentAvatar === p.img);
+                div.className = `avatar-option ${isSelected ? 'selected' : ''}`;
+                div.innerHTML = `<img src="${p.img}" alt="${p.label}">`;
+                div.onclick = () => {
+                    document.querySelectorAll('.avatar-option').forEach(el => el.classList.remove('selected'));
+                    div.classList.add('selected');
+                    currentAvatar = p.img;
+                    previewImg.src = p.img;
+                };
+                grid.appendChild(div);
+            });
+        }
+        renderPresets();
 
         // Sauvegarder
         document.getElementById('saveAvatar').onclick = () => {
             localStorage.setItem('userAvatar', currentAvatar);
             alert("Profil enregistré avec succès ! ✨");
             window.location.href = "menu.html";
+        };
+
+        // ==========================================================
+        // ================= MOTEUR BITMOJI DE NOËL =================
+        // ==========================================================
+        const bitmojiModal = document.getElementById('bitmojiModal');
+        const closeBitmojiModalBtn = document.getElementById('closeBitmojiModalBtn');
+        const cancelBitmojiBtn = document.getElementById('cancelBitmojiBtn');
+        const applyBitmojiBtn = document.getElementById('applyBitmojiBtn');
+        const randomBitmojiBtn = document.getElementById('randomBitmojiBtn');
+        const resetBitmojiBtn = document.getElementById('resetBitmojiBtn');
+        const bitmojiCanvas = document.getElementById('bitmojiCanvas');
+        const bCtx = bitmojiCanvas.getContext('2d');
+
+        // Palettes et données de personnalisation
+        const SKIN_COLORS = [
+            { id: '#ffe0bd', label: 'Très clair' },
+            { id: '#f6c8a4', label: 'Clair' },
+            { id: '#e8af80', label: 'Hâlé' },
+            { id: '#c68642', label: 'Doré' },
+            { id: '#8d5524', label: 'Caramel' },
+            { id: '#543315', label: 'Foncé' },
+            { id: '#361e0b', label: 'Ébène' }
+        ];
+
+        const HAIR_COLORS = [
+            { id: '#1a1a1a', label: 'Noir' },
+            { id: '#3d2314', label: 'Brun' },
+            { id: '#7b3f00', label: 'Châtain' },
+            { id: '#c9933b', label: 'Blond' },
+            { id: '#b84223', label: 'Roux' },
+            { id: '#dcdcdc', label: 'Argent' },
+            { id: '#ffffff', label: 'Polaire' },
+            { id: '#ff69b4', label: 'Rose' },
+            { id: '#00b4d8', label: 'Givré' }
+        ];
+
+        const EYE_COLORS = [
+            { id: '#3b2314', label: 'Marron' },
+            { id: '#225577', label: 'Bleu' },
+            { id: '#2e7d32', label: 'Vert' },
+            { id: '#d48800', label: 'Ambre' },
+            { id: '#7b1fa2', label: 'Violet' },
+            { id: '#111111', label: 'Noir' }
+        ];
+
+        const HAIR_STYLES = [
+            { id: 'short_fade', label: 'Court moderne', icon: '💇‍♂️' },
+            { id: 'curly', label: 'Bouclé', icon: '🧑‍🦱' },
+            { id: 'medium_bob', label: 'Mi-long ondulé', icon: '👩' },
+            { id: 'long_straight', label: 'Long lisse', icon: '👧' },
+            { id: 'afro', label: 'Afro', icon: '🧑‍🦱' },
+            { id: 'ponytail', label: 'Queue de cheval', icon: '👱‍♀️' },
+            { id: 'braids', label: 'Tresses', icon: '🪮' },
+            { id: 'bald', label: 'Chauve', icon: '🧑‍🦲' }
+        ];
+
+        const EYE_SHAPES = [
+            { id: 'normal', label: 'Pétillants', icon: '👀' },
+            { id: 'wink', label: 'Clin d\'œil', icon: '😉' },
+            { id: 'happy', label: 'Joyeux', icon: '😊' },
+            { id: 'sparkle', label: 'Étoilés', icon: '🤩' }
+        ];
+
+        const GLASSES_OPTIONS = [
+            { id: 'none', label: 'Sans lunettes', icon: '❌' },
+            { id: 'gold_round', label: 'Rondes dorées', icon: '👓' },
+            { id: 'party_star', label: 'Étoiles fête', icon: '⭐' },
+            { id: 'snow_shades', label: 'Ski givré', icon: '🕶️' }
+        ];
+
+        const MOUTH_STYLES = [
+            { id: 'big_smile', label: 'Grand sourire', icon: '😁' },
+            { id: 'sweet_smile', label: 'Doux sourire', icon: '🙂' },
+            { id: 'tongue_out', label: 'Tire la langue', icon: '😋' },
+            { id: 'laughing', label: 'Rire joyeux', icon: '😆' },
+            { id: 'smirk', label: 'Malicieux', icon: '😏' }
+        ];
+
+        const FACIAL_HAIR_OPTIONS = [
+            { id: 'none', label: 'Sans barbe', icon: '❌' },
+            { id: 'mustache', label: 'Moustache', icon: '🥸' },
+            { id: 'beard_trim', label: 'Barbe taillée', icon: '🧔' },
+            { id: 'santa_beard', label: 'Barbe Père Noël', icon: '🎅' }
+        ];
+
+        const HATS_OPTIONS = [
+            { id: 'santa_hat', label: 'Bonnet Noël', icon: '🎅' },
+            { id: 'reindeer_antlers', label: 'Bois de renne', icon: '🦌' },
+            { id: 'elf_hat', label: 'Chapeau elfe', icon: '🧝' },
+            { id: 'star_tiara', label: 'Couronne étoiles', icon: '👑' },
+            { id: 'cozy_earmuffs', label: 'Cache-oreilles', icon: '🎧' },
+            { id: 'none', label: 'Sans chapeau', icon: '❌' }
+        ];
+
+        const OUTFITS_OPTIONS = [
+            { id: 'santa_suit', label: 'Père Noël', icon: '🎅' },
+            { id: 'ugly_sweater', label: 'Pull moche sapin', icon: '🎄' },
+            { id: 'elf_tunic', label: 'Tunique elfe', icon: '🧝' },
+            { id: 'chic_suit', label: 'Costume chic', icon: '🤵' },
+            { id: 'cozy_scarf', label: 'Écharpe douce', icon: '🧣' },
+            { id: 'hoodie', label: 'Sweat capuche', icon: '🧥' }
+        ];
+
+        const BACKGROUND_OPTIONS = [
+            { id: 'winter_night', label: 'Nuit étoilée', icon: '🌌' },
+            { id: 'festive_green', label: 'Forêt festive', icon: '🌲' },
+            { id: 'santa_red', label: 'Rouge Noël', icon: '🔴' },
+            { id: 'golden_cozy', label: 'Éclat doré', icon: '✨' },
+            { id: 'snowy_forest', label: 'Neige fraîche', icon: '❄️' }
+        ];
+
+        // État du Bitmoji
+        const defaultState = {
+            skinColor: '#f6c8a4',
+            blush: true,
+            freckles: false,
+            hairStyle: 'short_fade',
+            hairColor: '#3d2314',
+            eyeShape: 'normal',
+            eyeColor: '#3b2314',
+            glasses: 'none',
+            mouthStyle: 'big_smile',
+            facialHair: 'none',
+            hat: 'santa_hat',
+            outfit: 'santa_suit',
+            background: 'winter_night'
+        };
+
+        let bitmojiState = Object.assign({}, defaultState);
+
+        // ================= FONCTIONS DE DESSIN =================
+        function drawSnowflakes(ctx, count) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+            for (let i = 0; i < count; i++) {
+                const x = (i * 37 + 19) % 320;
+                const y = (i * 47 + 23) % 320;
+                const r = (i % 3) + 1.2;
+                ctx.beginPath();
+                ctx.arc(x, y, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+        }
+
+        function drawSparkles(ctx, color, count) {
+            ctx.fillStyle = color;
+            for (let i = 0; i < count; i++) {
+                const x = (i * 41 + 13) % 320;
+                const y = (i * 53 + 17) % 320;
+                const size = (i % 2 === 0) ? 3 : 2;
+                ctx.fillRect(x - size/2, y - 1, size, 2);
+                ctx.fillRect(x - 1, y - size/2, 2, size);
+            }
+        }
+
+        function drawBackground(ctx, state) {
+            const w = 320, h = 320;
+            ctx.save();
+            ctx.clearRect(0, 0, w, h);
+
+            if (state.background === 'festive_green') {
+                const grad = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w*0.7);
+                grad.addColorStop(0, '#1f6e3c');
+                grad.addColorStop(1, '#072312');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                drawSparkles(ctx, '#ffd700', 14);
+            } else if (state.background === 'santa_red') {
+                const grad = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w*0.7);
+                grad.addColorStop(0, '#c41515');
+                grad.addColorStop(1, '#4d0606');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                drawSparkles(ctx, '#ffffff', 14);
+            } else if (state.background === 'golden_cozy') {
+                const grad = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w*0.7);
+                grad.addColorStop(0, '#e6a817');
+                grad.addColorStop(1, '#4a2c00');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                drawSparkles(ctx, '#fff3cc', 16);
+            } else if (state.background === 'snowy_forest') {
+                const grad = ctx.createLinearGradient(0, 0, 0, h);
+                grad.addColorStop(0, '#0e2e1b');
+                grad.addColorStop(1, '#1c4a2f');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                ctx.beginPath();
+                ctx.ellipse(w/2, h + 20, w * 0.7, 60, 0, 0, Math.PI * 2);
+                ctx.fill();
+                drawSnowflakes(ctx, 18);
+            } else {
+                const grad = ctx.createRadialGradient(w/2, h/2, 20, w/2, h/2, w*0.7);
+                grad.addColorStop(0, '#163860');
+                grad.addColorStop(1, '#040e1c');
+                ctx.fillStyle = grad;
+                ctx.fillRect(0, 0, w, h);
+                drawSnowflakes(ctx, 22);
+            }
+            ctx.restore();
+        }
+
+        function drawBackHair(ctx, state) {
+            ctx.save();
+            ctx.fillStyle = state.hairColor;
+            if (state.hairStyle === 'long_straight') {
+                ctx.beginPath();
+                ctx.moveTo(95, 120);
+                ctx.bezierCurveTo(70, 160, 60, 240, 65, 310);
+                ctx.lineTo(110, 310);
+                ctx.bezierCurveTo(105, 240, 110, 180, 120, 150);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.moveTo(225, 120);
+                ctx.bezierCurveTo(250, 160, 260, 240, 255, 310);
+                ctx.lineTo(210, 310);
+                ctx.bezierCurveTo(215, 240, 210, 180, 200, 150);
+                ctx.closePath();
+                ctx.fill();
+            } else if (state.hairStyle === 'afro') {
+                ctx.beginPath();
+                ctx.arc(160, 142, 78, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.hairStyle === 'ponytail') {
+                ctx.beginPath();
+                ctx.ellipse(225, 130, 32, 50, 0.3, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#d11a2a';
+                ctx.beginPath();
+                ctx.arc(205, 120, 9, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.hairStyle === 'curly') {
+                const curls = [
+                    { x: 92, y: 130, r: 24 }, { x: 86, y: 160, r: 22 }, { x: 92, y: 190, r: 20 },
+                    { x: 228, y: 130, r: 24 }, { x: 234, y: 160, r: 22 }, { x: 228, y: 190, r: 20 }
+                ];
+                curls.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (state.hairStyle === 'braids') {
+                for (let b = 0; b < 4; b++) {
+                    const bxL = 75 + b * 12;
+                    ctx.fillRect(bxL, 140, 8, 140);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillRect(bxL, 260, 8, 6);
+                    ctx.fillStyle = state.hairColor;
+
+                    const bxR = 215 + b * 12;
+                    ctx.fillRect(bxR, 140, 8, 140);
+                    ctx.fillStyle = '#ffd700';
+                    ctx.fillRect(bxR, 260, 8, 6);
+                    ctx.fillStyle = state.hairColor;
+                }
+            }
+            ctx.restore();
+        }
+
+        function drawBodyAndClothes(ctx, state) {
+            ctx.save();
+            ctx.beginPath();
+            ctx.moveTo(35, 320);
+            ctx.bezierCurveTo(45, 265, 95, 238, 130, 236);
+            ctx.lineTo(190, 236);
+            ctx.bezierCurveTo(225, 238, 275, 265, 285, 320);
+            ctx.closePath();
+
+            if (state.outfit === 'santa_suit') {
+                ctx.fillStyle = '#c41515';
+                ctx.fill();
+
+                ctx.fillStyle = '#f8f8f8';
+                ctx.fillRect(148, 236, 24, 84);
+
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(160, 265, 5, 0, Math.PI * 2);
+                ctx.arc(160, 295, 5, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(160, 240, 42, 14, 0, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.outfit === 'ugly_sweater') {
+                ctx.fillStyle = '#a11b2b';
+                ctx.fill();
+
+                ctx.strokeStyle = '#1b7a3a';
+                ctx.lineWidth = 4;
+                ctx.beginPath();
+                for (let x = 70; x <= 250; x += 15) {
+                    ctx.lineTo(x, 275 + ((x/15)%2 === 0 ? -6 : 6));
+                }
+                ctx.stroke();
+
+                ctx.fillStyle = '#1b7a3a';
+                ctx.beginPath();
+                ctx.moveTo(160, 270);
+                ctx.lineTo(172, 288);
+                ctx.lineTo(148, 288);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(160, 280);
+                ctx.lineTo(176, 302);
+                ctx.lineTo(144, 302);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(160, 268, 3.5, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.outfit === 'elf_tunic') {
+                ctx.fillStyle = '#1e7e34';
+                ctx.fill();
+
+                ctx.fillStyle = '#d11a2a';
+                ctx.beginPath();
+                ctx.moveTo(125, 236);
+                ctx.lineTo(135, 260);
+                ctx.lineTo(145, 238);
+                ctx.lineTo(160, 265);
+                ctx.lineTo(175, 238);
+                ctx.lineTo(185, 260);
+                ctx.lineTo(195, 236);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffd700';
+                [ {x: 135, y: 260}, {x: 160, y: 265}, {x: 185, y: 260} ].forEach(pt => {
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, 3.5, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (state.outfit === 'chic_suit') {
+                ctx.fillStyle = '#1b2028';
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.moveTo(144, 236);
+                ctx.lineTo(160, 280);
+                ctx.lineTo(176, 236);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#c41515';
+                ctx.beginPath();
+                ctx.moveTo(160, 250);
+                ctx.lineTo(146, 243);
+                ctx.lineTo(146, 257);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.moveTo(160, 250);
+                ctx.lineTo(174, 243);
+                ctx.lineTo(174, 257);
+                ctx.closePath();
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(160, 250, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.outfit === 'cozy_scarf') {
+                ctx.fillStyle = '#133c24';
+                ctx.fill();
+
+                ctx.save();
+                ctx.beginPath();
+                ctx.ellipse(160, 246, 44, 18, 0, 0, Math.PI * 2);
+                ctx.fillStyle = '#c41515';
+                ctx.fill();
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 4;
+                for (let sx = 125; sx <= 195; sx += 12) {
+                    ctx.beginPath();
+                    ctx.moveTo(sx - 5, 234);
+                    ctx.lineTo(sx + 5, 258);
+                    ctx.stroke();
+                }
+                ctx.fillStyle = '#c41515';
+                ctx.fillRect(172, 252, 20, 50);
+                ctx.strokeStyle = '#ffffff';
+                ctx.strokeRect(172, 270, 20, 4);
+                ctx.strokeRect(172, 285, 20, 4);
+                ctx.restore();
+            } else { // hoodie
+                ctx.fillStyle = '#8b1824';
+                ctx.fill();
+
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.moveTo(152, 245);
+                ctx.lineTo(152, 280);
+                ctx.moveTo(168, 245);
+                ctx.lineTo(168, 280);
+                ctx.stroke();
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.arc(152, 280, 2.5, 0, Math.PI * 2);
+                ctx.arc(168, 280, 2.5, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawHeadAndFace(ctx, state) {
+            ctx.save();
+
+            // Cou
+            ctx.fillStyle = state.skinColor;
+            ctx.fillRect(139, 180, 42, 60);
+
+            // Ombre sous le menton
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.12)';
+            ctx.beginPath();
+            ctx.ellipse(160, 218, 26, 10, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Oreilles
+            ctx.fillStyle = state.skinColor;
+            ctx.beginPath();
+            ctx.arc(97, 155, 13, 0, Math.PI * 2);
+            ctx.arc(223, 155, 13, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.15)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(97, 155, 6, -Math.PI*0.4, Math.PI*0.4);
+            ctx.stroke();
+            ctx.beginPath();
+            ctx.arc(223, 155, 6, Math.PI*0.6, Math.PI*1.4);
+            ctx.stroke();
+
+            // Visage Bitmoji
+            ctx.fillStyle = state.skinColor;
+            ctx.beginPath();
+            ctx.moveTo(160, 78);
+            ctx.bezierCurveTo(220, 78, 222, 130, 220, 165);
+            ctx.bezierCurveTo(218, 198, 195, 222, 160, 222);
+            ctx.bezierCurveTo(125, 222, 102, 198, 100, 165);
+            ctx.bezierCurveTo(98, 130, 100, 78, 160, 78);
+            ctx.closePath();
+            ctx.fill();
+
+            // Joues roses festives
+            if (state.blush) {
+                ctx.fillStyle = 'rgba(255, 80, 80, 0.28)';
+                ctx.beginPath();
+                ctx.ellipse(123, 175, 14, 8, 0, 0, Math.PI * 2);
+                ctx.ellipse(197, 175, 14, 8, 0, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // Taches de rousseur
+            if (state.freckles) {
+                ctx.fillStyle = 'rgba(120, 60, 20, 0.45)';
+                [
+                    {x: 122, y: 172}, {x: 126, y: 176}, {x: 130, y: 173},
+                    {x: 190, y: 173}, {x: 194, y: 176}, {x: 198, y: 172},
+                    {x: 156, y: 170}, {x: 164, y: 170}
+                ].forEach(pt => {
+                    ctx.beginPath();
+                    ctx.arc(pt.x, pt.y, 1.2, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            }
+
+            ctx.restore();
+        }
+
+        function drawEyesAndBrows(ctx, state) {
+            ctx.save();
+
+            // Sourcils
+            ctx.strokeStyle = (state.hairColor === '#ffffff' || state.hairColor === '#dcdcdc') ? '#999999' : (state.hairColor === '#c9933b' ? '#7b4f12' : state.hairColor);
+            ctx.lineWidth = 3.5;
+            ctx.lineCap = 'round';
+
+            ctx.beginPath();
+            ctx.moveTo(118, 132);
+            ctx.quadraticCurveTo(132, 126, 146, 131);
+            ctx.stroke();
+
+            ctx.beginPath();
+            ctx.moveTo(174, 131);
+            ctx.quadraticCurveTo(188, 126, 202, 132);
+            ctx.stroke();
+
+            // Yeux
+            if (state.eyeShape === 'wink') {
+                drawSingleEye(ctx, 132, 148, state.eyeColor, false);
+                ctx.strokeStyle = '#222222';
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.arc(188, 150, 10, Math.PI * 1.15, Math.PI * 1.85);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(196, 144);
+                ctx.lineTo(201, 141);
+                ctx.stroke();
+            } else if (state.eyeShape === 'happy') {
+                ctx.strokeStyle = '#222222';
+                ctx.lineWidth = 3.5;
+                ctx.beginPath();
+                ctx.arc(132, 150, 10, Math.PI * 1.15, Math.PI * 1.85);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.arc(188, 150, 10, Math.PI * 1.15, Math.PI * 1.85);
+                ctx.stroke();
+            } else {
+                drawSingleEye(ctx, 132, 148, state.eyeColor, state.eyeShape === 'sparkle');
+                drawSingleEye(ctx, 188, 148, state.eyeColor, state.eyeShape === 'sparkle');
+            }
+
+            ctx.restore();
+        }
+
+        function drawSingleEye(ctx, cx, cy, color, isSparkle) {
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.ellipse(cx, cy, 11, 12, 0, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.strokeStyle = '#222222';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            ctx.arc(cx, cy - 2, 11, Math.PI * 1.1, Math.PI * 1.9);
+            ctx.stroke();
+
+            ctx.fillStyle = color;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 7.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#0a0a0a';
+            ctx.beginPath();
+            ctx.arc(cx, cy, 4.5, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(cx - 2.5, cy - 2.5, 2.5, 0, Math.PI * 2);
+            ctx.arc(cx + 2.5, cy + 2.5, 1.2, 0, Math.PI * 2);
+            ctx.fill();
+
+            if (isSparkle) {
+                ctx.fillRect(cx - 3, cy - 1, 6, 1.5);
+                ctx.fillRect(cx - 1, cy - 3, 1.5, 6);
+            }
+        }
+
+        function drawNose(ctx, state) {
+            ctx.save();
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.18)';
+            ctx.lineWidth = 2;
+            ctx.lineCap = 'round';
+            ctx.beginPath();
+            ctx.arc(160, 169, 5, 0, Math.PI * 0.85);
+            ctx.stroke();
+            ctx.restore();
+        }
+
+        function drawMouth(ctx, state) {
+            ctx.save();
+            const cx = 160, cy = 192;
+
+            if (state.mouthStyle === 'sweet_smile') {
+                ctx.strokeStyle = '#732121';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.arc(cx, cy - 5, 14, Math.PI * 0.2, Math.PI * 0.8);
+                ctx.stroke();
+            } else if (state.mouthStyle === 'tongue_out') {
+                ctx.fillStyle = '#6d0c15';
+                ctx.beginPath();
+                ctx.arc(cx, cy - 2, 15, 0, Math.PI);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 11, cy - 2, 22, 4);
+
+                ctx.fillStyle = '#ff6b8b';
+                ctx.beginPath();
+                ctx.ellipse(cx, cy + 8, 8, 10, 0, 0, Math.PI);
+                ctx.fill();
+            } else if (state.mouthStyle === 'laughing') {
+                ctx.fillStyle = '#6d0c15';
+                ctx.beginPath();
+                ctx.ellipse(cx, cy + 2, 17, 12, 0, 0, Math.PI);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 13, cy + 2, 26, 4);
+
+                ctx.fillStyle = '#ff7b95';
+                ctx.beginPath();
+                ctx.arc(cx, cy + 11, 7, Math.PI, 0);
+                ctx.fill();
+            } else if (state.mouthStyle === 'smirk') {
+                ctx.strokeStyle = '#732121';
+                ctx.lineWidth = 3;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(cx - 10, cy + 2);
+                ctx.quadraticCurveTo(cx, cy + 3, cx + 13, cy - 3);
+                ctx.stroke();
+            } else { // big_smile
+                ctx.fillStyle = '#6d0c15';
+                ctx.beginPath();
+                ctx.arc(cx, cy - 2, 16, 0, Math.PI);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(cx - 13, cy - 2, 26, 5);
+
+                ctx.fillStyle = '#ff6f89';
+                ctx.beginPath();
+                ctx.arc(cx, cy + 9, 8, Math.PI, 0);
+                ctx.fill();
+            }
+
+            ctx.restore();
+        }
+
+        function drawFacialHair(ctx, state) {
+            if (state.facialHair === 'none') return;
+            ctx.save();
+            ctx.fillStyle = (state.facialHair === 'santa_beard') ? '#fbfbfb' : state.hairColor;
+
+            if (state.facialHair === 'mustache') {
+                ctx.beginPath();
+                ctx.moveTo(160, 182);
+                ctx.bezierCurveTo(150, 176, 135, 180, 130, 188);
+                ctx.bezierCurveTo(140, 189, 155, 186, 160, 188);
+                ctx.bezierCurveTo(165, 186, 180, 189, 190, 188);
+                ctx.bezierCurveTo(185, 180, 170, 176, 160, 182);
+                ctx.closePath();
+                ctx.fill();
+            } else if (state.facialHair === 'beard_trim') {
+                ctx.strokeStyle = state.hairColor;
+                ctx.lineWidth = 6;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.arc(160, 190, 26, Math.PI * 0.15, Math.PI * 0.85);
+                ctx.stroke();
+            } else if (state.facialHair === 'santa_beard') {
+                ctx.beginPath();
+                ctx.moveTo(110, 180);
+                ctx.bezierCurveTo(90, 210, 85, 260, 110, 290);
+                ctx.bezierCurveTo(130, 315, 190, 315, 210, 290);
+                ctx.bezierCurveTo(235, 260, 230, 210, 210, 180);
+                ctx.bezierCurveTo(190, 195, 130, 195, 110, 180);
+                ctx.closePath();
+                ctx.fill();
+
+                const puffs = [
+                    { x: 105, y: 240, r: 18 }, { x: 115, y: 275, r: 20 },
+                    { x: 140, y: 300, r: 22 }, { x: 160, y: 305, r: 24 },
+                    { x: 180, y: 300, r: 22 }, { x: 205, y: 275, r: 20 },
+                    { x: 215, y: 240, r: 18 }
+                ];
+                puffs.forEach(p => {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.moveTo(160, 182);
+                ctx.bezierCurveTo(145, 174, 125, 182, 118, 194);
+                ctx.bezierCurveTo(135, 196, 150, 190, 160, 194);
+                ctx.bezierCurveTo(170, 190, 185, 196, 202, 194);
+                ctx.bezierCurveTo(195, 182, 175, 174, 160, 182);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawFrontHair(ctx, state) {
+            if (state.hairStyle === 'bald') return;
+            ctx.save();
+            ctx.fillStyle = state.hairColor;
+
+            if (state.hairStyle === 'short_fade') {
+                ctx.beginPath();
+                ctx.moveTo(100, 120);
+                ctx.bezierCurveTo(100, 70, 220, 70, 220, 120);
+                ctx.bezierCurveTo(210, 100, 190, 95, 175, 105);
+                ctx.bezierCurveTo(160, 95, 130, 95, 115, 110);
+                ctx.closePath();
+                ctx.fill();
+            } else if (state.hairStyle === 'curly') {
+                const topCurls = [
+                    { x: 110, y: 95, r: 22 }, { x: 135, y: 80, r: 24 }, { x: 160, y: 75, r: 25 },
+                    { x: 185, y: 80, r: 24 }, { x: 210, y: 95, r: 22 },
+                    { x: 125, y: 110, r: 18 }, { x: 155, y: 105, r: 20 }, { x: 185, y: 110, r: 18 }
+                ];
+                topCurls.forEach(c => {
+                    ctx.beginPath();
+                    ctx.arc(c.x, c.y, c.r, 0, Math.PI * 2);
+                    ctx.fill();
+                });
+            } else if (state.hairStyle === 'medium_bob') {
+                ctx.beginPath();
+                ctx.moveTo(96, 170);
+                ctx.bezierCurveTo(90, 120, 100, 70, 160, 70);
+                ctx.bezierCurveTo(220, 70, 230, 120, 224, 170);
+                ctx.bezierCurveTo(215, 140, 205, 105, 160, 105);
+                ctx.bezierCurveTo(115, 105, 105, 140, 96, 170);
+                ctx.closePath();
+                ctx.fill();
+            } else if (state.hairStyle === 'long_straight') {
+                ctx.beginPath();
+                ctx.moveTo(98, 145);
+                ctx.bezierCurveTo(95, 75, 225, 75, 222, 145);
+                ctx.bezierCurveTo(215, 100, 195, 96, 160, 102);
+                ctx.bezierCurveTo(125, 96, 105, 100, 98, 145);
+                ctx.closePath();
+                ctx.fill();
+            } else if (state.hairStyle === 'afro') {
+                ctx.beginPath();
+                ctx.arc(160, 115, 55, Math.PI, 0);
+                ctx.fill();
+            } else if (state.hairStyle === 'ponytail') {
+                ctx.beginPath();
+                ctx.moveTo(100, 125);
+                ctx.bezierCurveTo(100, 72, 220, 72, 220, 125);
+                ctx.bezierCurveTo(205, 98, 160, 95, 100, 125);
+                ctx.closePath();
+                ctx.fill();
+            } else if (state.hairStyle === 'braids') {
+                ctx.beginPath();
+                ctx.moveTo(100, 120);
+                ctx.bezierCurveTo(100, 75, 220, 75, 220, 120);
+                ctx.bezierCurveTo(210, 98, 160, 96, 100, 120);
+                ctx.closePath();
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        function drawHatsAndAccessories(ctx, state) {
+            ctx.save();
+
+            // Lunettes
+            if (state.glasses === 'gold_round') {
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(132, 148, 15, 0, Math.PI * 2);
+                ctx.arc(188, 148, 15, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(147, 148);
+                ctx.lineTo(173, 148);
+                ctx.stroke();
+            } else if (state.glasses === 'party_star') {
+                drawStarGlasses(ctx, 132, 148);
+                drawStarGlasses(ctx, 188, 148);
+                ctx.strokeStyle = '#ffae00';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.moveTo(147, 148);
+                ctx.lineTo(173, 148);
+                ctx.stroke();
+            } else if (state.glasses === 'snow_shades') {
+                ctx.fillStyle = 'rgba(0, 180, 216, 0.7)';
+                ctx.strokeStyle = '#ffffff';
+                ctx.lineWidth = 2.5;
+                ctx.beginPath();
+                ctx.ellipse(132, 148, 17, 13, 0, 0, Math.PI * 2);
+                ctx.ellipse(188, 148, 17, 13, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(149, 146);
+                ctx.lineTo(171, 146);
+                ctx.stroke();
+            }
+
+            // Chapeaux de Noël
+            if (state.hat === 'santa_hat') {
+                ctx.fillStyle = '#d61a29';
+                ctx.beginPath();
+                ctx.moveTo(92, 100);
+                ctx.quadraticCurveTo(120, 20, 215, 35);
+                ctx.bezierCurveTo(245, 45, 260, 95, 255, 125);
+                ctx.lineTo(235, 115);
+                ctx.quadraticCurveTo(205, 50, 160, 48);
+                ctx.quadraticCurveTo(115, 52, 92, 100);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.beginPath();
+                ctx.ellipse(160, 95, 68, 16, 0, 0, Math.PI * 2);
+                ctx.fill();
+
+                ctx.beginPath();
+                ctx.arc(256, 130, 15, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.hat === 'reindeer_antlers') {
+                ctx.strokeStyle = '#5a3516';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(160, 105, 60, Math.PI * 1.15, Math.PI * 1.85);
+                ctx.stroke();
+
+                ctx.strokeStyle = '#7a4724';
+                ctx.lineWidth = 6;
+                ctx.lineCap = 'round';
+                ctx.beginPath();
+                ctx.moveTo(115, 82);
+                ctx.lineTo(95, 35);
+                ctx.moveTo(105, 60);
+                ctx.lineTo(85, 55);
+                ctx.moveTo(100, 45);
+                ctx.lineTo(115, 30);
+                ctx.stroke();
+
+                ctx.beginPath();
+                ctx.moveTo(205, 82);
+                ctx.lineTo(225, 35);
+                ctx.moveTo(215, 60);
+                ctx.lineTo(235, 55);
+                ctx.moveTo(220, 45);
+                ctx.lineTo(205, 30);
+                ctx.stroke();
+
+                ctx.fillStyle = '#1b7a3a';
+                ctx.beginPath();
+                ctx.ellipse(152, 68, 8, 4, -0.5, 0, Math.PI * 2);
+                ctx.ellipse(168, 68, 8, 4, 0.5, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.fillStyle = '#d11a2a';
+                ctx.beginPath();
+                ctx.arc(158, 72, 4, 0, Math.PI * 2);
+                ctx.arc(164, 72, 4, 0, Math.PI * 2);
+                ctx.arc(161, 67, 4, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.hat === 'elf_hat') {
+                ctx.fillStyle = '#1e7e34';
+                ctx.beginPath();
+                ctx.moveTo(96, 96);
+                ctx.bezierCurveTo(110, 25, 120, 15, 80, 20);
+                ctx.quadraticCurveTo(130, 40, 224, 96);
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#d11a2a';
+                ctx.beginPath();
+                ctx.moveTo(94, 96);
+                for (let zx = 94; zx <= 224; zx += 16) {
+                    ctx.lineTo(zx + 8, 86);
+                    ctx.lineTo(zx + 16, 96);
+                }
+                ctx.closePath();
+                ctx.fill();
+
+                ctx.fillStyle = '#ffd700';
+                ctx.beginPath();
+                ctx.arc(76, 22, 9, 0, Math.PI * 2);
+                ctx.fill();
+            } else if (state.hat === 'star_tiara') {
+                ctx.strokeStyle = '#ffd700';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.arc(160, 102, 58, Math.PI * 1.15, Math.PI * 1.85);
+                ctx.stroke();
+
+                [
+                    {x: 120, y: 75, r: 7}, {x: 140, y: 62, r: 9},
+                    {x: 160, y: 55, r: 12}, {x: 180, y: 62, r: 9},
+                    {x: 200, y: 75, r: 7}
+                ].forEach(st => {
+                    drawMiniStar(ctx, st.x, st.y, st.r);
+                });
+            } else if (state.hat === 'cozy_earmuffs') {
+                ctx.strokeStyle = '#d11a2a';
+                ctx.lineWidth = 5;
+                ctx.beginPath();
+                ctx.arc(160, 120, 68, Math.PI * 1.1, Math.PI * 1.9);
+                ctx.stroke();
+
+                ctx.fillStyle = '#ffffff';
+                ctx.strokeStyle = '#d11a2a';
+                ctx.lineWidth = 3;
+                ctx.beginPath();
+                ctx.ellipse(92, 155, 12, 18, 0, 0, Math.PI * 2);
+                ctx.ellipse(228, 155, 12, 18, 0, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.stroke();
+            }
+
+            ctx.restore();
+        }
+
+        function drawStarGlasses(ctx, cx, cy) {
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.65)';
+            ctx.strokeStyle = '#e69500';
+            ctx.lineWidth = 2.5;
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const outerAngle = (i * 72 - 90) * Math.PI / 180;
+                const innerAngle = (i * 72 + 36 - 90) * Math.PI / 180;
+                const ox = cx + Math.cos(outerAngle) * 16;
+                const oy = cy + Math.sin(outerAngle) * 16;
+                const ix = cx + Math.cos(innerAngle) * 8;
+                const iy = cy + Math.sin(innerAngle) * 8;
+                if (i === 0) ctx.moveTo(ox, oy);
+                else ctx.lineTo(ox, oy);
+                ctx.lineTo(ix, iy);
+            }
+            ctx.closePath();
+            ctx.fill();
+            ctx.stroke();
+        }
+
+        function drawMiniStar(ctx, cx, cy, r) {
+            ctx.fillStyle = '#ffd700';
+            ctx.beginPath();
+            for (let i = 0; i < 5; i++) {
+                const a1 = (i * 72 - 90) * Math.PI / 180;
+                const a2 = (i * 72 + 36 - 90) * Math.PI / 180;
+                const x1 = cx + Math.cos(a1) * r;
+                const y1 = cy + Math.sin(a1) * r;
+                const x2 = cx + Math.cos(a2) * (r * 0.45);
+                const y2 = cy + Math.sin(a2) * (r * 0.45);
+                if (i === 0) ctx.moveTo(x1, y1);
+                else ctx.lineTo(x1, y1);
+                ctx.lineTo(x2, y2);
+            }
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function renderAvatar() {
+            drawBackground(bCtx, bitmojiState);
+            drawBackHair(bCtx, bitmojiState);
+            drawBodyAndClothes(bCtx, bitmojiState);
+            drawHeadAndFace(bCtx, bitmojiState);
+            drawFrontHair(bCtx, bitmojiState);
+            drawEyesAndBrows(bCtx, bitmojiState);
+            drawNose(bCtx, bitmojiState);
+            drawMouth(bCtx, bitmojiState);
+            drawFacialHair(bCtx, bitmojiState);
+            drawHatsAndAccessories(bCtx, bitmojiState);
+        }
+
+        // ================= CONTRÔLES DE L'INTERFACE BITMOJI =================
+        function buildOptionsGrid(containerId, items, activeProp, onSelect) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            items.forEach(item => {
+                const card = document.createElement('div');
+                const isActive = (bitmojiState[activeProp] === item.id);
+                card.className = `bitmoji-option-card ${isActive ? 'active' : ''}`;
+                card.innerHTML = `
+                    <span class="bitmoji-card-icon">${item.icon}</span>
+                    <span class="bitmoji-card-label">${item.label}</span>
+                `;
+                card.onclick = () => {
+                    container.querySelectorAll('.bitmoji-option-card').forEach(c => c.classList.remove('active'));
+                    card.classList.add('active');
+                    bitmojiState[activeProp] = item.id;
+                    if (onSelect) onSelect(item.id);
+                    renderAvatar();
+                };
+                container.appendChild(card);
+            });
+        }
+
+        function buildColorSwatches(containerId, colors, activeProp, onSelect) {
+            const container = document.getElementById(containerId);
+            container.innerHTML = '';
+            colors.forEach(col => {
+                const swatch = document.createElement('div');
+                const isActive = (bitmojiState[activeProp] === col.id);
+                swatch.className = `bitmoji-color-swatch ${isActive ? 'active' : ''}`;
+                swatch.style.backgroundColor = col.id;
+                swatch.title = col.label;
+                swatch.onclick = () => {
+                    container.querySelectorAll('.bitmoji-color-swatch').forEach(s => s.classList.remove('active'));
+                    swatch.classList.add('active');
+                    bitmojiState[activeProp] = col.id;
+                    if (onSelect) onSelect(col.id);
+                    renderAvatar();
+                };
+                container.appendChild(swatch);
+            });
+        }
+
+        function initBitmojiControls() {
+            // Teint
+            buildColorSwatches('skinColorSwatches', SKIN_COLORS, 'skinColor');
+            document.getElementById('toggleBlush').checked = bitmojiState.blush;
+            document.getElementById('toggleBlush').onchange = (e) => {
+                bitmojiState.blush = e.target.checked;
+                renderAvatar();
+            };
+            document.getElementById('toggleFreckles').checked = bitmojiState.freckles;
+            document.getElementById('toggleFreckles').onchange = (e) => {
+                bitmojiState.freckles = e.target.checked;
+                renderAvatar();
+            };
+
+            // Cheveux
+            buildOptionsGrid('hairStyleGrid', HAIR_STYLES, 'hairStyle');
+            buildColorSwatches('hairColorSwatches', HAIR_COLORS, 'hairColor');
+
+            // Regard
+            buildOptionsGrid('eyeShapeGrid', EYE_SHAPES, 'eyeShape');
+            buildColorSwatches('eyeColorSwatches', EYE_COLORS, 'eyeColor');
+            buildOptionsGrid('glassesGrid', GLASSES_OPTIONS, 'glasses');
+
+            // Sourire
+            buildOptionsGrid('mouthStyleGrid', MOUTH_STYLES, 'mouthStyle');
+
+            // Pilosité
+            buildOptionsGrid('facialHairGrid', FACIAL_HAIR_OPTIONS, 'facialHair');
+
+            // Chapeau
+            buildOptionsGrid('hatGrid', HATS_OPTIONS, 'hat');
+
+            // Tenue
+            buildOptionsGrid('outfitGrid', OUTFITS_OPTIONS, 'outfit');
+
+            // Décor
+            buildOptionsGrid('bgGrid', BACKGROUND_OPTIONS, 'background');
+        }
+
+        // Navigation par onglets
+        const tabsNav = document.getElementById('bitmojiTabsNav');
+        tabsNav.querySelectorAll('.bitmoji-tab-btn').forEach(btn => {
+            btn.onclick = () => {
+                tabsNav.querySelectorAll('.bitmoji-tab-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                const targetTab = btn.dataset.tab;
+                document.querySelectorAll('.bitmoji-panel').forEach(p => {
+                    p.classList.toggle('active', p.id === targetTab);
+                });
+            };
+        });
+
+        // Aléatoire
+        function randomChoice(arr) {
+            return arr[Math.floor(Math.random() * arr.length)];
+        }
+
+        randomBitmojiBtn.onclick = () => {
+            bitmojiState.skinColor = randomChoice(SKIN_COLORS).id;
+            bitmojiState.hairStyle = randomChoice(HAIR_STYLES).id;
+            bitmojiState.hairColor = randomChoice(HAIR_COLORS).id;
+            bitmojiState.eyeShape = randomChoice(EYE_SHAPES).id;
+            bitmojiState.eyeColor = randomChoice(EYE_COLORS).id;
+            bitmojiState.glasses = randomChoice(GLASSES_OPTIONS).id;
+            bitmojiState.mouthStyle = randomChoice(MOUTH_STYLES).id;
+            bitmojiState.facialHair = randomChoice(FACIAL_HAIR_OPTIONS).id;
+            bitmojiState.hat = randomChoice(HATS_OPTIONS).id;
+            bitmojiState.outfit = randomChoice(OUTFITS_OPTIONS).id;
+            bitmojiState.background = randomChoice(BACKGROUND_OPTIONS).id;
+            bitmojiState.blush = true;
+            bitmojiState.freckles = Math.random() > 0.5;
+
+            initBitmojiControls();
+            renderAvatar();
+        };
+
+        // Réinitialiser
+        resetBitmojiBtn.onclick = () => {
+            bitmojiState = Object.assign({}, defaultState);
+            initBitmojiControls();
+            renderAvatar();
+        };
+
+        // Ouvrir / Fermer Studio Bitmoji
+        openBitmojiStudioBtn.onclick = () => {
+            initBitmojiControls();
+            renderAvatar();
+            bitmojiModal.style.display = 'flex';
+        };
+
+        function closeBitmojiModal() {
+            bitmojiModal.style.display = 'none';
+        }
+        closeBitmojiModalBtn.onclick = closeBitmojiModal;
+        cancelBitmojiBtn.onclick = closeBitmojiModal;
+        bitmojiModal.onclick = (e) => {
+            if (e.target === bitmojiModal) closeBitmojiModal();
+        };
+
+        // Appliquer et sauvegarder le Bitmoji
+        applyBitmojiBtn.onclick = () => {
+            const dataUrl = bitmojiCanvas.toDataURL('image/png');
+            currentAvatar = dataUrl;
+            previewImg.src = dataUrl;
+            localStorage.setItem('userAvatar', dataUrl);
+
+            // Mettre à jour les presets en ajoutant ou sélectionnant l'option Bitmoji
+            const existingBitmojiIdx = presets.findIndex(p => p.id === 'bitmoji');
+            if (existingBitmojiIdx >= 0) {
+                presets[existingBitmojiIdx].img = dataUrl;
+            } else {
+                presets.unshift({ id: 'bitmoji', img: dataUrl, label: 'Mon Bitmoji' });
+            }
+            renderPresets();
+
+            closeBitmojiModal();
+            alert("Ton Bitmoji de Noël est prêt et défini comme photo de profil ! 🎅✨");
         };
     </script>
     <script src="static/java/theme.js"></script>
