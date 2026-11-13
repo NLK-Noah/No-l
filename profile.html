@@ -166,6 +166,57 @@
           box-shadow: 0 0 15px var(--gold);
           transform: scale(1.1);
       }
+      .security-card {
+          margin: 20px 0 15px;
+          padding: 16px 14px;
+          background: rgba(0, 0, 0, 0.4);
+          border: 2px dashed var(--gold);
+          border-radius: 20px;
+          text-align: center;
+          box-sizing: border-box;
+          width: 100%;
+      }
+      .pwd-inputs-container {
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+          align-items: center;
+          margin-top: 8px;
+      }
+      .pwd-change-input {
+          width: 100%;
+          max-width: 280px;
+          padding: 10px 14px;
+          border-radius: 14px;
+          border: 2px solid var(--gold);
+          background: white;
+          color: #222;
+          font-size: 0.95rem;
+          outline: none;
+          box-sizing: border-box;
+          font-family: inherit;
+          text-align: center;
+      }
+      .btn-change-pwd {
+          background: linear-gradient(135deg, #ffd700, #ff9800);
+          color: #1a1a1a;
+          border: none;
+          padding: 10px 20px;
+          border-radius: 20px;
+          font-weight: bold;
+          font-size: 0.9rem;
+          cursor: pointer;
+          box-shadow: 0 3px 10px rgba(255,215,0,0.4);
+          transition: transform 0.15s;
+          margin-top: 4px;
+          font-family: inherit;
+      }
+      .btn-change-pwd:hover {
+          transform: scale(1.03);
+      }
+      .btn-change-pwd:active {
+          transform: scale(0.97);
+      }
       .save-btn {
           background: linear-gradient(to bottom, var(--bright-red), var(--dark-red));
           border: 3px solid var(--gold);
@@ -544,6 +595,17 @@
         <div class="presets-title">Ou choisis un avatar :</div>
         <div class="avatar-grid" id="avatarGrid"></div>
 
+        <div class="security-card">
+            <div class="presets-title">🔒 Mon mot de passe personnel</div>
+            <p style="font-size: 0.82rem; opacity: 0.85; margin: 0 0 8px 0;">Ce mot de passe protège ton compte individuel lors de la connexion.</p>
+            <div class="pwd-inputs-container">
+                <input type="password" id="newPasswordInput" class="pwd-change-input" placeholder="Nouveau mot de passe..." autocomplete="new-password">
+                <input type="password" id="confirmPasswordInput" class="pwd-change-input" placeholder="Confirmer le mot de passe..." autocomplete="new-password">
+                <button type="button" id="btnUpdatePassword" class="btn-change-pwd">Mettre à jour mon mot de passe 🔑</button>
+            </div>
+            <div id="pwdMessage" style="display: none; font-size: 0.85rem; margin-top: 8px;"></div>
+        </div>
+
         <button class="save-btn" id="saveAvatar">Enregistrer mon profil ✨</button>
     </div>
 
@@ -662,7 +724,22 @@
     </div>
 
     <script src="static/java/christmas-camera.js"></script>
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getFirestore, doc, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+            authDomain: "santa-secret-3c1f4.firebaseapp.com",
+            projectId: "santa-secret-3c1f4",
+            storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+            messagingSenderId: "238129661360",
+            appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         const DEFAULT_PHOTO = 'static/png/naima.png';
         const presets = [
             { id: 'naima', img: 'static/png/naima.png', label: 'Festif' },
@@ -736,11 +813,87 @@
         }
         renderPresets();
 
+        function getUserId(name) {
+            return name.trim().toLowerCase().replace(/[^a-z0-9à-ÿ]/gi, "_") || "user";
+        }
+
+        const currentUserName = localStorage.getItem("username") || "Invité";
+        const currentUserId = getUserId(currentUserName);
+
         // Sauvegarder
-        document.getElementById('saveAvatar').onclick = () => {
+        document.getElementById('saveAvatar').onclick = async () => {
             localStorage.setItem('userAvatar', currentAvatar);
-            alert("Profil enregistré avec succès ! ✨");
+            try {
+                await setDoc(doc(db, 'users', currentUserId), {
+                    avatar: currentAvatar,
+                    username: currentUserName
+                }, { merge: true });
+            } catch(e) {}
+            alert("Profil et avatar enregistrés avec succès ! ✨");
             window.location.href = "menu.html";
+        };
+
+        // Gestion du changement de mot de passe individuel
+        const newPasswordInput = document.getElementById('newPasswordInput');
+        const confirmPasswordInput = document.getElementById('confirmPasswordInput');
+        const btnUpdatePassword = document.getElementById('btnUpdatePassword');
+        const pwdMessage = document.getElementById('pwdMessage');
+
+        btnUpdatePassword.onclick = async () => {
+            pwdMessage.style.display = 'none';
+            const p1 = newPasswordInput.value.trim();
+            const p2 = confirmPasswordInput.value.trim();
+
+            if (!p1) {
+                pwdMessage.style.display = 'block';
+                pwdMessage.style.color = '#ff6b6b';
+                pwdMessage.textContent = 'Entre un nouveau mot de passe !';
+                newPasswordInput.focus();
+                return;
+            }
+
+            if (p1.length < 3) {
+                pwdMessage.style.display = 'block';
+                pwdMessage.style.color = '#ff6b6b';
+                pwdMessage.textContent = 'Le mot de passe doit comporter au moins 3 caractères !';
+                newPasswordInput.focus();
+                return;
+            }
+
+            if (p1 !== p2) {
+                pwdMessage.style.display = 'block';
+                pwdMessage.style.color = '#ff6b6b';
+                pwdMessage.textContent = 'Les deux mots de passe ne correspondent pas !';
+                confirmPasswordInput.focus();
+                return;
+            }
+
+            btnUpdatePassword.disabled = true;
+            btnUpdatePassword.textContent = 'Mise à jour... ⏳';
+
+            try {
+                await setDoc(doc(db, 'users', currentUserId), {
+                    password: p1,
+                    username: currentUserName,
+                    avatar: currentAvatar
+                }, { merge: true });
+
+                localStorage.setItem('userPassword', p1);
+                pwdMessage.style.display = 'block';
+                pwdMessage.style.color = '#64ff88';
+                pwdMessage.textContent = `✅ Mot de passe personnel mis à jour pour ${currentUserName} !`;
+                newPasswordInput.value = '';
+                confirmPasswordInput.value = '';
+                alert(`Ton mot de passe personnel a été mis à jour avec succès, ${currentUserName} ! 🔒✨`);
+            } catch (err) {
+                console.error("Erreur mise à jour mot de passe individuel :", err);
+                pwdMessage.style.display = 'block';
+                pwdMessage.style.color = '#ff6b6b';
+                pwdMessage.textContent = 'Erreur lors de la mise à jour sur le serveur. Réessaie !';
+            } finally {
+                btnUpdatePassword.disabled = false;
+                btnUpdatePassword.textContent = 'Mettre à jour mon mot de passe 🔑';
+            }
         };
 
         // ==========================================================

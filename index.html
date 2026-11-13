@@ -129,14 +129,34 @@
         </div>
 
         <div class="login-section">
-            <input type="text" id="usernameInput" class="login-input" placeholder="Ton nom secret...">
+            <input type="text" id="usernameInput" class="login-input" placeholder="Ton nom ou prénom..." autocomplete="username">
+            <input type="password" id="passwordInput" class="login-input" placeholder="Ton mot de passe personnel 🔒" autocomplete="current-password">
+            <div id="loginErrorMsg" style="color: #ffb4b4; background: rgba(180, 0, 0, 0.4); padding: 6px 14px; border-radius: 12px; border: 1px solid #ff4444; font-size: 0.85rem; font-family: 'Poppins', sans-serif; display: none; margin-top: 2px;"></div>
             <div class="entry-btn-wrapper">
                 <a href="#" id="enterBtn" class="btn-noel">Entrer dans la magie ✨</a>
             </div>
+            <p style="font-size: 0.75rem; opacity: 0.85; margin: 4px 0 0 0; color: #ffd700; font-family: 'Poppins', sans-serif;">
+                ✨ Première visite ? Ton mot de passe sera enregistré pour ton prénom !
+            </p>
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getFirestore, doc, getDoc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+            authDomain: "santa-secret-3c1f4.firebaseapp.com",
+            projectId: "santa-secret-3c1f4",
+            storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+            messagingSenderId: "238129661360",
+            appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+
         function updateCountdown() {
             const targetDate = new Date('December 24, 2026 00:00:00').getTime();
             const now = new Date().getTime();
@@ -156,15 +176,96 @@
 
         const enterBtn = document.getElementById('enterBtn');
         const usernameInput = document.getElementById('usernameInput');
+        const passwordInput = document.getElementById('passwordInput');
+        const loginErrorMsg = document.getElementById('loginErrorMsg');
 
-        enterBtn.onclick = () => {
+        // Pré-remplir le pseudo si déjà connu
+        const savedUser = localStorage.getItem("username");
+        if (savedUser) usernameInput.value = savedUser;
+
+        function getUserId(name) {
+            return name.trim().toLowerCase().replace(/[^a-z0-9à-ÿ]/gi, "_") || "user";
+        }
+
+        async function attemptLogin() {
+            loginErrorMsg.style.display = 'none';
             const name = usernameInput.value.trim();
-            if (name) {
-                localStorage.setItem("username", name);
-                window.location.href = "menu.html";
-            } else {
-                alert("S'il te plaît, entre ton nom secret ! 🎅");
+            const pwd = passwordInput.value.trim();
+
+            if (!name) {
+                loginErrorMsg.textContent = "S'il te plaît, entre ton nom ou prénom ! 🎅";
+                loginErrorMsg.style.display = 'block';
+                usernameInput.focus();
+                return;
             }
+
+            if (!pwd) {
+                loginErrorMsg.textContent = "Entre ton mot de passe personnel ! 🔒";
+                loginErrorMsg.style.display = 'block';
+                passwordInput.focus();
+                return;
+            }
+
+            enterBtn.textContent = "Vérification... ⏳";
+
+            const userId = getUserId(name);
+            const userRef = doc(db, "users", userId);
+
+            try {
+                const userSnap = await getDoc(userRef);
+
+                if (userSnap.exists()) {
+                    // Utilisateur existant : vérification du mot de passe individuel
+                    const userData = userSnap.data();
+                    if (userData.password && userData.password !== pwd) {
+                        enterBtn.textContent = "Entrer dans la magie ✨";
+                        loginErrorMsg.textContent = `Mot de passe incorrect pour ${name} ! 🔒`;
+                        loginErrorMsg.style.display = 'block';
+                        passwordInput.value = "";
+                        passwordInput.focus();
+                        return;
+                    }
+
+                    // Mot de passe correct : synchroniser avatar s'il existe
+                    const finalName = userData.username || name;
+                    localStorage.setItem("username", finalName);
+                    if (userData.avatar) {
+                        localStorage.setItem("userAvatar", userData.avatar);
+                    }
+                    localStorage.setItem("userPassword", pwd);
+                    window.location.href = "menu.html";
+                } else {
+                    // Nouveau compte : enregistrement automatique avec ce mot de passe
+                    const userAvatar = localStorage.getItem("userAvatar") || "static/png/naima.png";
+                    await setDoc(userRef, {
+                        username: name,
+                        password: pwd,
+                        avatar: userAvatar,
+                        createdAt: serverTimestamp()
+                    });
+
+                    localStorage.setItem("username", name);
+                    localStorage.setItem("userPassword", pwd);
+                    window.location.href = "menu.html";
+                }
+            } catch (err) {
+                console.error("Erreur de connexion :", err);
+                enterBtn.textContent = "Entrer dans la magie ✨";
+                loginErrorMsg.textContent = "Erreur de connexion au serveur. Réessaie !";
+                loginErrorMsg.style.display = 'block';
+            }
+        }
+
+        enterBtn.onclick = (e) => {
+            e.preventDefault();
+            attemptLogin();
+        };
+
+        usernameInput.onkeyup = (e) => {
+            if (e.key === "Enter") passwordInput.focus();
+        };
+        passwordInput.onkeyup = (e) => {
+            if (e.key === "Enter") attemptLogin();
         };
     </script>
     <script src="static/java/audio.js"></script>

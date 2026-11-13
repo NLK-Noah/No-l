@@ -3,44 +3,1350 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Calendrier de l'Avent 2026</title>
+    <title>Calendrier de l'Avent 2026 - Mini-Jeux de Noël</title>
     <link rel="icon" type="image/png" href="static/png/naima.png">
-    <link rel="stylesheet" href="static/css/avent.css">
-    
     <link rel="stylesheet" href="static/css/noel-3d.css">
-<link rel="stylesheet" href="static/css/transitions.css">
-<link rel="manifest" href="manifest.json">
+    <link rel="stylesheet" href="static/css/transitions.css">
+    <link rel="manifest" href="manifest.json">
+    <style>
+        body {
+            background: radial-gradient(circle at center, #0f3d1f 0%, #051a0d 100%) !important;
+            color: white;
+            font-family: 'Comic Sans MS', 'Segoe UI', Tahoma, sans-serif;
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            overflow-x: hidden;
+            box-sizing: border-box;
+        }
+
+        .back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            width: 48px;
+            z-index: 1000;
+            transition: transform 0.2s;
+        }
+        .back-btn:hover {
+            transform: scale(1.1);
+        }
+        .back-btn img {
+            width: 100%;
+            display: block;
+        }
+
+        header {
+            text-align: center;
+            padding: 70px 15px 15px;
+            max-width: 900px;
+            width: 95%;
+        }
+
+        h1 {
+            font-size: clamp(1.8rem, 5vw, 2.8rem);
+            color: var(--gold, #ffd700);
+            text-shadow: 2px 2px 8px rgba(0,0,0,0.8), 0 0 15px rgba(255,215,0,0.5);
+            margin: 0 0 8px 0;
+        }
+
+        .subtitle {
+            font-size: 0.95rem;
+            opacity: 0.9;
+            margin: 0 0 16px 0;
+        }
+
+        /* Barre profil joueur */
+        .player-bar {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            border: 2px solid var(--gold, #ffd700);
+            border-radius: 20px;
+            padding: 10px 18px;
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 6px 20px rgba(0,0,0,0.5);
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .player-avatar {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            border: 2px solid var(--gold, #ffd700);
+            object-fit: cover;
+        }
+
+        .player-info {
+            text-align: left;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: var(--gold, #ffd700);
+            font-size: 1.05rem;
+        }
+
+        .player-stats {
+            font-size: 0.8rem;
+            opacity: 0.9;
+        }
+
+        /* Onglets Calendrier / Classement */
+        .main-nav-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 25px;
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.12);
+            border: 2px solid var(--gold, #ffd700);
+            color: white;
+            padding: 10px 22px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn:hover, .tab-btn.active {
+            background: var(--gold, #ffd700);
+            color: #8b0000;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.5);
+            transform: translateY(-2px);
+        }
+
+        /* Conteneurs de section */
+        .tab-section {
+            width: 95%;
+            max-width: 960px;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            margin-bottom: 60px;
+        }
+        .tab-section.active {
+            display: flex;
+        }
+
+        /* Grille du calendrier */
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(135px, 1fr));
+            gap: 15px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 480px) {
+            .calendar-grid {
+                grid-template-columns: repeat(3, 1fr);
+                gap: 10px;
+            }
+        }
+
+        .day-card {
+            background: linear-gradient(135deg, #b81414 0%, #6e0808 100%);
+            border: 3px solid var(--gold, #ffd700);
+            border-radius: 16px;
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 6px;
+            box-sizing: border-box;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+            box-shadow: 0 8px 16px rgba(0,0,0,0.5);
+            position: relative;
+            user-select: none;
+        }
+
+        .day-card:hover {
+            transform: translateY(-4px) scale(1.03);
+            box-shadow: 0 12px 25px rgba(255, 215, 0, 0.4);
+            filter: brightness(1.1);
+        }
+
+        .day-card.completed {
+            background: linear-gradient(135deg, #1b6330 0%, #0a3517 100%);
+            border-color: #64ff88;
+        }
+
+        .day-card.locked {
+            background: #2a333c;
+            border-color: #667788;
+            opacity: 0.65;
+            cursor: not-allowed;
+        }
+        .day-card.locked:hover {
+            transform: none;
+            box-shadow: none;
+            filter: none;
+        }
+
+        .day-badge-type {
+            font-size: 0.72rem;
+            padding: 2px 6px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.4);
+            color: var(--gold, #ffd700);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 90%;
+            border: 1px solid rgba(255,215,0,0.3);
+        }
+
+        .day-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #fff;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .day-status {
+            font-size: 0.75rem;
+            font-weight: bold;
+        }
+        .day-card.completed .day-status {
+            color: #ffd700;
+        }
+
+        /* Classement / Leaderboard */
+        .leaderboard-card {
+            background: rgba(0, 0, 0, 0.65);
+            backdrop-filter: blur(12px);
+            border: 3px solid var(--gold, #ffd700);
+            border-radius: 28px;
+            padding: 25px 20px;
+            width: 100%;
+            max-width: 700px;
+            box-sizing: border-box;
+            box-shadow: 0 15px 40px rgba(0,0,0,0.7);
+        }
+
+        .leaderboard-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .leaderboard-header h2 {
+            margin: 0;
+            color: var(--gold, #ffd700);
+            font-size: 1.8rem;
+        }
+
+        .podium-container {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 12px;
+            margin-bottom: 25px;
+            padding-top: 10px;
+        }
+
+        .podium-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            width: 30%;
+            max-width: 140px;
+        }
+
+        .podium-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            border: 3px solid var(--gold, #ffd700);
+            object-fit: cover;
+            margin-bottom: 6px;
+        }
+
+        .podium-item:nth-child(2) .podium-avatar {
+            width: 75px;
+            height: 75px;
+            border-color: #ffd700;
+            box-shadow: 0 0 20px rgba(255,215,0,0.7);
+        }
+
+        .podium-item:nth-child(1) .podium-avatar { border-color: #c0c0c0; }
+        .podium-item:nth-child(3) .podium-avatar { border-color: #cd7f32; }
+
+        .podium-bar {
+            width: 100%;
+            background: rgba(255,215,0,0.2);
+            border: 2px solid var(--gold, #ffd700);
+            border-radius: 12px 12px 0 0;
+            padding: 8px 4px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .podium-item:nth-child(2) .podium-bar {
+            height: 100px;
+            background: linear-gradient(to top, rgba(255,215,0,0.3), rgba(255,215,0,0.6));
+        }
+        .podium-item:nth-child(1) .podium-bar {
+            height: 75px;
+            background: rgba(192,192,192,0.25);
+            border-color: #c0c0c0;
+        }
+        .podium-item:nth-child(3) .podium-bar {
+            height: 60px;
+            background: rgba(205,127,50,0.25);
+            border-color: #cd7f32;
+        }
+
+        .podium-score {
+            font-weight: bold;
+            font-size: 1.1rem;
+            color: #fff;
+        }
+
+        .rank-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .rank-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid rgba(255,215,0,0.3);
+            border-radius: 14px;
+            padding: 10px 14px;
+            transition: transform 0.15s;
+        }
+        .rank-row:hover {
+            transform: translateX(4px);
+            border-color: var(--gold, #ffd700);
+        }
+
+        .rank-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .rank-number {
+            font-size: 1.2rem;
+            font-weight: bold;
+            width: 25px;
+            text-align: center;
+        }
+        .rank-avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            border: 2px solid var(--gold, #ffd700);
+            object-fit: cover;
+        }
+        .rank-name {
+            font-weight: bold;
+            font-size: 0.95rem;
+        }
+        .rank-right {
+            text-align: right;
+        }
+        .rank-pts {
+            color: var(--gold, #ffd700);
+            font-weight: bold;
+            font-size: 1.15rem;
+        }
+        .rank-days {
+            font-size: 0.75rem;
+            opacity: 0.8;
+        }
+
+        /* Modal du Jeu */
+        .game-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 20000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 15px;
+            box-sizing: border-box;
+            animation: modalFadeIn 0.2s ease-out;
+        }
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: scale(0.95); }
+            to { opacity: 1; transform: scale(1); }
+        }
+
+        .game-modal-card {
+            background: linear-gradient(135deg, #133c1d 0%, #071f0f 100%);
+            border: 3px solid var(--gold, #ffd700);
+            border-radius: 28px;
+            width: 100%;
+            max-width: 580px;
+            max-height: 90vh;
+            display: flex;
+            flex-direction: column;
+            color: white;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.9), inset 0 0 25px rgba(255,215,0,0.15);
+            overflow: hidden;
+        }
+
+        .game-modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 14px 20px;
+            border-bottom: 2px solid rgba(255, 215, 0, 0.3);
+            background: rgba(0, 0, 0, 0.25);
+        }
+
+        .game-modal-header h3 {
+            margin: 0;
+            color: var(--gold, #ffd700);
+            font-size: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .game-modal-close {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1.5px solid var(--gold, #ffd700);
+            color: white;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+        .game-modal-close:hover {
+            background: #ff0000;
+            transform: rotate(90deg);
+        }
+
+        .game-modal-body {
+            padding: 20px;
+            overflow-y: auto;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Styles spécifiques aux jeux */
+        .game-item-img {
+            width: 100%;
+            max-height: 220px;
+            object-fit: cover;
+            border-radius: 16px;
+            border: 2px solid var(--gold, #ffd700);
+            box-shadow: 0 6px 18px rgba(0,0,0,0.5);
+        }
+
+        .clue-scroll {
+            background: rgba(255, 245, 220, 0.12);
+            border-left: 4px solid var(--gold, #ffd700);
+            padding: 10px 14px;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            line-height: 1.4;
+        }
+
+        .price-input-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .price-input {
+            flex: 1;
+            padding: 12px 16px;
+            border-radius: 14px;
+            border: 2px solid var(--gold, #ffd700);
+            background: white;
+            color: #111;
+            font-size: 1.2rem;
+            font-weight: bold;
+            outline: none;
+            text-align: center;
+        }
+
+        .quick-step-btns {
+            display: flex;
+            gap: 6px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .quick-step-btn {
+            background: rgba(255,255,255,0.15);
+            border: 1px solid var(--gold, #ffd700);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 0.85rem;
+        }
+        .quick-step-btn:hover {
+            background: rgba(255,215,0,0.3);
+        }
+
+        .btn-validate-game {
+            background: linear-gradient(135deg, #ffd700 0%, #ffae00 100%);
+            color: #8b0000;
+            border: none;
+            padding: 14px;
+            border-radius: 20px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(255,215,0,0.5);
+            transition: transform 0.15s;
+            margin-top: 5px;
+        }
+        .btn-validate-game:hover {
+            transform: scale(1.02);
+            filter: brightness(1.1);
+        }
+
+        /* Pendu */
+        .pendu-lives-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 1.1rem;
+        }
+
+        .pendu-word-box {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin: 15px 0;
+        }
+
+        .pendu-letter-slot {
+            font-size: 1.7rem;
+            font-weight: bold;
+            min-width: 26px;
+            text-align: center;
+            border-bottom: 3px solid var(--gold, #ffd700);
+            color: var(--gold, #ffd700);
+        }
+        .pendu-letter-slot.space {
+            border-bottom: none;
+            min-width: 14px;
+        }
+
+        .virtual-keyboard {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 6px;
+            margin-top: 10px;
+        }
+
+        .vkey-btn {
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 215, 0, 0.5);
+            color: white;
+            border-radius: 8px;
+            padding: 10px 0;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        .vkey-btn:hover:not(:disabled) {
+            background: var(--gold, #ffd700);
+            color: #8b0000;
+            transform: scale(1.08);
+        }
+        .vkey-btn:disabled {
+            opacity: 0.3;
+            cursor: not-allowed;
+            border-color: #555;
+        }
+
+        /* Quiz */
+        .quiz-question-box {
+            background: rgba(0, 0, 0, 0.25);
+            border: 1.5px solid rgba(255,215,0,0.3);
+            border-radius: 16px;
+            padding: 12px 14px;
+            margin-bottom: 12px;
+        }
+
+        .quiz-q-title {
+            font-weight: bold;
+            font-size: 1rem;
+            color: var(--gold, #ffd700);
+            margin-bottom: 8px;
+        }
+
+        .quiz-options-list {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 8px;
+        }
+        @media (max-width: 500px) {
+            .quiz-options-list {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .quiz-opt-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1.5px solid rgba(255, 215, 0, 0.4);
+            color: white;
+            padding: 10px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            text-align: left;
+            transition: all 0.15s;
+        }
+        .quiz-opt-btn:hover {
+            background: rgba(255, 215, 0, 0.2);
+            border-color: var(--gold, #ffd700);
+        }
+        .quiz-opt-btn.selected {
+            background: var(--gold, #ffd700);
+            color: #8b0000;
+            font-weight: bold;
+            border-color: var(--gold, #ffd700);
+        }
+        .quiz-opt-btn.correct {
+            background: #28a745 !important;
+            color: white !important;
+            border-color: #28a745 !important;
+        }
+        .quiz-opt-btn.wrong {
+            background: #dc3545 !important;
+            color: white !important;
+            border-color: #dc3545 !important;
+        }
+
+        /* Résultat d'un jeu terminé */
+        .finished-game-box {
+            text-align: center;
+            padding: 20px 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .score-circle {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            border: 4px solid var(--gold, #ffd700);
+            background: rgba(255, 215, 0, 0.15);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 20px rgba(255,215,0,0.5);
+            margin: 10px 0;
+        }
+        .score-circle-num {
+            font-size: 2.2rem;
+            font-weight: bold;
+            color: var(--gold, #ffd700);
+            line-height: 1;
+        }
+        .score-circle-label {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+        }
+
+        /* Toggle mode debug */
+        .debug-toggle-container {
+            margin-top: 15px;
+            font-size: 0.85rem;
+            opacity: 0.8;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
-<a href="menu.html" class="back">
-    <img src="static/png/back.png" class="back" alt="Retour" />
+
+<a href="menu.html" class="back-btn" title="Retour au menu">
+    <img src="static/png/back.png" alt="Retour">
 </a>
 
-    <div class="snow-bg"></div>
+<header>
+    <h1>🎄 Calendrier de l'Avent 2026 🎅</h1>
+    <p class="subtitle">24 jours de mini-jeux de Noël • Défis quotidiens & classement familial en temps réel !</p>
 
-    <header>
-        <h1>🎄 Mon Calendrier de l'Avent 🎄</h1>
-        <p>Clique sur la case du jour pour découvrir ta surprise !</p>
-    </header>
-
-    <div class="calendar-grid" id="calendar">
-        <!-- Les 24 cases seront générées par JavaScript -->
+    <!-- Carte du Joueur Connecté -->
+    <div class="player-bar">
+        <a href="profile.html" title="Modifier mon profil">
+            <img id="userAvatarImg" src="static/png/naima.png" class="player-avatar" alt="Avatar">
+        </a>
+        <div class="player-info">
+            <span class="player-name" id="userNameLabel">Joueur</span>
+            <span class="player-stats" id="userStatsLabel">Score : 0 pt • 0/24 validé</span>
+        </div>
+        <button type="button" class="quick-step-btn" id="changeNameBtn" style="margin-left: 8px;">✏️ Changer</button>
     </div>
 
-    <!-- Modal pour la surprise -->
-    <div id="modal" class="modal">
-        <div class="modal-content">
-            <span class="close-button">&times;</span>
-            <div id="surprise-content"></div>
+    <!-- Navigation principale : Calendrier / Classement -->
+    <div class="main-nav-tabs">
+        <button type="button" class="tab-btn active" id="tabBtnCalendar">📅 Les 24 Jeux</button>
+        <button type="button" class="tab-btn" id="tabBtnLeaderboard">🏆 Classement Familial</button>
+    </div>
+</header>
+
+<!-- SECTION 1 : LES 24 CASES DU CALENDRIER -->
+<section class="tab-section active" id="sectionCalendar">
+    <div class="calendar-grid" id="calendarGrid">
+        <!-- Généré dynamiquement en JS -->
+    </div>
+
+    <!-- Mode découverte / Réel -->
+    <label class="debug-toggle-container">
+        <input type="checkbox" id="debugUnlockToggle" checked>
+        <span>🔓 Mode Découverte (Toutes les cases débloquées pour tester)</span>
+    </label>
+</section>
+
+<!-- SECTION 2 : CLASSEMENT GÉNÉRAL (LEADERBOARD) -->
+<section class="tab-section" id="sectionLeaderboard">
+    <div class="leaderboard-card">
+        <div class="leaderboard-header">
+            <h2>🏆 Classement Général de la Famille</h2>
+            <p style="font-size: 0.85rem; opacity: 0.85;">Mis à jour en direct dès qu'un joueur valide son jeu du jour !</p>
+        </div>
+
+        <!-- Podium Top 3 -->
+        <div class="podium-container" id="podiumContainer" style="display: none;"></div>
+
+        <!-- Liste complète -->
+        <div class="rank-list" id="rankList">
+            <div style="text-align: center; padding: 25px; color: var(--gold, #ffd700);">
+                ⏳ Chargement des scores de la famille...
+            </div>
         </div>
     </div>
+</section>
 
-    <script src="static/java/avent.js"></script>
-    <script src="static/java/snow.js"></script>
-    <script src="static/java/audio.js"></script>
+<!-- MODAL DU JEU QUOTIDIEN -->
+<div class="game-modal-overlay" id="gameModal">
+    <div class="game-modal-card">
+        <div class="game-modal-header">
+            <h3 id="modalGameTitle">🎮 Jour 1</h3>
+            <button type="button" class="game-modal-close" id="closeModalBtn">✕</button>
+        </div>
+        <div class="game-modal-body" id="modalGameBody">
+            <!-- Rendu interactif selon le jeu -->
+        </div>
+    </div>
+</div>
+
+<script src="static/java/snow.js"></script>
+<script src="static/java/audio.js"></script>
 <script src="static/java/theme.js"></script>
-    <script src="static/java/effects.js"></script>
-    <script src="static/java/noel-ui.js"></script>
+<script src="static/java/effects.js"></script>
+<script src="static/java/noel-ui.js"></script>
 <script src="static/java/transitions.js"></script>
+
+<!-- Logique Firebase & Jeux -->
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection, query, orderBy, onSnapshot, serverTimestamp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyBVQh_y9U1D5gA7BmCCFJgOlEPlUAogxV8",
+    authDomain: "santa-secret-3c1f4.firebaseapp.com",
+    projectId: "santa-secret-3c1f4",
+    storageBucket: "santa-secret-3c1f4.firebasestorage.app",
+    messagingSenderId: "238129661360",
+    appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+// Profil joueur
+let currentUserName = localStorage.getItem("username") || "Invité";
+let currentUserAvatar = localStorage.getItem("userAvatar") || "static/png/naima.png";
+const userId = currentUserName.toLowerCase().replace(/[^a-z0-9]/g, "_") || "invite";
+
+const userAvatarImg = document.getElementById("userAvatarImg");
+const userNameLabel = document.getElementById("userNameLabel");
+const userStatsLabel = document.getElementById("userStatsLabel");
+const changeNameBtn = document.getElementById("changeNameBtn");
+
+userAvatarImg.src = currentUserAvatar;
+userNameLabel.textContent = currentUserName;
+
+changeNameBtn.onclick = () => {
+    const newName = prompt("Entre ton prénom pour le calendrier et le classement :", currentUserName);
+    if (newName && newName.trim()) {
+        localStorage.setItem("username", newName.trim());
+        location.reload();
+    }
+};
+
+// Mode découverte vs officiel
+let unlockAllDays = true;
+const debugToggle = document.getElementById("debugUnlockToggle");
+debugToggle.onchange = (e) => {
+    unlockAllDays = e.target.checked;
+    renderCalendarGrid();
+};
+
+// Données locales des 24 jeux (pour chargement instantané sans latence)
+const GAMES_CATALOG = {
+    1: { type: "juste_prix", title: "Le Pull de Noël Lumineux", item: "Pull de Noël LED Star Wars Dark Vador", description: "Pull tricoté officiel sous licence avec 12 mini-LED clignotantes.", actualPrice: 45, imageUrl: "https://images.unsplash.com/photo-1543257580-7269da773bf5?w=600" },
+    2: { type: "pendu", title: "Gourmandise d'Antan", word: "PAIN DEPICES", clue: "Gâteau traditionnel au miel et cannelle découpé en forme de bonhomme." },
+    3: { type: "quiz", title: "Cinéma & Coutumes Mondiales", questions: [
+        { q: "Dans 'Maman, j'ai raté l'avion', où la famille McCallister part-elle fêter Noël ?", options: ["Paris", "Rome", "Londres", "Tokyo"], answerIndex: 0 },
+        { q: "Dans quel pays déguste-t-on traditionnellement du poulet frit le soir du 24 décembre ?", options: ["Corée du Sud", "Japon", "Islande", "Australie"], answerIndex: 1 },
+        { q: "Combien de rennes tirent le traîneau du Père Noël dans le poème historique de 1823 ?", options: ["6", "8", "9", "12"], answerIndex: 1 }
+    ]},
+    4: { type: "annee", title: "Sortie du film 'Le Grinch'", target: "Le film culte 'Le Grinch' avec Jim Carrey", clue: "Réalisé par Ron Howard pour inaugurer le nouveau millénaire.", actualYear: 2000 },
+    5: { type: "juste_prix", title: "Lego Sapin de Noël 2-en-1", item: "Lego Creator 40573 - Le Sapin de Noël", description: "Set officiel de 784 pièces Lego pour ériger un grand sapin ou 2 sapins de table.", actualPrice: 40, imageUrl: "https://images.unsplash.com/photo-1512909006721-3d6018887383?w=600" },
+    6: { type: "pendu", title: "Personnage Féerique", word: "CASSE NOISETTE", clue: "Soldat de bois qui prend vie dans le célèbre ballet d'hiver de Tchaïkovski." },
+    7: { type: "quiz", title: "Musique & Records d'Hiver", questions: [
+        { q: "En quelle année est sorti le tube 'All I Want for Christmas Is You' de Mariah Carey ?", options: ["1990", "1994", "1998", "2001"], answerIndex: 1 },
+        { q: "Quel est le nom du célèbre renne au nez rouge ?", options: ["Comète", "Rudolphe", "Cupidon", "Éclair"], answerIndex: 1 },
+        { q: "Quelle boisson chaude épicée nordique boit-on traditionnellement en hiver ?", options: ["Glögg", "Kombucha", "Mate", "Rooibos"], answerIndex: 0 }
+    ]},
+    8: { type: "annee", title: "La Game Boy sous le sapin", target: "Sortie de la console Nintendo Game Boy en Europe", clue: "La console portable grise vendue en pack avec le jeu Tetris.", actualYear: 1990 },
+    9: { type: "juste_prix", title: "Chocolatière Électrique Rétro", item: "Chocolatière électrique émulsionneur vintage", description: "Prépare 1L de chocolat chaud onctueux et mousseux comme au chalet.", actualPrice: 60, imageUrl: "https://images.unsplash.com/photo-1542990253-0d0f5be5f0ed?w=600" },
+    10: { type: "pendu", title: "Magie Polaire", word: "AURORE BOREALE", clue: "Lumières féeriques vertes et violettes dansant dans la nuit arctique." },
+    11: { type: "quiz", title: "Contes & Géographie", questions: [
+        { q: "Dans quelle région de Finlande se situe le village officiel du Père Noël (Rovaniemi) ?", options: ["Laponie", "Carélie", "Pirkanmaa", "Åland"], answerIndex: 0 },
+        { q: "Dans 'L'Étrange Noël de monsieur Jack' de Tim Burton, qui est le roi des citrouilles ?", options: ["Oogie Boogie", "Jack Skellington", "Zero", "Maire"], answerIndex: 1 },
+        { q: "Combien y a-t-il de jours entre Noël (25 déc) et l'Épiphanie (6 janv) ?", options: ["8", "10", "12", "14"], answerIndex: 2 }
+    ]},
+    12: { type: "annee", title: "Comédie Culte du Splendid", target: "Sortie au cinéma de 'Le père Noël est une ordure'", clue: "Pierre et Thérèse à la permanence de SOS Détresse Amitié.", actualYear: 1982 },
+    13: { type: "juste_prix", title: "Casque Audio Sony WH-1000XM5", item: "Casque Bluetooth Sony WH-1000XM5 Réduction de Bruit", description: "Le casque arceau haut de gamme incontournable sous le sapin.", actualPrice: 330, imageUrl: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=600" },
+    14: { type: "pendu", title: "Joie de l'Hiver", word: "BOULE DE NEIGE", clue: "Bataille amicale glacée ou sphère décorative féerique que l'on secoue." },
+    15: { type: "quiz", title: "Traditions & Gastronomie", questions: [
+        { q: "D'où vient historiquement la tradition de la bûche de Noël mangée en dessert ?", options: ["D'un gâteau russe", "D'une vraie bûche brûlée dans l'âtre", "D'une fête romaine du blé", "D'un pâtissier américain"], answerIndex: 1 },
+        { q: "Quel prince a popularisé le sapin de Noël en Angleterre aux côtés de la reine Victoria ?", options: ["Prince Albert", "George IV", "Édouard VII", "Guillaume IV"], answerIndex: 0 },
+        { q: "Dans quel célèbre film de Noël Hugh Grant incarne-t-il le Premier ministre britannique ?", options: ["Love Actually", "The Holiday", "Coup de foudre à Notting Hill", "Bridget Jones"], answerIndex: 0 }
+    ]},
+    16: { type: "annee", title: "Le Train Magique", target: "Sortie du film d'animation 'Le Pôle Express'", clue: "Le chef-d'œuvre de Robert Zemeckis avec Tom Hanks.", actualYear: 2004 },
+    17: { type: "juste_prix", title: "Plaid Chauffant XXL Fausse Fourrure", item: "Plaid chauffant électrique 180x130cm", description: "Couverture chauffante ultra-douce avec 6 niveaux de chaleur pour l'hiver.", actualPrice: 55, imageUrl: "https://images.unsplash.com/photo-1584100936595-c0654b55a2e2?w=600" },
+    18: { type: "pendu", title: "Esprit Farceur", word: "LUTIN FARCEUR", clue: "Petite créature 'Elf on the Shelf' qui fait des bêtises la nuit dans la maison." },
+    19: { type: "quiz", title: "Légendes Internationales", questions: [
+        { q: "En Espagne, comment appelle-t-on la célèbre loterie géante de Noël du 22 décembre ?", options: ["El Niño", "El Gordo", "La Primitiva", "Bonoloto"], answerIndex: 1 },
+        { q: "En Italie, qui apporte des douceurs aux enfants la nuit de l'Épiphanie le 6 janvier ?", options: ["Babbo Natale", "La Befana", "San Nicola", "Strega Nona"], answerIndex: 1 },
+        { q: "Quel objet magique donne vie au bonhomme de neige Frosty dans la chanson légendaire ?", options: ["Son écharpe", "Son balai", "Un vieux chapeau en soie", "Son nez en carotte"], answerIndex: 2 }
+    ]},
+    20: { type: "annee", title: "La Nintendo Switch", target: "Lancement mondial de la console Nintendo Switch", clue: "Avec Zelda Breath of the Wild au lancement.", actualYear: 2017 },
+    21: { type: "juste_prix", title: "Appareil à Raclette Traditionnelle", item: "Appareil à raclette 1/2 meule d'alpage", description: "Pour racler directement la meule dorée comme dans un chalet savoyard.", actualPrice: 160, imageUrl: "https://images.unsplash.com/photo-1541544741938-0af808871cc0?w=600" },
+    22: { type: "pendu", title: "Délicatesse Sucrée", word: "MARRON GLACE", clue: "Châtaigne noble confite dans un sirop vanillé puis glacée au sucre." },
+    23: { type: "quiz", title: "Ultime Tour de Table", questions: [
+        { q: "Dans quelle comédie Will Ferrell incarne-t-il un humain élevé par les lutins du Père Noël ?", options: ["Elfe", "Le Grinch", "Super Noël", "Bad Santa"], answerIndex: 0 },
+        { q: "Dans quelle ville peut-on admirer le sapin géant illuminé du Rockefeller Center ?", options: ["Chicago", "New York", "Boston", "Toronto"], answerIndex: 1 },
+        { q: "Dans 'Le Père Noël est une ordure', de quelle couleur est le célèbre gilet tricoté par Thérèse ?", options: ["Bleu canard", "Gris souris", "Marron", "Vert bouteille"], answerIndex: 1 }
+    ]},
+    24: { type: "annee", title: "Le Réveillon de John McClane", target: "Sortie du film culte 'Piège de Cristal' (Die Hard)", clue: "Bruce Willis seul contre les terroristes dans la tour Nakatomi Plaza.", actualYear: 1988 }
+};
+
+// Stockage des scores de l'utilisateur courant
+const userPlayedDays = {}; // { dayNumber: { pointsEarned, userAnswer } }
+
+// Calcul des points
+function calcJustePrixScore(guess, actual) {
+    const errorRatio = Math.abs(guess - actual) / actual;
+    return Math.max(0, Math.round(100 * Math.max(0, 1 - errorRatio)));
+}
+function calcPenduScore(livesLeft, won) {
+    return won ? Math.min(100, livesLeft * 15 + 10) : 0;
+}
+function calcQuizScore(selectedAnswers, questions) {
+    let pts = 0;
+    let allGood = true;
+    questions.forEach((q, idx) => {
+        if (selectedAnswers[idx] === q.answerIndex) {
+            pts += 30;
+        } else {
+            allGood = false;
+        }
+    });
+    if (allGood && questions.length === 3) pts += 10; // Bonus 100 max
+    return pts;
+}
+function calcAnneeScore(guess, actual) {
+    return Math.max(0, 100 - Math.abs(guess - actual) * 10);
+}
+
+// Navigation par onglets
+const tabBtnCalendar = document.getElementById("tabBtnCalendar");
+const tabBtnLeaderboard = document.getElementById("tabBtnLeaderboard");
+const sectionCalendar = document.getElementById("sectionCalendar");
+const sectionLeaderboard = document.getElementById("sectionLeaderboard");
+
+tabBtnCalendar.onclick = () => {
+    tabBtnCalendar.classList.add("active");
+    tabBtnLeaderboard.classList.remove("active");
+    sectionCalendar.classList.add("active");
+    sectionLeaderboard.classList.remove("active");
+};
+
+tabBtnLeaderboard.onclick = () => {
+    tabBtnLeaderboard.classList.add("active");
+    tabBtnCalendar.classList.remove("active");
+    sectionLeaderboard.classList.add("active");
+    sectionCalendar.classList.remove("active");
+};
+
+// Affichage de la grille du calendrier
+const calendarGrid = document.getElementById("calendarGrid");
+const gameModal = document.getElementById("gameModal");
+const closeModalBtn = document.getElementById("closeModalBtn");
+const modalGameTitle = document.getElementById("modalGameTitle");
+const modalGameBody = document.getElementById("modalGameBody");
+
+function getTypeLabel(type) {
+    switch (type) {
+        case "juste_prix": return "🏷️ Juste Prix";
+        case "pendu": return "🔤 Pendu";
+        case "quiz": return "❓ Quiz";
+        case "annee": return "⏳ Année";
+        default: return "🎁 Surprise";
+    }
+}
+
+function renderCalendarGrid() {
+    calendarGrid.innerHTML = "";
+    const todayDay = new Date().getDate();
+    const isDecember = new Date().getMonth() === 11;
+
+    for (let day = 1; day <= 24; day++) {
+        const game = GAMES_CATALOG[day];
+        const card = document.createElement("div");
+        const isCompleted = !!userPlayedDays[day];
+        const isLocked = !unlockAllDays && (!isDecember || todayDay < day);
+
+        card.className = `day-card ${isCompleted ? 'completed' : ''} ${isLocked ? 'locked' : ''}`;
+        
+        let statusText = isCompleted ? `⭐ ${userPlayedDays[day].pointsEarned} pts` : (isLocked ? "🔒 Bloqué" : "À jouer");
+
+        card.innerHTML = `
+            <span class="day-badge-type">${getTypeLabel(game.type)}</span>
+            <span class="day-number">${day}</span>
+            <span class="day-status">${statusText}</span>
+        `;
+
+        card.onclick = () => {
+            if (isLocked) {
+                alert(`Patience ! Cette case ne s'ouvre que le ${day} décembre 🎅`);
+                return;
+            }
+            openGameModal(day);
+        };
+
+        calendarGrid.appendChild(card);
+    }
+
+    // Mise à jour des stats globales du joueur
+    let totalScore = 0;
+    let completedCount = 0;
+    Object.values(userPlayedDays).forEach(entry => {
+        totalScore += entry.pointsEarned || 0;
+        completedCount++;
+    });
+    userStatsLabel.textContent = `Score : ${totalScore} pts • ${completedCount}/24 validé${completedCount > 1 ? 's' : ''}`;
+}
+
+// Ouvrir le modal pour jouer ou voir le score
+function openGameModal(day) {
+    const game = GAMES_CATALOG[day];
+    modalGameTitle.innerHTML = `<span>Jour ${day} • ${getTypeLabel(game.type)}</span>`;
+    modalGameBody.innerHTML = "";
+
+    if (typeof playSound === 'function') playSound("bell");
+
+    if (userPlayedDays[day]) {
+        // Déjà joué
+        const res = userPlayedDays[day];
+        modalGameBody.innerHTML = `
+            <div class="finished-game-box">
+                <h2>🎉 Jour ${day} Déjà Complété !</h2>
+                <div class="score-circle">
+                    <span class="score-circle-num">${res.pointsEarned}</span>
+                    <span class="score-circle-label">POINTS</span>
+                </div>
+                <p>Ton score est enregistré au classement général de la famille.</p>
+                <div class="clue-scroll" style="width: 100%; box-sizing: border-box;">
+                    <strong>Défi :</strong> ${game.title}
+                </div>
+                <button type="button" class="btn-validate-game" style="width: 100%;" id="btnOkFinished">Fermer</button>
+            </div>
+        `;
+        document.getElementById("btnOkFinished").onclick = closeGameModal;
+    } else {
+        // Jeu interactif
+        renderInteractiveGame(day, game);
+    }
+
+    gameModal.style.display = "flex";
+}
+
+function closeGameModal() {
+    gameModal.style.display = "none";
+}
+closeModalBtn.onclick = closeGameModal;
+gameModal.onclick = (e) => {
+    if (e.target === gameModal) closeGameModal();
+};
+
+// Rendu des 4 mini-jeux
+function renderInteractiveGame(day, game) {
+    if (game.type === "juste_prix") {
+        modalGameBody.innerHTML = `
+            <div>
+                <img src="${game.imageUrl}" alt="${game.item}" class="game-item-img">
+                <h3 style="margin: 10px 0 4px 0; color: var(--gold, #ffd700);">${game.item}</h3>
+                <p style="font-size: 0.9rem; opacity: 0.9; margin: 0 0 10px 0;">${game.description}</p>
+                
+                <div class="clue-scroll">
+                    💡 <strong>Objectif :</strong> Devine le prix exact en euros TTC de cet objet dans le commerce !
+                </div>
+
+                <div class="price-input-row">
+                    <input type="number" id="priceGuessInput" class="price-input" placeholder="Ex: 45 €" min="1" step="1" autofocus>
+                </div>
+
+                <div class="quick-step-btns">
+                    <button type="button" class="quick-step-btn" data-step="-10">-10€</button>
+                    <button type="button" class="quick-step-btn" data-step="-1">-1€</button>
+                    <button type="button" class="quick-step-btn" data-step="+1">+1€</button>
+                    <button type="button" class="quick-step-btn" data-step="+10">+10€</button>
+                </div>
+
+                <button type="button" class="btn-validate-game" id="btnSubmitPrice">Valider mon estimation 🎁</button>
+            </div>
+        `;
+
+        const priceInput = document.getElementById("priceGuessInput");
+        modalGameBody.querySelectorAll(".quick-step-btn").forEach(btn => {
+            btn.onclick = () => {
+                let cur = parseInt(priceInput.value, 10) || 0;
+                let step = parseInt(btn.dataset.step, 10);
+                priceInput.value = Math.max(1, cur + step);
+            };
+        });
+
+        document.getElementById("btnSubmitPrice").onclick = async () => {
+            const val = parseFloat(priceInput.value);
+            if (!val || val <= 0) {
+                alert("Entre un prix valide en euros ! 🎅");
+                return;
+            }
+            const pts = calcJustePrixScore(val, game.actualPrice);
+            await recordScore(day, game.type, val, pts, `Prix réel : ${game.actualPrice}€ • Ton estimation : ${val}€`);
+        };
+
+    } else if (game.type === "pendu") {
+        const word = game.word.toUpperCase();
+        let guessedLetters = new Set([' ', '-', "'"]);
+        let mistakes = 0;
+        const maxMistakes = 6;
+
+        function renderPenduDOM() {
+            modalGameBody.innerHTML = `
+                <div>
+                    <div class="pendu-lives-bar">
+                        <span>💡 <strong>Pendu de Noël</strong></span>
+                        <span>❤️ Vies : ${maxMistakes - mistakes}/${maxMistakes}</span>
+                    </div>
+
+                    <div class="clue-scroll" style="margin-top: 10px;">
+                        <em>${game.clue}</em>
+                    </div>
+
+                    <div class="pendu-word-box" id="penduWordBox">
+                        ${word.split('').map(c => `
+                            <span class="pendu-letter-slot ${c === ' ' ? 'space' : ''}">
+                                ${guessedLetters.has(c) ? c : (c === ' ' ? '&nbsp;' : '_')}
+                            </span>
+                        `).join('')}
+                    </div>
+
+                    <div class="virtual-keyboard" id="virtualKeyboard">
+                        ${"ABCDEFGHIJKLMNOPQRSTUVWXYZ".split('').map(letter => `
+                            <button type="button" class="vkey-btn" data-l="${letter}" ${guessedLetters.has(letter) || mistakes >= maxMistakes ? 'disabled' : ''}>
+                                ${letter}
+                            </button>
+                        `).join('')}
+                    </div>
+                </div>
+            `;
+
+            modalGameBody.querySelectorAll(".vkey-btn").forEach(btn => {
+                btn.onclick = async () => {
+                    const l = btn.dataset.l;
+                    guessedLetters.add(l);
+                    if (!word.includes(l)) {
+                        mistakes++;
+                    }
+
+                    const won = word.split('').every(c => guessedLetters.has(c));
+                    const lost = mistakes >= maxMistakes;
+
+                    if (won || lost) {
+                        const pts = calcPenduScore(maxMistakes - mistakes, won);
+                        await recordScore(day, game.type, Array.from(guessedLetters).join(''), pts, won ? `Mot trouvé : ${word} ! Bravo !` : `Perdu ! Le mot était : ${word}`);
+                    } else {
+                        renderPenduDOM();
+                    }
+                };
+            });
+        }
+        renderPenduDOM();
+
+    } else if (game.type === "quiz") {
+        let userAnswers = {};
+
+        function renderQuizDOM() {
+            modalGameBody.innerHTML = `
+                <div>
+                    <p style="font-size: 0.9rem; opacity: 0.9; margin: 0 0 10px 0;">Réponds aux 3 questions de culture générale (30 pts par bonne réponse + 10 pts bonus si 3/3 !) :</p>
+                    
+                    ${game.questions.map((q, qIdx) => `
+                        <div class="quiz-question-box">
+                            <div class="quiz-q-title">${qIdx + 1}. ${q.q}</div>
+                            <div class="quiz-options-list">
+                                ${q.options.map((opt, optIdx) => `
+                                    <button type="button" class="quiz-opt-btn ${userAnswers[qIdx] === optIdx ? 'selected' : ''}" data-q="${qIdx}" data-opt="${optIdx}">
+                                        ${opt}
+                                    </button>
+                                `).join('')}
+                            </div>
+                        </div>
+                    `).join('')}
+
+                    <button type="button" class="btn-validate-game" id="btnSubmitQuiz" style="width: 100%;">Valider mes 3 réponses 📝</button>
+                </div>
+            `;
+
+            modalGameBody.querySelectorAll(".quiz-opt-btn").forEach(btn => {
+                btn.onclick = () => {
+                    const qIdx = parseInt(btn.dataset.q, 10);
+                    const optIdx = parseInt(btn.dataset.opt, 10);
+                    userAnswers[qIdx] = optIdx;
+                    renderQuizDOM();
+                };
+            });
+
+            document.getElementById("btnSubmitQuiz").onclick = async () => {
+                if (Object.keys(userAnswers).length < game.questions.length) {
+                    alert("Sélectionne une réponse pour chacune des 3 questions ! 🎅");
+                    return;
+                }
+                const pts = calcQuizScore(userAnswers, game.questions);
+                await recordScore(day, game.type, userAnswers, pts, `Score au Quiz : ${pts}/100 pts`);
+            };
+        }
+        renderQuizDOM();
+
+    } else if (game.type === "annee") {
+        modalGameBody.innerHTML = `
+            <div>
+                <h3 style="color: var(--gold, #ffd700); font-size: 1.3rem; margin: 0 0 8px 0;">${game.target}</h3>
+                <div class="clue-scroll">
+                    💡 <strong>Indice :</strong> ${game.clue}
+                </div>
+
+                <p style="margin: 15px 0 8px 0; font-size: 0.95rem;">En quelle année cela s'est-il passé ? (100 pts si exact, -10 pts par an d'écart)</p>
+
+                <div class="price-input-row">
+                    <input type="number" id="yearGuessInput" class="price-input" placeholder="Ex: 1994" min="1900" max="2026" autofocus>
+                </div>
+
+                <button type="button" class="btn-validate-game" id="btnSubmitYear" style="width: 100%;">Confirmer l'année ⏳</button>
+            </div>
+        `;
+
+        document.getElementById("btnSubmitYear").onclick = async () => {
+            const yr = parseInt(document.getElementById("yearGuessInput").value, 10);
+            if (!yr || yr < 1900 || yr > 2026) {
+                alert("Entre une année valide à 4 chiffres (ex: 1990) ! 🎅");
+                return;
+            }
+            const pts = calcAnneeScore(yr, game.actualYear);
+            await recordScore(day, game.type, yr, pts, `Année réelle : ${game.actualYear} • Ton choix : ${yr}`);
+        };
+    }
+}
+
+// Enregistrement du score dans Firestore et affichage
+async function recordScore(day, gameType, answer, points, message) {
+    const docId = `${userId}_day_${day}`;
+    const scoreData = {
+        userId: userId,
+        userName: currentUserName,
+        userAvatar: currentUserAvatar,
+        day: day,
+        gameType: gameType,
+        userAnswer: answer,
+        pointsEarned: points,
+        timestamp: serverTimestamp()
+    };
+
+    // Mise à jour locale immédiate
+    userPlayedDays[day] = { pointsEarned: points, userAnswer: answer };
+    renderCalendarGrid();
+
+    // Envoi vers Firestore
+    try {
+        await setDoc(doc(db, "scores", docId), scoreData);
+    } catch (e) {
+        console.error("Erreur enregistrement Firestore :", e);
+    }
+
+    // Affichage résultat
+    modalGameBody.innerHTML = `
+        <div class="finished-game-box">
+            <h2>🎉 Bravo ${currentUserName} !</h2>
+            <div class="score-circle">
+                <span class="score-circle-num">${points}</span>
+                <span class="score-circle-label">POINTS</span>
+            </div>
+            <p style="font-size: 1.05rem; font-weight: bold; color: var(--gold, #ffd700);">${message}</p>
+            <p style="font-size: 0.85rem; opacity: 0.9;">Ton score a été envoyé au classement familial en direct !</p>
+            <button type="button" class="btn-validate-game" style="width: 100%;" id="btnCloseGameDone">Continuer 🎄</button>
+        </div>
+    `;
+    document.getElementById("btnCloseGameDone").onclick = closeGameModal;
+}
+
+// Écoute en direct des scores de la famille sur Firestore
+const scoresRef = collection(db, "scores");
+const qScores = query(scoresRef, orderBy("timestamp", "desc"));
+
+onSnapshot(qScores, (snapshot) => {
+    const usersMap = {};
+
+    snapshot.forEach((docSnap) => {
+        const d = docSnap.data();
+        const uId = d.userId || d.userName.toLowerCase();
+
+        // Récupérer les jours joués par l'utilisateur connecté
+        if (uId === userId) {
+            userPlayedDays[d.day] = { pointsEarned: d.pointsEarned, userAnswer: d.userAnswer };
+        }
+
+        if (!usersMap[uId]) {
+            usersMap[uId] = {
+                name: d.userName || "Anonyme",
+                avatar: d.userAvatar || "static/png/naima.png",
+                totalPoints: 0,
+                daysCount: 0
+            };
+        }
+        usersMap[uId].totalPoints += (d.pointsEarned || 0);
+        usersMap[uId].daysCount += 1;
+    });
+
+    renderCalendarGrid();
+    renderLeaderboard(Object.values(usersMap));
+});
+
+// Rendu du Leaderboard
+function renderLeaderboard(playersList) {
+    const podiumContainer = document.getElementById("podiumContainer");
+    const rankList = document.getElementById("rankList");
+
+    playersList.sort((a, b) => b.totalPoints - a.totalPoints);
+
+    if (playersList.length === 0) {
+        podiumContainer.style.display = "none";
+        rankList.innerHTML = `
+            <div style="text-align: center; padding: 25px; color: var(--gold, #ffd700);">
+                🎅 Aucun score enregistré pour le moment. Ouvre une case pour être le premier !
+            </div>
+        `;
+        return;
+    }
+
+    // Top 3 Podium
+    podiumContainer.style.display = "flex";
+    podiumContainer.innerHTML = "";
+
+    const p1 = playersList[0];
+    const p2 = playersList[1];
+    const p3 = playersList[2];
+
+    const podiumOrder = [
+        { player: p2, place: "🥈 2ème", rank: 2 },
+        { player: p1, place: "👑 1er", rank: 1 },
+        { player: p3, place: "🥉 3ème", rank: 3 }
+    ];
+
+    podiumOrder.forEach(item => {
+        if (!item.player) return;
+        const col = document.createElement("div");
+        col.className = "podium-item";
+        col.innerHTML = `
+            <img src="${item.player.avatar}" class="podium-avatar" alt="${item.player.name}">
+            <strong style="font-size: 0.85rem; color: var(--gold, #ffd700);">${item.player.name}</strong>
+            <div class="podium-bar">
+                <span>${item.place}</span>
+                <span class="podium-score">${item.player.totalPoints}</span>
+                <span style="font-size: 0.65rem;">${item.player.daysCount} j</span>
+            </div>
+        `;
+        podiumContainer.appendChild(col);
+    });
+
+    // Liste des rangs
+    rankList.innerHTML = "";
+    playersList.forEach((player, idx) => {
+        const medal = idx === 0 ? "🥇" : (idx === 1 ? "🥈" : (idx === 2 ? "🥉" : `${idx + 1}.`));
+        const row = document.createElement("div");
+        row.className = "rank-row";
+        row.innerHTML = `
+            <div class="rank-left">
+                <span class="rank-number">${medal}</span>
+                <img src="${player.avatar}" class="rank-avatar" alt="${player.name}">
+                <span class="rank-name">${player.name}</span>
+            </div>
+            <div class="rank-right">
+                <div class="rank-pts">${player.totalPoints} pts</div>
+                <div class="rank-days">${player.daysCount}/24 jour${player.daysCount > 1 ? 's' : ''}</div>
+            </div>
+        `;
+        rankList.appendChild(row);
+    });
+}
+
+// Initialisation
+renderCalendarGrid();
+</script>
 </body>
 </html>
