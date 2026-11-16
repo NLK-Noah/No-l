@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const dotenv = require('dotenv');
 const { cert, initializeApp } = require('firebase-admin/app');
-const { getFirestore } = require('firebase-admin/firestore');
+const { getFirestore, Timestamp } = require('firebase-admin/firestore');
 const { getMessaging } = require('firebase-admin/messaging');
 
 const workerDir = __dirname;
@@ -35,7 +35,6 @@ if (process.env.FIREBASE_CONFIG) {
 const app = initializeApp({ credential });
 const db = getFirestore(app);
 const messaging = getMessaging(app);
-let initialSnapshotReceived = false;
 
 function normalize(value) {
   return typeof value === 'string' ? value.trim().toUpperCase() : '';
@@ -67,6 +66,11 @@ async function notifySubscribers(messageId, message) {
       entry.token.length > 0 &&
       normalize(entry.document.get('usernameNormalized') || entry.document.get('username')) !== sender
     );
+
+  if (subscribers.length === 0) {
+    console.log(`[worker] Aucun abonné à notifier pour le message ${messageId}.`);
+    return;
+  }
 
   const body = getMessageBody(message);
   let successCount = 0;
@@ -108,24 +112,31 @@ async function notifySubscribers(messageId, message) {
   );
 }
 
-console.log(`[worker] Écoute de Firestore démarrée pour ${projectId}.`);
+async function runWorker() {
+  console.log(`[worker] Démarrage de la vérification des messages pour ${projectId}...`);
 
-db.collection('messages').onSnapshot(
-  snapshot => {
-    if (!initialSnapshotReceived) {
-      initialSnapshotReceived = true;
-      console.log(`[worker] Démarrage terminé ; ${snapshot.size} message(s) existant(s) ignoré(s).`);
-      return;
-    }
+  const fifteenMinutesAgo = new Date(Date.now() - 15 * 60 * 1000);
+  
+  const snapshot = await db.collection('messages')
+    .where('createdAt', '>=', Timestamp.fromDate(fifteenMinutesAgo))
+    .get();
 
-    for (const change of snapshot.docChanges()) {
-      if (change.type !== 'added') continue;
-      notifySubscribers(change.doc.id, change.doc.data()).catch(error => {
-        console.error(`[worker] Notification du message ${change.doc.id} impossible :`, error);
-      });
-    }
-  },
-  error => {
-    console.error('[worker] Écoute Firestore interrompue :', error);
+  if (snapshot.empty) {
+    console.log('[worker] Aucun nouveau message récent trouvé.');
+    process.exit(0);
   }
-);
+
+  console.log(`[worker] ${snapshot.size} message(s) récent(s) trouvé(s). Traitement en cours...`);
+
+  for (const doc of snapshot.docs) {
+    await notifySubscribers(doc.id, doc.data());
+  }
+
+  console.log('[worker] Traitement terminé avec succès.');
+  process.exit(0);
+}
+
+runWorker().catch(error => {
+  console.error('[worker] Erreur critique :', error);
+  process.exit(1);
+});
