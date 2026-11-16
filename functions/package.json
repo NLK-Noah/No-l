@@ -6,7 +6,7 @@
     "node": "22"
   },
   "scripts": {
-    "deploy": "firebase deploy --only functions"
+    "deploy": "firebase deploy --only functions:default"
   },
   "dependencies": {
     "firebase-admin": "^14.5.1",

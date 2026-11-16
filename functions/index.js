@@ -1,7 +1,9 @@
-const { initializeApp } = require("firebase-admin/app");
+"use strict";
+
+const functions = require("firebase-functions/v1");
 const { getFirestore } = require("firebase-admin/firestore");
 const { getMessaging } = require("firebase-admin/messaging");
-const { onDocumentCreated } = require("firebase-functions/v2/firestore");
+const { initializeApp } = require("firebase-admin/app");
 
 initializeApp();
 
@@ -30,52 +32,81 @@ function messageBody(message) {
 
 async function sendToTokenDocuments(tokenDocuments, title, body, url, tag) {
   const usableTokens = tokenDocuments
-    .map(document => ({ document, token: document.get("token") }))
-    .filter(entry => typeof entry.token === "string" && entry.token.length > 0);
+    .map((document) => ({
+      document,
+      token: document.get("token"),
+    }))
+    .filter((entry) => typeof entry.token === "string" && entry.token.length > 0);
+
+  if (process.env.FCM_DRY_RUN === "1") {
+    console.log(`[FCM dry-run] ${title} — ${usableTokens.length} jeton(s), destination ${url}.`);
+    return;
+  }
 
   for (let offset = 0; offset < usableTokens.length; offset += 500) {
     const batch = usableTokens.slice(offset, offset + 500);
     const result = await getMessaging().sendEachForMulticast({
-      tokens: batch.map(entry => entry.token),
-      data: { title, body, url, tag }
+      tokens: batch.map((entry) => entry.token),
+      data: { title, body, url, tag },
     });
-    const staleDocuments = [];
+    const staleTokenDeletes = [];
 
     result.responses.forEach((response, index) => {
       const code = response.error?.code;
-      if (code === "messaging/invalid-registration-token" ||
-          code === "messaging/registration-token-not-registered") {
-        staleDocuments.push(batch[index].document.ref.delete());
+      if (
+        code === "messaging/invalid-registration-token" ||
+        code === "messaging/registration-token-not-registered"
+      ) {
+        staleTokenDeletes.push(batch[index].document.ref.delete());
+      } else if (response.error) {
+        console.error(`[FCM] Échec d'envoi (${code || "erreur inconnue"}).`);
       }
     });
 
-    await Promise.all(staleDocuments);
+    await Promise.all(staleTokenDeletes);
+    console.log(
+      `[FCM] ${result.successCount} envoyé(s), ${result.failureCount} échec(s).`
+    );
   }
 }
 
-exports.notifyGeneralDiscussion = onDocumentCreated("messages/{messageId}", async event => {
-  const message = event.data?.data();
-  const sender = normalize(message?.sender);
-  if (!message || !sender) return;
+async function getTokenDocuments(excludedUser = "") {
+  const snapshot = await db.collection("fcm_tokens").get();
+  return snapshot.docs.filter((document) => {
+    const username = normalize(
+      document.get("usernameNormalized") || document.get("username")
+    );
+    return !excludedUser || username !== excludedUser;
+  });
+}
 
-  const tokenSnapshot = await db.collection("notificationTokens")
-    .where("usernameNormalized", "!=", sender)
-    .get();
-  await sendToTokenDocuments(
-    tokenSnapshot.docs,
-    `💬 ${message.sender} (Discussion)`,
-    messageBody(message),
-    "./rapporte.html",
-    event.params.messageId
-  );
-});
-
-exports.notifySecretDiscussion = onDocumentCreated(
-  "chats/{chatId}/messages/{messageId}",
-  async event => {
-    const message = event.data?.data();
+exports.notifyGeneralDiscussion = functions.firestore
+  .document("messages/{messageId}")
+  .onCreate(async (snapshot, context) => {
+    const message = snapshot.data();
     const sender = normalize(message?.sender);
-    if (!message || !sender) return;
+    if (!message || !sender) {
+      console.warn(`[Firestore] Message ${context.params.messageId} ignoré : auteur absent.`);
+      return null;
+    }
+
+    const tokens = await getTokenDocuments(sender);
+    await sendToTokenDocuments(
+      tokens,
+      `💬 ${message.sender} (Discussion)`,
+      messageBody(message),
+      "./rapporte.html",
+      context.params.messageId
+    );
+    return null;
+  });
+
+exports.notifySecretDiscussion = functions.firestore
+  .document("chats/{chatId}/messages/{messageId}")
+  .onCreate(async (snapshot, context) => {
+    const message = snapshot.data();
+    const sender = normalize(message?.sender);
+    if (!message || !sender) return null;
 
     const resultsSnapshot = await db.collection("results").get();
     let notification = null;
@@ -83,35 +114,39 @@ exports.notifySecretDiscussion = onDocumentCreated(
     for (const result of resultsSnapshot.docs) {
       const { player, picked } = result.data();
       if (typeof player !== "string" || typeof picked !== "string") continue;
-      if (chatIdFor(player, picked) !== event.params.chatId) continue;
+      if (chatIdFor(player, picked) !== context.params.chatId) continue;
 
       if (sender === normalize(player)) {
         notification = {
-          recipient: picked,
+          recipient: normalize(picked),
           title: "🎅 Ton Père Noël secret",
-          url: "./aup.html"
+          url: "./aup.html",
         };
       } else if (sender === normalize(picked)) {
         notification = {
-          recipient: player,
+          recipient: normalize(player),
           title: `🧝 Ton lutin secret (${picked})`,
-          url: "./auf.html"
+          url: "./auf.html",
         };
       }
       break;
     }
 
-    if (!notification) return;
+    if (!notification) return null;
 
-    const tokenSnapshot = await db.collection("notificationTokens")
-      .where("usernameNormalized", "==", normalize(notification.recipient))
-      .get();
+    const tokenDocuments = await getTokenDocuments();
+    const tokens = tokenDocuments.filter((document) => {
+      const username = normalize(
+        document.get("usernameNormalized") || document.get("username")
+      );
+      return username === notification.recipient;
+    });
     await sendToTokenDocuments(
-      tokenSnapshot.docs,
+      tokens,
       notification.title,
       messageBody(message),
       notification.url,
-      event.params.messageId
+      context.params.messageId
     );
-  }
-);
+    return null;
+  });

@@ -42,7 +42,7 @@
     messagingSenderId: "238129661360",
     appId: "1:238129661360:web:d6ccb73539dc67d9f68275"
   };
-  const FCM_VAPID_KEY = 'BP-4pla1fRxMG6tQNqk3iD7kNt6K2aKCD-j4w7tQdymme8JkzeXjqwUpJAVpcuGbKvaMC-HsRu77dxcnx3P0mF4';
+  const VAPID_KEY = 'BKhJsU8Wx4GelZhOTs43Ai1NMAAM_mx0dS8PyGiQEdaF5FCiu1gwS0IeuZhV0ffnfcT8KldmtJec9mpEv28M3b8';
 
   async function getFirebaseApp() {
     const { initializeApp, getApps } = await import("https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js");
@@ -50,7 +50,7 @@
   }
 
   async function registerFcmToken() {
-    if (FCM_VAPID_KEY.startsWith('REPLACE_')) {
+    if (VAPID_KEY.startsWith('REPLACE_')) {
       throw new Error('La clé VAPID FCM doit être configurée.');
     }
 
@@ -67,10 +67,17 @@
     }
 
     const app = await getFirebaseApp();
-    const registration = await navigator.serviceWorker.ready;
+    if (!('serviceWorker' in navigator)) {
+      throw new Error('Les Service Workers ne sont pas pris en charge par ce navigateur.');
+    }
+
+    const swUrl = new URL('./sw.js', window.location.href);
+    const swScope = new URL('./', window.location.href).pathname;
+    const registration = await navigator.serviceWorker.register(swUrl, { scope: swScope });
+    swRegistration = registration;
     const messaging = messagingSdk.getMessaging(app);
     const token = await messagingSdk.getToken(messaging, {
-      vapidKey: FCM_VAPID_KEY,
+      vapidKey: VAPID_KEY,
       serviceWorkerRegistration: registration
     });
 
@@ -85,7 +92,7 @@
 
     if (tokenId !== lastTokenId || usernameNormalized !== lastUsername) {
       const { doc, getFirestore, serverTimestamp, setDoc } = firestoreSdk;
-      await setDoc(doc(getFirestore(app), 'notificationTokens', tokenId), {
+      await setDoc(doc(getFirestore(app), 'fcm_tokens', tokenId), {
         token,
         username,
         usernameNormalized,
@@ -484,7 +491,7 @@
 
     if (notifManager.isSupported && Notification.permission === 'granted') {
       notifManager.checkDailyAdventReminder();
-      if (!FCM_VAPID_KEY.startsWith('REPLACE_')) {
+      if (!VAPID_KEY.startsWith('REPLACE_')) {
         registerFcmToken().catch(err => {
           console.error('[FCM] Actualisation du jeton impossible :', err);
         });
@@ -525,9 +532,8 @@
         <div class="ios-install-body">
           Pour installer l'application de Noël sur ton écran d'accueil :
           <ol class="ios-install-steps">
-            <li>Appuie sur le bouton <strong>Partager</strong> en bas de Safari <span class="ios-install-icon-share">⎋</span></li>
-            <li>Fais défiler et sélectionne <strong>"Sur l'écran d'accueil" ➕</strong></li>
-            <li>Valide en haut à droite sur <strong>"Ajouter"</strong> ✨</li>
+            <li>Appuie sur <strong>Partager</strong> (carré avec une flèche), puis sur <strong>« Sur l'écran d'accueil »</strong>.</li>
+            <li>Ouvre ensuite l'application depuis sa nouvelle icône pour activer les notifications.</li>
           </ol>
         </div>
       `;
@@ -548,8 +554,9 @@
     btn.id = 'notifBellBtn';
     btn.className = `notif-floating-btn ${notifManager.permission !== 'granted' ? 'has-badge' : ''}`;
     btn.type = 'button';
-    btn.title = 'Gérer les notifications de Noël 🔔';
-    btn.innerHTML = '🔔';
+    btn.title = 'Activer les notifications';
+    btn.setAttribute('aria-label', 'Activer les notifications');
+    btn.innerHTML = '🔔 <span>Activer les notifications</span>';
     btn.onclick = openNotificationModal;
 
     document.body.appendChild(btn);

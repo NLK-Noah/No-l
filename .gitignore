@@ -1,1 +1,5 @@
 .aider*
+.env
+serviceAccountKey.json
+/worker/.env
+/worker/serviceAccountKey.json
