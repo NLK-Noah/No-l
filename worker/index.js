@@ -11,12 +11,13 @@ const workerDir = __dirname;
 dotenv.config({ path: path.join(workerDir, '.env') });
 
 let credential;
+let projectId = 'inconnu';
 
 if (process.env.FIREBASE_CONFIG) {
-    // Si on est sur GitHub Actions, on lit le secret directement sous forme de texte/objet JSON
-    credential = cert(JSON.parse(process.env.FIREBASE_CONFIG));
+    const serviceAccountConfig = JSON.parse(process.env.FIREBASE_CONFIG);
+    credential = cert(serviceAccountConfig);
+    projectId = serviceAccountConfig.project_id || 'projet-firebase';
 } else {
-    // Sinon, on cherche le fichier localement (pour ton Mac)
     const credentialPath = path.resolve(
         workerDir,
         process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 'serviceAccountKey.json'
@@ -26,12 +27,12 @@ if (process.env.FIREBASE_CONFIG) {
             `Compte de service introuvable : ${credentialPath}. Définissez FIREBASE_SERVICE_ACCOUNT_PATH ou le secret FIREBASE_CONFIG.`
         );
     }
-    credential = cert(require(credentialPath));
+    const serviceAccount = require(credentialPath);
+    credential = cert(serviceAccount);
+    projectId = serviceAccount.project_id || 'projet-firebase';
 }
 
 const app = initializeApp({ credential });
-const db = getFirestore(app);
-const messaging = getMessaging(app);
 const db = getFirestore(app);
 const messaging = getMessaging(app);
 let initialSnapshotReceived = false;
@@ -107,7 +108,7 @@ async function notifySubscribers(messageId, message) {
   );
 }
 
-console.log(`[worker] Écoute de Firestore démarrée pour ${serviceAccount.project_id}.`);
+console.log(`[worker] Écoute de Firestore démarrée pour ${projectId}.`);
 
 db.collection('messages').onSnapshot(
   snapshot => {
