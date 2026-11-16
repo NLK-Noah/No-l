@@ -1,11 +1,11 @@
 name: Run Notification Worker
 
 on:
-  # Optionnel : Exécuter automatiquement toutes les 10 minutes pour vérifier les nouveaux messages
+  # Exécuter automatiquement toutes les 10 minutes pour vérifier les nouveaux messages
   schedule:
     - cron: '*/10 * * * *'
   
-  # Permet aussi de le lancer manuellement depuis l'onglet "Actions" de ton GitHub
+  # Permet de le lancer manuellement depuis l'onglet "Actions" de GitHub
   workflow_dispatch:
 
 jobs:
@@ -22,11 +22,10 @@ jobs:
 
       - name: Installer les dépendances du worker
         run: npm install
-        working-directory: ./worker # (Adapte si ton dossier s'appelle différemment, ex: functions)
+        working-directory: ./worker
 
       - name: Lancer le worker
         env:
-          # Tu pourras stocker ta clé secrète Firebase dans les Secrets GitHub
           FIREBASE_CONFIG: ${{ secrets.FIREBASE_CONFIG }}
         run: node index.js
         working-directory: ./worker

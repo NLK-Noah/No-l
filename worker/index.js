@@ -10,20 +10,28 @@ const { getMessaging } = require('firebase-admin/messaging');
 const workerDir = __dirname;
 dotenv.config({ path: path.join(workerDir, '.env') });
 
-const credentialPath = path.resolve(
-  workerDir,
-  process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 'serviceAccountKey.json'
-);
+let credential;
 
-if (!fs.existsSync(credentialPath)) {
-  throw new Error(
-    `Compte de service introuvable : ${credentialPath}. ` +
-    'Définissez FIREBASE_SERVICE_ACCOUNT_PATH dans worker/.env.'
-  );
+if (process.env.FIREBASE_CONFIG) {
+    // Si on est sur GitHub Actions, on lit le secret directement sous forme de texte/objet JSON
+    credential = cert(JSON.parse(process.env.FIREBASE_CONFIG));
+} else {
+    // Sinon, on cherche le fichier localement (pour ton Mac)
+    const credentialPath = path.resolve(
+        workerDir,
+        process.env.FIREBASE_SERVICE_ACCOUNT_PATH || 'serviceAccountKey.json'
+    );
+    if (!fs.existsSync(credentialPath)) {
+        throw new Error(
+            `Compte de service introuvable : ${credentialPath}. Définissez FIREBASE_SERVICE_ACCOUNT_PATH ou le secret FIREBASE_CONFIG.`
+        );
+    }
+    credential = cert(require(credentialPath));
 }
 
-const serviceAccount = require(credentialPath);
-const app = initializeApp({ credential: cert(serviceAccount) });
+const app = initializeApp({ credential });
+const db = getFirestore(app);
+const messaging = getMessaging(app);
 const db = getFirestore(app);
 const messaging = getMessaging(app);
 let initialSnapshotReceived = false;
